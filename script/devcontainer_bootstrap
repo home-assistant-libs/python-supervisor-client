@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+uv pip install -U setuptools uv
+uv pip install --compile -r requirements.txt -r requirements_tests.txt
+uv pip install tox

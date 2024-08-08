@@ -1,0 +1,8 @@
+{
+  "result": "ok",
+  "data": {
+    "message": "Missing option 'server' in root in Terminal & SSH (core_ssh). Got {'bad': 'config'}",
+    "valid": false,
+    "pwned": false
+  }
+}

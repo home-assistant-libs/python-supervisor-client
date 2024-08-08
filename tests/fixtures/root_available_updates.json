@@ -1,0 +1,17 @@
+{
+  "result": "ok",
+  "data": {
+    "available_updates": [
+      {
+        "update_type": "core",
+        "panel_path": "/update-available/core",
+        "version_latest": "2024.9.0.dev202408010224"
+      },
+      {
+        "update_type": "os",
+        "panel_path": "/update-available/os",
+        "version_latest": "13.0.dev20240802"
+      }
+    ]
+  }
+}

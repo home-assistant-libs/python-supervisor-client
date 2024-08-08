@@ -1,0 +1,32 @@
+FROM mcr.microsoft.com/devcontainers/python:1-3.12
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Uninstall pre-installed formatting and linting tools
+# They would conflict with our pinned versions
+RUN \
+    pipx uninstall mypy \
+    && pipx uninstall pylint
+
+# Install uv
+RUN pip3 install --no-cache-dir uv==0.2.26
+
+# Make venv
+USER vscode
+ENV VIRTUAL_ENV="/home/vscode/.local/ha-venv"
+RUN uv venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+WORKDIR /tmp
+
+# Copy in bootstrap script
+COPY script/devcontainer_bootstrap /usr/bin
+
+# Install Python dependencies from requirements
+COPY requirements.txt requirements_tests.txt ./
+RUN uv pip install --no-cache-dir -r requirements.txt -r requirements_tests.txt
+
+WORKDIR /workspaces
+
+# Set the default shell to bash instead of sh
+ENV SHELL /bin/bash
