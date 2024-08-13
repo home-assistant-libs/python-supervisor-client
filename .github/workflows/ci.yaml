@@ -318,7 +318,7 @@ jobs:
         run: |
           . venv/bin/activate
           # Required for metadata request from code for version info
-          pip install
+          pip install -e .
       - name: Run pytest
         run: |
           . venv/bin/activate
