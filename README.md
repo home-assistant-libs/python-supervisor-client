@@ -55,6 +55,7 @@ Fork ([https://github.com/home-assistant-libs/python-supervisor-client/fork](htt
 From within the devcontainer, open terminal and do the following:
 
 ```shell
+uv pip install -e .
 export SUPERVISOR_API_HOST=http://192.168.1.2
 export SUPERVISOR_TOKEN=replace_this_with_remote_api_token
 python examples/connectivity_test.py
