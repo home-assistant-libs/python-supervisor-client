@@ -18,9 +18,6 @@ if not SUPERVISOR_TOKEN:
 
 client = SupervisorClient(SUPERVISOR_API_HOST, SUPERVISOR_TOKEN)
 
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
-
 
 async def get_info() -> RootInfo:
     """Get root info."""
@@ -28,5 +25,5 @@ async def get_info() -> RootInfo:
         return await client.info()
 
 
-info = loop.run_until_complete(get_info())
+info = asyncio.run(get_info())
 print(json.dumps(info.to_dict(), indent=4))  # noqa: T201

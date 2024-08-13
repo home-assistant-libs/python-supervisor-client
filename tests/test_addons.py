@@ -8,8 +8,11 @@ from aiosupervisor.models import (
     AddonBoot,
     AddonsOptions,
     AddonsSecurityOptions,
+    AddonStage,
     AddonState,
     AddonsUninstall,
+    Capability,
+    SupervisorRole,
 )
 
 from . import load_fixture
@@ -29,7 +32,10 @@ async def test_addons_list(
     assert addons[0].icon is True
     assert addons[0].logo is True
     assert addons[0].state == AddonState.STARTED
+    assert addons[0].stage == AddonStage.STABLE
     assert addons[1].slug == "a0d7b954_vscode"
+    assert addons[2].slug == "local_example"
+    assert addons[2].stage == "not_real"
 
 
 async def test_addons_info(
@@ -49,6 +55,10 @@ async def test_addons_info(
     assert addon.watchdog is False
     assert addon.auto_update is False
     assert addon.ip_address == "172.30.33.0"
+    assert Capability.NET_RAW in addon.privileged
+    assert "not_real" in addon.privileged
+    assert addon.supervisor_api is True
+    assert addon.supervisor_role == SupervisorRole.MANAGER
 
 
 async def test_addons_uninstall(

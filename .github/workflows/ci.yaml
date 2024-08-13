@@ -40,15 +40,14 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-${{
-            hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            hashFiles('requirements_dev.txt') }}
       - name: Create Python virtual environment
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
           python -m venv venv
           . venv/bin/activate
           pip install -U pip setuptools
-          pip install -r requirements.txt -r requirements_tests.txt
+          pip install -r requirements_dev.txt
       - name: Restore pre-commit environment from cache
         id: cache-precommit
         uses: actions/cache@v4.0.2
@@ -85,8 +84,7 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ needs.prepare.outputs.python-version
-            }}-${{ hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            }}-${{ hashFiles('requirements_dev.txt') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -132,8 +130,7 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ needs.prepare.outputs.python-version
-            }}-${{ hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            }}-${{ hashFiles('requirements_dev.txt') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -179,8 +176,7 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ needs.prepare.outputs.python-version
-            }}-${{ hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            }}-${{ hashFiles('requirements_dev.txt') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -269,8 +265,7 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ needs.prepare.outputs.python-version
-            }}-${{ hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            }}-${{ hashFiles('requirements_dev.txt') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -303,8 +298,7 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ needs.prepare.outputs.python-version
-            }}-${{ hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            }}-${{ hashFiles('requirements_dev.txt') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -320,6 +314,11 @@ jobs:
           # However this plugin is fairly new and doesn't run correctly
           # on a non-GitHub environment.
           pip install pytest-github-actions-annotate-failures
+      - name: Install aiosupervisor
+        run: |
+          . venv/bin/activate
+          # Required for metadata request from code for version info
+          pip install
       - name: Run pytest
         run: |
           . venv/bin/activate
@@ -355,8 +354,7 @@ jobs:
           path: venv
           key: |
             ${{ runner.os }}-venv-${{ needs.prepare.outputs.python-version
-            }}-${{ hashFiles('requirements.txt') }}-${{
-            hashFiles('requirements_tests.txt') }}
+            }}-${{ hashFiles('requirements_dev.txt') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |

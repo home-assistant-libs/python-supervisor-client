@@ -16,6 +16,7 @@ from aiosupervisor import (
     SupervisorNotFoundError,
     SupervisorServiceUnavailableError,
 )
+from aiosupervisor.models import HostFeature, SupervisorState, UpdateType
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -62,7 +63,9 @@ async def test_info(responses: aioresponses, supervisor_client: SupervisorClient
     assert info.hostname == "homeassistant"
     assert info.arch == "aarch64"
     assert info.supported is True
-    assert info.state == "running"
+    assert info.state == SupervisorState.RUNNING
+    assert HostFeature.REBOOT in info.features
+    assert "not_real" in info.features
 
 
 async def test_available_updates(
@@ -75,12 +78,13 @@ async def test_available_updates(
         body=load_fixture("root_available_updates.json"),
     )
     updates = await supervisor_client.available_updates()
-    assert updates[0].update_type == "core"
+    assert updates[0].update_type == UpdateType.CORE
     assert updates[0].panel_path == "/update-available/core"
     assert updates[0].version_latest == "2024.9.0.dev202408010224"
     assert updates[0].name is None
     assert updates[0].icon is None
-    assert updates[1].update_type == "os"
+    assert updates[1].update_type == UpdateType.OS
+    assert updates[2].update_type == "something_new"
 
 
 async def test_refresh_updates(

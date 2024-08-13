@@ -21,9 +21,9 @@ Even better: You could submit a pull request with a fix / new feature!
 1. Search our repository for open or closed [pull requests][prs] that relates
    to your submission. You don't want to duplicate effort.
 
-2. You may merge the pull request in once you have the sign-off of two other
-   developers, or if you do not have permission to do that, you may request
-   the second reviewer to merge it for you.
+2. You may merge the pull request in once you have the sign-off of another
+   developer, or if you do not have permission to do that, you may request
+   the reviewer to merge it for you.
 
 [github]: https://github.com/home-assistant-libs/python-supervisor-client/issues
 [prs]: https://github.com/home-assistant-libs/python-supervisor-client/pulls

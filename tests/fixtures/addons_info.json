@@ -58,7 +58,7 @@
     "host_ipc": false,
     "host_uts": false,
     "host_dbus": true,
-    "privileged": [],
+    "privileged": ["NET_RAW", "not_real"],
     "full_access": false,
     "apparmor": "default",
     "icon": true,

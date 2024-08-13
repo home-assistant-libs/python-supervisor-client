@@ -1,3 +1,10 @@
+# Production requiremetns
+aiohttp==3.9.5
+mashumaro==3.13.1
+orjson==3.10.6
+yarl==1.9.4
+
+# Test requirements
 aioresponses==0.7.6
 codespell==2.3.0
 coverage==7.6.0

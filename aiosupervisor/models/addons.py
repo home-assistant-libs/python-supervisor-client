@@ -13,7 +13,11 @@ from .base import DEFAULT, Options, Request, RequestConfig, ResponseData
 
 
 class AddonStage(StrEnum):
-    """AddonStage type."""
+    """AddonStage type.
+
+    Supervisor may add new AddonStages in future as a non-breaking change.
+    Those should be returned as string in response models until next update.
+    """
 
     STABLE = "stable"
     EXPERIMENTAL = "experimental"
@@ -38,7 +42,11 @@ class CpuArch(StrEnum):
 
 
 class Capability(StrEnum):
-    """Capability type."""
+    """Capability type.
+
+    Supervisor may add new Capabilities in future as a non-breaking change.
+    Those should be returned as string in response models until next update.
+    """
 
     BPF = "BPF"
     DAC_READ_SEARCH = "DAC_READ_SEARCH"
@@ -64,7 +72,11 @@ class AppArmor(StrEnum):
 
 
 class SupervisorRole(StrEnum):
-    """SupervisorRole type."""
+    """SupervisorRole type.
+
+    Supervisor may add new Roles in future as a non-breaking change.
+    Those should be returned as string in response models until next update.
+    """
 
     ADMIN = "admin"
     BACKUP = "backup"
@@ -100,7 +112,7 @@ class AddonInfoBaseFields(ABC):
     name: str
     repository: str
     slug: str
-    stage: AddonStage
+    stage: AddonStage | str
     update_available: bool
     url: str | None
     version_latest: str
@@ -133,7 +145,9 @@ class AddonInfoStoreExtFields(ABC):
 
     # Hassio is deprecated name for supervisor
     supervisor_api: bool = field(metadata=field_options(alias="hassio_api"))
-    supervisor_role: SupervisorRole = field(metadata=field_options(alias="hassio_role"))
+    supervisor_role: SupervisorRole | str = field(
+        metadata=field_options(alias="hassio_role")
+    )
 
 
 @dataclass(frozen=True)
@@ -195,7 +209,7 @@ class InstalledAddonComplete(
     host_ipc: bool
     host_uts: bool
     host_dbus: bool
-    privileged: list[Capability]
+    privileged: list[Capability | str]
     changelog: bool
     stdin: bool
     gpio: bool

@@ -19,7 +19,8 @@
       "resolved",
       "journal",
       "disk",
-      "mount"
+      "mount",
+      "not_real"
     ],
     "machine": "odroid-n2",
     "arch": "aarch64",

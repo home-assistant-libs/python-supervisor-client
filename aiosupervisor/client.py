@@ -1,6 +1,5 @@
 """Internal client for making requests and managing session with Supervisor."""
 
-from collections.abc import Awaitable
 from dataclasses import dataclass, field
 from importlib import metadata
 from typing import Any
@@ -38,7 +37,8 @@ def is_json(response: ClientResponse, raise_on_fail: bool = False) -> bool:
     if "application/json" not in content_type:
         if raise_on_fail:
             raise SupervisorError(
-                f"Unexpected response received from supervisor when expecting JSON. Status: {response.status}, content type: {content_type}"
+                "Unexpected response received from supervisor when expecting"
+                f"JSON. Status: {response.status}, content type: {content_type}"
             )
         return False
     return True
@@ -137,17 +137,19 @@ class _SupervisorClient:
                 "Error occurred connecting to supervisor"
             ) from err
 
-    def get(
+    async def get(
         self,
         uri: str,
         *,
         params: dict[str, str] | None = None,
         response_type: ResponseType = ResponseType.JSON,
-    ) -> Awaitable[Response]:
+    ) -> Response:
         """Handle a GET request to Supervisor."""
-        return self._request(METH_GET, uri, params=params, response_type=response_type)
+        return await self._request(
+            METH_GET, uri, params=params, response_type=response_type
+        )
 
-    def post(
+    async def post(
         self,
         uri: str,
         *,
@@ -155,9 +157,9 @@ class _SupervisorClient:
         response_type: ResponseType = ResponseType.NONE,
         json: dict[str, Any] | None = None,
         data: Any = None,
-    ) -> Awaitable[Response]:
+    ) -> Response:
         """Handle a POST request to Supervisor."""
-        return self._request(
+        return await self._request(
             METH_POST,
             uri,
             params=params,
@@ -166,26 +168,26 @@ class _SupervisorClient:
             data=data,
         )
 
-    def put(
+    async def put(
         self,
         uri: str,
         *,
         params: dict[str, str] | None = None,
         json: dict[str, Any] | None = None,
-    ) -> Awaitable[Response]:
+    ) -> Response:
         """Handle a PUT request to Supervisor."""
-        return self._request(
+        return await self._request(
             METH_PUT, uri, params=params, response_type=ResponseType.NONE, json=json
         )
 
-    def delete(
+    async def delete(
         self,
         uri: str,
         *,
         params: dict[str, str] | None = None,
-    ) -> Awaitable[Response]:
+    ) -> Response:
         """Handle a DELETE request to Supervisor."""
-        return self._request(
+        return await self._request(
             METH_DELETE, uri, params=params, response_type=ResponseType.NONE
         )
 

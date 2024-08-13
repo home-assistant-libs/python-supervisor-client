@@ -9,7 +9,11 @@ from .base import ResponseData
 
 
 class HostFeature(StrEnum):
-    """HostFeature type."""
+    """HostFeature type.
+
+    Supervisor may add new HostFeatures in future as a non-breaking change.
+    Those should be returned as string in response models until next update.
+    """
 
     DISK = "disk"
     HAOS = "haos"
@@ -57,7 +61,11 @@ class LogLevel(StrEnum):
 
 
 class UpdateType(StrEnum):
-    """UpdateType type."""
+    """UpdateType type.
+
+    Supervisor may add new UpdateTypes in future as a non-breaking change.
+    Those should be returned as string in response models until next update.
+    """
 
     ADDON = "addon"
     CORE = "core"
@@ -78,7 +86,7 @@ class RootInfo(ResponseData):
     docker: str
     hostname: str | None
     operating_system: str | None
-    features: list[HostFeature]
+    features: list[HostFeature | str]
     machine: str | None
     arch: str
     state: SupervisorState
@@ -93,7 +101,7 @@ class RootInfo(ResponseData):
 class AvailableUpdate(ResponseData):
     """AvailableUpdate type."""
 
-    update_type: UpdateType
+    update_type: UpdateType | str
     panel_path: str
     version_latest: str
     name: str | None = None

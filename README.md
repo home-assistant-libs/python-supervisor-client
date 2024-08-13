@@ -27,9 +27,7 @@ And then used via import
 import asyncio
 import supervisor_client
 
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
-loop.run_until_complete(supervisor_client.info())
+asyncio.run(supervisor_client.info())
 ```
 
 Output would look like the example response in `/info` from [here](https://developers.home-assistant.io/docs/api/supervisor/endpoints#root)

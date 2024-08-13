@@ -23,8 +23,8 @@ WORKDIR /tmp
 COPY script/devcontainer_bootstrap /usr/bin
 
 # Install Python dependencies from requirements
-COPY requirements.txt requirements_tests.txt ./
-RUN uv pip install --no-cache-dir -r requirements.txt -r requirements_tests.txt
+COPY requirements_dev.txt ./
+RUN uv pip install --no-cache-dir -r requirements_dev.txt
 
 WORKDIR /workspaces
 

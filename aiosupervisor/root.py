@@ -1,6 +1,5 @@
 """Main client for supervisor."""
 
-from collections.abc import Awaitable
 from typing import Self
 
 from aiohttp import ClientSession
@@ -43,9 +42,9 @@ class SupervisorClient:
         result = await self._client.get("available_updates")
         return AvailableUpdates.from_dict(result.data).available_updates
 
-    def close(self) -> Awaitable[None]:
+    async def close(self) -> None:
         """Close open client session."""
-        return self._client.close()
+        await self._client.close()
 
     async def __aenter__(self) -> Self:
         """Async enter, closes session on exit."""
