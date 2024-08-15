@@ -30,11 +30,14 @@ class AddonsClient(_SupervisorComponentClient):
         return InstalledAddonComplete.from_dict(result.data)
 
     async def uninstall_addon(
-        self, addon: str, options: AddonsUninstall | None = None
+        self,
+        addon: str,
+        options: AddonsUninstall | None = None,
     ) -> None:
         """Uninstall an addon."""
         await self._client.post(
-            f"addons/{addon}/uninstall", json=options.to_dict() if options else None
+            f"addons/{addon}/uninstall",
+            json=options.to_dict() if options else None,
         )
 
     async def start_addon(self, addon: str) -> None:
@@ -54,7 +57,9 @@ class AddonsClient(_SupervisorComponentClient):
         await self._client.post(f"addons/{addon}/options", json=options.to_dict())
 
     async def addon_config_validate(
-        self, addon: str, config: dict[str, Any]
+        self,
+        addon: str,
+        config: dict[str, Any],
     ) -> AddonsConfigValidate:
         """Validate config for an addon."""
         result = await self._client.post(
@@ -70,7 +75,7 @@ class AddonsClient(_SupervisorComponentClient):
         return result.data
 
     async def rebuild_addon(self, addon: str) -> None:
-        """Rebuild an addon (only available for local addons in /addons built from source)."""
+        """Rebuild an addon (only available for local addons built from source)."""
         await self._client.post(f"addons/{addon}/rebuild")
 
     async def addon_stdin(self, addon: str, stdin: bytes) -> None:

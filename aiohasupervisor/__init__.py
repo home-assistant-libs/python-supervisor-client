@@ -1,6 +1,6 @@
-"""Init file for aiosupervisor."""
+"""Init file for aiohasupervisor."""
 
-from aiosupervisor.exceptions import (
+from aiohasupervisor.exceptions import (
     SupervisorAuthenticationError,
     SupervisorBadRequestError,
     SupervisorConnectionError,
@@ -11,7 +11,7 @@ from aiosupervisor.exceptions import (
     SupervisorServiceUnavailableError,
     SupervisorTimeoutError,
 )
-from aiosupervisor.root import SupervisorClient
+from aiohasupervisor.root import SupervisorClient
 
 __all__ = [
     "SupervisorError",

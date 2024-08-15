@@ -13,11 +13,7 @@ from .base import DEFAULT, Options, Request, RequestConfig, ResponseData
 
 
 class AddonStage(StrEnum):
-    """AddonStage type.
-
-    Supervisor may add new AddonStages in future as a non-breaking change.
-    Those should be returned as string in response models until next update.
-    """
+    """AddonStage type."""
 
     STABLE = "stable"
     EXPERIMENTAL = "experimental"
@@ -44,8 +40,10 @@ class CpuArch(StrEnum):
 class Capability(StrEnum):
     """Capability type.
 
-    Supervisor may add new Capabilities in future as a non-breaking change.
-    Those should be returned as string in response models until next update.
+    This is an incomplete list. Supervisor regularly adds support for new
+    privileged capabilities as addon developers request them. Therefore
+    when returning a list of capabilities, there may be some which are not in
+    this list parsed as strings on older versions of the client.
     """
 
     BPF = "BPF"
@@ -72,11 +70,7 @@ class AppArmor(StrEnum):
 
 
 class SupervisorRole(StrEnum):
-    """SupervisorRole type.
-
-    Supervisor may add new Roles in future as a non-breaking change.
-    Those should be returned as string in response models until next update.
-    """
+    """SupervisorRole type."""
 
     ADMIN = "admin"
     BACKUP = "backup"
@@ -112,7 +106,7 @@ class AddonInfoBaseFields(ABC):
     name: str
     repository: str
     slug: str
-    stage: AddonStage | str
+    stage: AddonStage
     update_available: bool
     url: str | None
     version_latest: str
@@ -145,8 +139,8 @@ class AddonInfoStoreExtFields(ABC):
 
     # Hassio is deprecated name for supervisor
     supervisor_api: bool = field(metadata=field_options(alias="hassio_api"))
-    supervisor_role: SupervisorRole | str = field(
-        metadata=field_options(alias="hassio_role")
+    supervisor_role: SupervisorRole = field(
+        metadata=field_options(alias="hassio_role"),
     )
 
 
@@ -179,7 +173,9 @@ class StoreAddonComplete(
 
 @dataclass(frozen=True, slots=True)
 class InstalledAddon(
-    AddonInfoBaseFields, AddonInfoStoreExtInstalledBaseFields, ResponseData
+    AddonInfoBaseFields,
+    AddonInfoStoreExtInstalledBaseFields,
+    ResponseData,
 ):
     """InstalledAddon type."""
 
@@ -247,10 +243,11 @@ class AddonsList(ResponseData):
 class AddonsOptions(Options):
     """AddonsOptions model."""
 
-    # Options term is double used here to reference both general addon options and addon-specific config
+    # Options term is used to reference both general options and addon-specific config
     # Therefore this field is config to match UI rather then Supervisor's API
     config: dict[str, Any] | None = field(  # type: ignore[assignment]
-        default=DEFAULT, metadata=field_options(alias="options")
+        default=DEFAULT,
+        metadata=field_options(alias="options"),
     )
     boot: AddonBoot | None = None
     auto_update: bool | None = None

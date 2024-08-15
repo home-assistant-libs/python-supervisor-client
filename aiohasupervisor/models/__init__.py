@@ -1,6 +1,6 @@
 """Models for supervisor client."""
 
-from aiosupervisor.models.addons import (
+from aiohasupervisor.models.addons import (
     AddonBoot,
     AddonsConfigValidate,
     AddonsOptions,
@@ -22,7 +22,7 @@ from aiosupervisor.models.addons import (
     StoreInfo,
     SupervisorRole,
 )
-from aiosupervisor.models.root import (
+from aiohasupervisor.models.root import (
     AvailableUpdate,
     HostFeature,
     LogLevel,

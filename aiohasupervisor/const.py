@@ -1,4 +1,4 @@
-"""Constants for aiosupervisor."""
+"""Constants for aiohasupervisor."""
 
 from enum import StrEnum
 

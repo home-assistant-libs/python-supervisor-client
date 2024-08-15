@@ -88,9 +88,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# pylint
-.pylint.d/
-
 # VS Code
 .vscode/*
 !.vscode/cSpell.json

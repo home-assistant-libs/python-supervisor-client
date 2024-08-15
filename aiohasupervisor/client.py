@@ -1,6 +1,7 @@
 """Internal client for making requests and managing session with Supervisor."""
 
 from dataclasses import dataclass, field
+from http import HTTPMethod, HTTPStatus
 from importlib import metadata
 from typing import Any
 
@@ -11,7 +12,6 @@ from aiohttp import (
     ClientSession,
     ClientTimeout,
 )
-from aiohttp.hdrs import METH_DELETE, METH_GET, METH_POST, METH_PUT
 from yarl import URL
 
 from .const import ResponseType
@@ -31,14 +31,14 @@ from .models.base import Response, ResultType
 VERSION = metadata.version(__package__)
 
 
-def is_json(response: ClientResponse, raise_on_fail: bool = False) -> bool:
+def is_json(response: ClientResponse, *, raise_on_fail: bool = False) -> bool:
     """Check if response is json according to Content-Type."""
     content_type = response.headers.get("Content-Type", "")
     if "application/json" not in content_type:
         if raise_on_fail:
-            raise SupervisorError(
+            raise SupervisorResponseError(
                 "Unexpected response received from supervisor when expecting"
-                f"JSON. Status: {response.status}, content type: {content_type}"
+                f"JSON. Status: {response.status}, content type: {content_type}",
             )
         return False
     return True
@@ -61,7 +61,7 @@ class _SupervisorClient:
 
     async def _request(
         self,
-        method: str,
+        method: HTTPMethod,
         uri: str,
         *,
         params: dict[str, str] | None,
@@ -79,7 +79,7 @@ class _SupervisorClient:
                 accept = "application/json, text/plain, */*"
 
         headers = {
-            "User-Agent": f"AioSupervisor/{VERSION}",
+            "User-Agent": f"AioHASupervisor/{VERSION}",
             "Accept": accept,
             "Authorization": f"Bearer {self.token}",
         }
@@ -90,7 +90,7 @@ class _SupervisorClient:
 
         try:
             async with self.session.request(
-                method,
+                method.value,
                 url,
                 timeout=self.timeout,
                 headers=headers,
@@ -98,18 +98,18 @@ class _SupervisorClient:
                 json=json,
                 data=data,
             ) as response:
-                if response.status >= 400:
+                if response.status >= HTTPStatus.BAD_REQUEST.value:
                     exc_type: type[SupervisorError] = SupervisorError
                     match response.status:
-                        case 400:
+                        case HTTPStatus.BAD_REQUEST:
                             exc_type = SupervisorBadRequestError
-                        case 401:
+                        case HTTPStatus.UNAUTHORIZED:
                             exc_type = SupervisorAuthenticationError
-                        case 403:
+                        case HTTPStatus.FORBIDDEN:
                             exc_type = SupervisorForbiddenError
-                        case 404:
+                        case HTTPStatus.NOT_FOUND:
                             exc_type = SupervisorNotFoundError
-                        case 503:
+                        case HTTPStatus.SERVICE_UNAVAILABLE:
                             exc_type = SupervisorServiceUnavailableError
 
                     if is_json(response):
@@ -128,13 +128,13 @@ class _SupervisorClient:
 
         except (UnicodeDecodeError, ClientResponseError) as err:
             raise SupervisorResponseError(
-                "Unusable response received from Supervisor, check logs"
+                "Unusable response received from Supervisor, check logs",
             ) from err
         except TimeoutError as err:
             raise SupervisorTimeoutError("Timeout connecting to Supervisor") from err
         except ClientError as err:
             raise SupervisorConnectionError(
-                "Error occurred connecting to supervisor"
+                "Error occurred connecting to supervisor",
             ) from err
 
     async def get(
@@ -146,7 +146,10 @@ class _SupervisorClient:
     ) -> Response:
         """Handle a GET request to Supervisor."""
         return await self._request(
-            METH_GET, uri, params=params, response_type=response_type
+            HTTPMethod.GET,
+            uri,
+            params=params,
+            response_type=response_type,
         )
 
     async def post(
@@ -160,7 +163,7 @@ class _SupervisorClient:
     ) -> Response:
         """Handle a POST request to Supervisor."""
         return await self._request(
-            METH_POST,
+            HTTPMethod.POST,
             uri,
             params=params,
             response_type=response_type,
@@ -177,7 +180,11 @@ class _SupervisorClient:
     ) -> Response:
         """Handle a PUT request to Supervisor."""
         return await self._request(
-            METH_PUT, uri, params=params, response_type=ResponseType.NONE, json=json
+            HTTPMethod.PUT,
+            uri,
+            params=params,
+            response_type=ResponseType.NONE,
+            json=json,
         )
 
     async def delete(
@@ -188,7 +195,10 @@ class _SupervisorClient:
     ) -> Response:
         """Handle a DELETE request to Supervisor."""
         return await self._request(
-            METH_DELETE, uri, params=params, response_type=ResponseType.NONE
+            HTTPMethod.DELETE,
+            uri,
+            params=params,
+            response_type=ResponseType.NONE,
         )
 
     async def close(self) -> None:

@@ -11,8 +11,10 @@ from .base import ResponseData
 class HostFeature(StrEnum):
     """HostFeature type.
 
-    Supervisor may add new HostFeatures in future as a non-breaking change.
-    Those should be returned as string in response models until next update.
+    This is an incomplete list. Supervisor regularly adds support for new host
+    features as users request them. Therefore when returning a list of host
+    features, there may be some which are not in this list parsed as strings on
+    older versions of the client.
     """
 
     DISK = "disk"

@@ -39,25 +39,6 @@
         "url": "https://github.com/hassio-addons/addon-vscode",
         "icon": true,
         "logo": true
-      },
-      {
-        "name": "Example",
-        "slug": "local_example",
-        "description": "An example addon.",
-        "advanced": false,
-        "stage": "not_real",
-        "version": "1.0",
-        "version_latest": "1.0",
-        "update_available": false,
-        "available": true,
-        "detached": false,
-        "homeassistant": null,
-        "state": "started",
-        "repository": "local",
-        "build": false,
-        "url": "https://github.com/addons/example",
-        "icon": false,
-        "logo": false
       }
     ]
   }

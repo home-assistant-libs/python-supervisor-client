@@ -6,5 +6,8 @@ lint.extend-select = [
 ]
 
 lint.extend-ignore = [
-    "S101", # Use of assert detected
+    "PLR2004", # Magic values are fine in tests
+    "RUF018",  # Tests are never run with asserts disabled
+    "S101",    # Use of assert detected
+    "SLF001",  # Tests will access private/protected members
 ]

@@ -1,4 +1,4 @@
-"""Tests for aiosupervisor."""
+"""Tests for aiohasupervisor."""
 
 from pathlib import Path
 

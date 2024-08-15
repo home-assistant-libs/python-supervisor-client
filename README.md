@@ -7,8 +7,8 @@ via its [REST API](https://developers.home-assistant.io/docs/api/supervisor/endp
 Currently used in the [Home Assistant Supervisor integration](https://www.home-assistant.io/integrations/hassio/)
 in Home Assistant.
 
-Add-ons which interface with Supervisor can also leverage it. The library will
-expect to find the access token in the `SUPERVISOR_TOKEN` env which is set automatically
+Add-ons which interface with Supervisor can also leverage it. The library expects
+to find the access token in the `SUPERVISOR_TOKEN` env which is set automatically
 by Supervisor for add-ons. Currently there is no way to get a long-lived access
 token for Supervisor outside these use cases so the library's usage is limited
 to these.
@@ -18,7 +18,7 @@ to these.
 The library is published on `pip` and can be installed that way:
 
 ```sh
-pip install supervisor-client
+pip install aiohasupervisor
 ```
 
 And then used via import
@@ -56,7 +56,7 @@ From within the devcontainer, open terminal and do the following:
 
 ```shell
 uv pip install -e .
-export SUPERVISOR_API_HOST=http://192.168.1.2
+export SUPERVISOR_API_URL=http://192.168.1.2
 export SUPERVISOR_TOKEN=replace_this_with_remote_api_token
 python examples/connectivity_test.py
 ```

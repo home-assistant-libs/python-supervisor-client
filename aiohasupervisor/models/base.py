@@ -55,7 +55,7 @@ class Options(ABC, DataClassDictMixin):
     sentinel. Client should only pass changed fields to Supervisor.
     """
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate at least one field is present."""
         if not self.to_dict():
             raise TypeError("At least one field must have a value")

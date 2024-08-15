@@ -1,11 +1,11 @@
-"""Shared fixtures for aiosupervisor tests."""
+"""Shared fixtures for aiohasupervisor tests."""
 
 from collections.abc import AsyncGenerator, Generator
 
 from aioresponses import aioresponses
 import pytest
 
-from aiosupervisor import SupervisorClient
+from aiohasupervisor import SupervisorClient
 
 from .const import SUPERVISOR_URL
 

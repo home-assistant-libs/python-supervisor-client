@@ -7,7 +7,7 @@ repos:
         args:
           - --fix
       - id: ruff-format
-        files: ^((aiosupervisor|script|tests)/.+)?[^/]+\.(py|pyi)$
+        files: ^((aiohasupervisor|script|tests)/.+)?[^/]+\.(py|pyi)$
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:
@@ -49,7 +49,7 @@ repos:
           - --py312-plus
           - --force
           - --keep-updates
-        files: ^(aiosupervisor|script|tests)/.+\.py$
+        files: ^(aiohasupervisor|script|tests)/.+\.py$
   - repo: local
     hooks:
       # Run mypy through our wrapper script in order to get the possible
@@ -62,11 +62,5 @@ repos:
         language: script
         types_or: [python, pyi]
         require_serial: true
-        files: ^aiosupervisor/.+\.(py|pyi)$
+        files: ^aiohasupervisor/.+\.(py|pyi)$
         stages: [manual]
-      - id: pylint
-        name: pylint
-        entry: script/run-in-env.sh pylint -j 0
-        language: script
-        types_or: [python, pyi]
-        files: ^(aiosupervisor|tests)/.+\.(py|pyi)$

@@ -7,7 +7,7 @@ from aioresponses import aioresponses
 import pytest
 from yarl import URL
 
-from aiosupervisor import (
+from aiohasupervisor import (
     SupervisorAuthenticationError,
     SupervisorBadRequestError,
     SupervisorClient,
@@ -16,13 +16,13 @@ from aiosupervisor import (
     SupervisorNotFoundError,
     SupervisorServiceUnavailableError,
 )
-from aiosupervisor.models import HostFeature, SupervisorState, UpdateType
+from aiohasupervisor.models import HostFeature, SupervisorState, UpdateType
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
 
 
-async def test_using_own_session(responses: aioresponses):
+async def test_using_own_session(responses: aioresponses) -> None:
     """Test passing in an existing session."""
     responses.get(
         f"{SUPERVISOR_URL}/info", status=200, body=load_fixture("root_info.json")
@@ -37,7 +37,7 @@ async def test_using_own_session(responses: aioresponses):
         assert not session.closed
 
 
-async def test_using_new_session(responses: aioresponses):
+async def test_using_new_session(responses: aioresponses) -> None:
     """Test letting client create new session."""
     responses.get(
         f"{SUPERVISOR_URL}/info", status=200, body=load_fixture("root_info.json")
@@ -51,7 +51,9 @@ async def test_using_new_session(responses: aioresponses):
     assert client._client.session.closed
 
 
-async def test_info(responses: aioresponses, supervisor_client: SupervisorClient):
+async def test_info(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
     """Test info API."""
     responses.get(
         f"{SUPERVISOR_URL}/info", status=200, body=load_fixture("root_info.json")
@@ -70,7 +72,7 @@ async def test_info(responses: aioresponses, supervisor_client: SupervisorClient
 
 async def test_available_updates(
     responses: aioresponses, supervisor_client: SupervisorClient
-):
+) -> None:
     """Test available updates API."""
     responses.get(
         f"{SUPERVISOR_URL}/available_updates",
@@ -89,7 +91,7 @@ async def test_available_updates(
 
 async def test_refresh_updates(
     responses: aioresponses, supervisor_client: SupervisorClient
-):
+) -> None:
     """Test refresh updates API."""
     responses.post(f"{SUPERVISOR_URL}/refresh_updates", status=200)
     assert await supervisor_client.refresh_updates() is None
@@ -115,7 +117,7 @@ async def test_error_handling(
     status: int,
     message: str | None,
     expected_exc: type[SupervisorError],
-):
+) -> None:
     """Test error handling scenarios."""
     if message is not None:
         kwargs = {
