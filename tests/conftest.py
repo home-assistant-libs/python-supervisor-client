@@ -16,8 +16,8 @@ async def client() -> AsyncGenerator[SupervisorClient, None]:
     async with SupervisorClient(
         SUPERVISOR_URL,
         "abc123",
-    ) as mealie_client:
-        yield mealie_client
+    ) as supervisor_client:
+        yield supervisor_client
 
 
 @pytest.fixture(name="responses")
