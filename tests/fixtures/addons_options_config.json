@@ -1,0 +1,9 @@
+{
+  "result": "ok",
+  "data": {
+    "authorized_keys": [],
+    "password": "",
+    "apks": [],
+    "server": { "tcp_forwarding": false }
+  }
+}

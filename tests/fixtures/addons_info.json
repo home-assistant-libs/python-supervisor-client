@@ -1,0 +1,125 @@
+{
+  "result": "ok",
+  "data": {
+    "name": "Terminal & SSH",
+    "slug": "core_ssh",
+    "hostname": "core-ssh",
+    "dns": ["core-ssh.local.hass.io"],
+    "description": "Allow logging in remotely to Home Assistant using SSH",
+    "long_description": "# Home Assistant Add-on: SSH server\n\nAllow logging in remotely to Home Assistant using SSH or just the web terminal with Ingress.\n\n![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield]\n\n## About\n\nSetting up an SSH server allows access to your Home Assistant folders with any SSH\nclient. It also includes a command-line tool to access the Home Assistant API.\n\n\n[aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg\n[amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg\n[armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg\n[armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg\n[i386-shield]: https://img.shields.io/badge/i386-yes-green.svg\n",
+    "advanced": true,
+    "stage": "stable",
+    "repository": "core",
+    "version_latest": "9.14.0",
+    "protected": true,
+    "rating": 7,
+    "boot": "auto",
+    "options": {
+      "authorized_keys": [],
+      "password": "",
+      "apks": [],
+      "server": { "tcp_forwarding": false }
+    },
+    "schema": [
+      {
+        "name": "authorized_keys",
+        "multiple": true,
+        "required": true,
+        "type": "string"
+      },
+      {
+        "name": "password",
+        "required": true,
+        "type": "string",
+        "format": "password"
+      },
+      { "name": "apks", "multiple": true, "required": true, "type": "string" },
+      {
+        "name": "server",
+        "type": "schema",
+        "optional": true,
+        "multiple": false,
+        "schema": [
+          { "name": "tcp_forwarding", "required": true, "type": "boolean" }
+        ]
+      }
+    ],
+    "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
+    "machine": [],
+    "homeassistant": null,
+    "url": "https://github.com/home-assistant/addons/tree/master/ssh",
+    "detached": false,
+    "available": true,
+    "build": false,
+    "network": { "22/tcp": null },
+    "network_description": null,
+    "host_network": false,
+    "host_pid": false,
+    "host_ipc": false,
+    "host_uts": false,
+    "host_dbus": true,
+    "privileged": ["NET_RAW", "not_real"],
+    "full_access": false,
+    "apparmor": "default",
+    "icon": true,
+    "logo": true,
+    "changelog": true,
+    "documentation": true,
+    "stdin": false,
+    "hassio_api": true,
+    "hassio_role": "manager",
+    "auth_api": false,
+    "homeassistant_api": false,
+    "gpio": false,
+    "usb": false,
+    "uart": true,
+    "kernel_modules": false,
+    "devicetree": false,
+    "udev": false,
+    "docker_api": false,
+    "video": false,
+    "audio": true,
+    "startup": "services",
+    "services": [],
+    "discovery": [],
+    "translations": {
+      "en": {
+        "configuration": {
+          "authorized_keys": {
+            "name": "Authorized Keys",
+            "description": "Your public keys that you wish to accept for login."
+          },
+          "password": {
+            "name": "Password",
+            "description": "Set a password for login. We do NOT recommend this variant."
+          },
+          "apks": {
+            "name": "Packages",
+            "description": "Additional software packages to install in the add-on container."
+          },
+          "server": {
+            "name": "Server",
+            "description": "SSH Server configuration"
+          }
+        },
+        "network": { "22/tcp": "SSH Port" }
+      }
+    },
+    "ingress": true,
+    "signed": true,
+    "state": "started",
+    "webui": null,
+    "ingress_entry": "/api/hassio_ingress/rltExSetBjBZ-WFm4ch5YVdUNmSRIQtnKrYANqpEnms",
+    "ingress_url": "/api/hassio_ingress/rltExSetBjBZ-WFm4ch5YVdUNmSRIQtnKrYANqpEnms/",
+    "ingress_port": 8099,
+    "ingress_panel": true,
+    "audio_input": null,
+    "audio_output": null,
+    "auto_update": false,
+    "ip_address": "172.30.33.0",
+    "version": "9.14.0",
+    "update_available": false,
+    "watchdog": false,
+    "devices": []
+  }
+}

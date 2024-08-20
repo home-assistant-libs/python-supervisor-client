@@ -1,0 +1,34 @@
+{
+  "result": "ok",
+  "data": {
+    "supervisor": "2024.07.1.dev3001",
+    "homeassistant": "2024.6.0.dev202405280218",
+    "hassos": "12.4.dev20240527",
+    "docker": "25.0.5",
+    "hostname": "homeassistant",
+    "operating_system": "Home Assistant OS 12.4.dev20240527",
+    "features": [
+      "reboot",
+      "shutdown",
+      "services",
+      "network",
+      "hostname",
+      "timedate",
+      "os_agent",
+      "haos",
+      "resolved",
+      "journal",
+      "disk",
+      "mount",
+      "not_real"
+    ],
+    "machine": "odroid-n2",
+    "arch": "aarch64",
+    "state": "running",
+    "supported_arch": ["aarch64", "armv7", "armhf"],
+    "supported": true,
+    "channel": "dev",
+    "logging": "info",
+    "timezone": "America/New_York"
+  }
+}
