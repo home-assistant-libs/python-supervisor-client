@@ -86,7 +86,6 @@ async def test_available_updates(
     assert updates[0].name is None
     assert updates[0].icon is None
     assert updates[1].update_type == UpdateType.OS
-    assert updates[2].update_type == "something_new"
 
 
 async def test_refresh_updates(

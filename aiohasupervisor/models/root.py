@@ -63,11 +63,7 @@ class LogLevel(StrEnum):
 
 
 class UpdateType(StrEnum):
-    """UpdateType type.
-
-    Supervisor may add new UpdateTypes in future as a non-breaking change.
-    Those should be returned as string in response models until next update.
-    """
+    """UpdateType type."""
 
     ADDON = "addon"
     CORE = "core"
@@ -103,7 +99,7 @@ class RootInfo(ResponseData):
 class AvailableUpdate(ResponseData):
     """AvailableUpdate type."""
 
-    update_type: UpdateType | str
+    update_type: UpdateType
     panel_path: str
     version_latest: str
     name: str | None = None
