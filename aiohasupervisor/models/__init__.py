@@ -2,6 +2,7 @@
 
 from aiohasupervisor.models.addons import (
     AddonBoot,
+    AddonBootConfig,
     AddonsConfigValidate,
     AddonsOptions,
     AddonsSecurityOptions,
@@ -42,6 +43,7 @@ __all__ = [
     "AvailableUpdate",
     "AddonStage",
     "AddonBoot",
+    "AddonBootConfig",
     "CpuArch",
     "Capability",
     "AppArmor",

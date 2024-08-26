@@ -20,6 +20,14 @@ class AddonStage(StrEnum):
     DEPRECATED = "deprecated"
 
 
+class AddonBootConfig(StrEnum):
+    """AddonBootConfig type."""
+
+    AUTO = "auto"
+    MANUAL = "manual"
+    MANUAL_FORCED = "manual_forced"
+
+
 class AddonBoot(StrEnum):
     """AddonBoot type."""
 
@@ -197,6 +205,7 @@ class InstalledAddonComplete(
     dns: list[str]
     protected: bool
     boot: AddonBoot
+    boot_config: AddonBootConfig
     options: dict[str, Any]
     schema: list[dict[str, Any]] | None
     machine: list[str]
