@@ -14,6 +14,7 @@
     "protected": true,
     "rating": 7,
     "boot": "auto",
+    "boot_config": "auto",
     "options": {
       "authorized_keys": [],
       "password": "",
