@@ -25,7 +25,7 @@ class AddonBootConfig(StrEnum):
 
     AUTO = "auto"
     MANUAL = "manual"
-    MANUAL_FORCED = "manual_forced"
+    MANUAL_ONLY = "manual_only"
 
 
 class AddonBoot(StrEnum):
