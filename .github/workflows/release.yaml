@@ -5,19 +5,28 @@ name: Publish releases
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version for release on TestPyPI"
+        required: true
 env:
   PYTHON_VERSION: "3.12"
 
 jobs:
-  build-and-publish-pypi:
+  build:
     name: Builds and publishes releases to PyPI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.7
-      - name: Get tag
-        id: vars
+      - name: Store version from inputs
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "tag=${{ inputs.version }}"
+      - name: Get version from tag
+        if: github.event_name == 'release'
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Validate version number
+        if: github.event_name == 'release'
         run: >-
           if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
             if ! [[ "${tag}" =~ "b" ]]; then
@@ -53,10 +62,50 @@ jobs:
       - name: Build python package
         run: >-
           python3 -m build
-      - name: Publish release to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.9.0
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
-      - name: Wait for PyPI
-        run: sleep 300
+          name: python-package-distributions
+          path: dist/
+
+  publish-pypi:
+    name: Publishes releases to PyPI
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    needs:
+      - build
+    environment:
+      name: pypi
+      url: https://pypi.org/p/aiohasupervisor
+    permissions:
+      id-token: write
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-test-pypi:
+    name: Publishes releases to Test-PyPI
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    needs:
+      - build
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/aiohasupervisor
+    permissions:
+      id-token: write
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution 📦 to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
