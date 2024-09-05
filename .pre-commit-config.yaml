@@ -46,7 +46,7 @@ repos:
       - id: python-typing-update
         stages: [manual]
         args:
-          - --py312-plus
+          - --py311-plus
           - --force
           - --keep-updates
         files: ^(aiohasupervisor|script|tests)/.+\.py$
