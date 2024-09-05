@@ -11,7 +11,7 @@ on:
         description: "Version for release on TestPyPI"
         required: true
 env:
-  PYTHON_VERSION: "3.12"
+  PYTHON_VERSION: "3.11"
 
 jobs:
   build:
