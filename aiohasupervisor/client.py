@@ -79,7 +79,7 @@ class _SupervisorClient:
         # string that was passed in. If they are different, then the passed in uri
         # contained characters that were removed by the normalization
         # such as ../../../../etc/passwd
-        if url.raw_path != uri:
+        if not url.raw_path.endswith(uri):
             raise SupervisorError(f"Invalid request {uri}")
 
         match response_type:
