@@ -70,7 +70,17 @@ class _SupervisorClient:
         data: Any = None,
     ) -> Response:
         """Handle a request to Supervisor."""
-        url = URL(self.api_host).joinpath(uri)
+        try:
+            url = URL(self.api_host).joinpath(uri)
+        except ValueError as err:
+            raise SupervisorError from err
+
+        # This check is to make sure the normalized URL string is the same as the URL
+        # string that was passed in. If they are different, then the passed in uri
+        # contained characters that were removed by the normalization
+        # such as ../../../../etc/passwd
+        if url.raw_path != uri:
+            raise SupervisorError(f"Invalid request {uri}")
 
         match response_type:
             case ResponseType.TEXT:
