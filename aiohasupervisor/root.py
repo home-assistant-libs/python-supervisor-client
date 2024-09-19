@@ -7,6 +7,7 @@ from aiohttp import ClientSession
 from .addons import AddonsClient
 from .client import _SupervisorClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
+from .resolution import ResolutionClient
 from .store import StoreClient
 
 
@@ -23,12 +24,18 @@ class SupervisorClient:
         """Initialize client."""
         self._client = _SupervisorClient(api_host, token, request_timeout, session)
         self._addons = AddonsClient(self._client)
+        self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
         """Get addons component client."""
         return self._addons
+
+    @property
+    def resolution(self) -> ResolutionClient:
+        """Get resolution center component client."""
+        return self._resolution
 
     @property
     def store(self) -> StoreClient:

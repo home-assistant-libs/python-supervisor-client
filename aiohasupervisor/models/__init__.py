@@ -23,6 +23,19 @@ from aiohasupervisor.models.addons import (
     StoreInfo,
     SupervisorRole,
 )
+from aiohasupervisor.models.resolution import (
+    Check,
+    CheckOptions,
+    CheckType,
+    ContextType,
+    Issue,
+    IssueType,
+    ResolutionInfo,
+    Suggestion,
+    SuggestionType,
+    UnhealthyReason,
+    UnsupportedReason,
+)
 from aiohasupervisor.models.root import (
     AvailableUpdate,
     HostFeature,
@@ -62,4 +75,15 @@ __all__ = [
     "StoreInfo",
     "StoreAddonUpdate",
     "StoreAddRepository",
+    "Check",
+    "CheckOptions",
+    "CheckType",
+    "ContextType",
+    "Issue",
+    "IssueType",
+    "ResolutionInfo",
+    "Suggestion",
+    "SuggestionType",
+    "UnhealthyReason",
+    "UnsupportedReason",
 ]

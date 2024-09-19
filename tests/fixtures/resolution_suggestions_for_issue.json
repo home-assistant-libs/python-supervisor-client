@@ -1,0 +1,14 @@
+{
+  "result": "ok",
+  "data": {
+    "suggestions": [
+      {
+        "type": "create_full_backup",
+        "context": "system",
+        "reference": null,
+        "uuid": "f87d3556f02c4004a47111c072c76fac",
+        "auto": false
+      }
+    ]
+  }
+}
