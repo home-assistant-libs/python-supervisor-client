@@ -1,4 +1,4 @@
-"""Models for Supervisor."""
+"""Models for Supervisor addons."""
 
 from abc import ABC
 from dataclasses import dataclass, field

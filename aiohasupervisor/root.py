@@ -7,6 +7,7 @@ from aiohttp import ClientSession
 from .addons import AddonsClient
 from .client import _SupervisorClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
+from .store import StoreClient
 
 
 class SupervisorClient:
@@ -22,11 +23,17 @@ class SupervisorClient:
         """Initialize client."""
         self._client = _SupervisorClient(api_host, token, request_timeout, session)
         self._addons = AddonsClient(self._client)
+        self._store = StoreClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
         """Get addons component client."""
         return self._addons
+
+    @property
+    def store(self) -> StoreClient:
+        """Get store component client."""
+        return self._store
 
     async def info(self) -> RootInfo:
         """Get root info."""
