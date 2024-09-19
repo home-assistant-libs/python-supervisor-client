@@ -12,6 +12,9 @@ categories:
   - title: ":boar: Chore"
     label: "chore"
 
+  - title: ":books: Documentation"
+    label: "documentation"
+
   - title: ":sparkles: New Features"
     label: "new-feature"
 
@@ -38,6 +41,7 @@ include-labels:
   - "breaking-change"
   - "build"
   - "chore"
+  - "documentation"
   - "performance"
   - "refactor"
   - "new-feature"
