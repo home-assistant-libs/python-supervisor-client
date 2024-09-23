@@ -1,0 +1,39 @@
+{
+  "result": "ok",
+  "data": {
+    "unsupported": [],
+    "unhealthy": ["supervisor"],
+    "suggestions": [
+      {
+        "type": "create_full_backup",
+        "context": "system",
+        "reference": null,
+        "uuid": "f87d3556f02c4004a47111c072c76fac",
+        "auto": false
+      }
+    ],
+    "issues": [
+      {
+        "type": "no_current_backup",
+        "context": "system",
+        "reference": null,
+        "uuid": "7f0eac2b61c9456dab6970507a276c36"
+      }
+    ],
+    "checks": [
+      { "enabled": true, "slug": "dns_server_ipv6" },
+      { "enabled": true, "slug": "disabled_data_disk" },
+      { "enabled": true, "slug": "detached_addon_missing" },
+      { "enabled": true, "slug": "multiple_data_disks" },
+      { "enabled": true, "slug": "backups" },
+      { "enabled": true, "slug": "supervisor_trust" },
+      { "enabled": true, "slug": "network_interface_ipv4" },
+      { "enabled": true, "slug": "dns_server" },
+      { "enabled": true, "slug": "free_space" },
+      { "enabled": true, "slug": "detached_addon_removed" },
+      { "enabled": true, "slug": "docker_config" },
+      { "enabled": true, "slug": "addon_pwned" },
+      { "enabled": true, "slug": "core_security" }
+    ]
+  }
+}
