@@ -13,7 +13,7 @@ class SuggestionType(StrEnum):
     """SuggestionType type.
 
     This is an incomplete list. Supervisor regularly adds new types of suggestions as
-    they are discovered. Therefore when returning an suggestion, it may have a type that
+    they are discovered. Therefore when returning a suggestion, it may have a type that
     is not in this list parsed as strings on older versions of the client.
     """
 
