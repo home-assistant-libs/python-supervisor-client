@@ -1,0 +1,4 @@
+{
+  "result": "ok",
+  "data": { "activity_led": true, "power_led": true, "system_health_led": true }
+}

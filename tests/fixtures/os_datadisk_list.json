@@ -1,0 +1,17 @@
+{
+  "result": "ok",
+  "data": {
+    "devices": ["SSK-SSK-Storage-DF123"],
+    "disks": [
+      {
+        "name": "SSK SSK Storage (DF123)",
+        "vendor": "SSK",
+        "model": "SSK Storage",
+        "serial": "DF123",
+        "size": 250059350016,
+        "id": "SSK-SSK-Storage-DF123",
+        "dev_path": "/dev/sda"
+      }
+    ]
+  }
+}
