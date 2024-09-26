@@ -4,7 +4,7 @@ from aioresponses import aioresponses
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models.os import (
+from aiohasupervisor.models import (
     BootSlotName,
     GreenOptions,
     MigrateDataOptions,
