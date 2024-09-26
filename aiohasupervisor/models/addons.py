@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import Any
 
 from mashumaro import field_options
+from mashumaro.config import TO_DICT_ADD_BY_ALIAS_FLAG, BaseConfig
 
 from .base import DEFAULT, Options, Request, RequestConfig, ResponseData
 
@@ -150,6 +151,11 @@ class AddonInfoStoreExtFields(ABC):
     supervisor_role: SupervisorRole = field(
         metadata=field_options(alias="hassio_role"),
     )
+
+    class Config(BaseConfig):
+        """Mashumaro config options."""
+
+        code_generation_options = [TO_DICT_ADD_BY_ALIAS_FLAG]  # noqa: RUF012
 
 
 @dataclass(frozen=True)

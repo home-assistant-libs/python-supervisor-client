@@ -12,8 +12,11 @@ from aiohasupervisor.models import (
     AddonState,
     AddonsUninstall,
     Capability,
+    InstalledAddonComplete,
+    StoreAddonComplete,
     SupervisorRole,
 )
+from aiohasupervisor.models.base import Response
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -234,3 +237,20 @@ async def test_addons_stats(
     assert stats.cpu_percent == 0
     assert stats.memory_usage == 24588288
     assert stats.network_rx == 1717120021
+
+
+async def test_addons_serialize_by_alias() -> None:
+    """Test serializing addons by alias."""
+    response = Response.from_json(load_fixture("store_addon_info.json"))
+    store_addon_info = StoreAddonComplete.from_dict(response.data)
+
+    assert store_addon_info.supervisor_api is False
+    assert (store_addon_info.to_dict())["supervisor_api"] is False
+    assert (store_addon_info.to_dict(by_alias=True))["hassio_api"] is False
+
+    response = Response.from_json(load_fixture("addons_info.json"))
+    addon_info = InstalledAddonComplete.from_dict(response.data)
+
+    assert addon_info.supervisor_api is True
+    assert (addon_info.to_dict())["supervisor_api"] is True
+    assert (addon_info.to_dict(by_alias=True))["hassio_api"] is True
