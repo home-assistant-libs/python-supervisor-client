@@ -9,6 +9,7 @@ from .client import _SupervisorClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .resolution import ResolutionClient
 from .store import StoreClient
+from .supervisor import SupervisorManagementClient
 
 
 class SupervisorClient:
@@ -26,6 +27,7 @@ class SupervisorClient:
         self._addons = AddonsClient(self._client)
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
+        self._supervisor = SupervisorManagementClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
@@ -41,6 +43,11 @@ class SupervisorClient:
     def store(self) -> StoreClient:
         """Get store component client."""
         return self._store
+
+    @property
+    def supervisor(self) -> SupervisorManagementClient:
+        """Get supervisor component client."""
+        return self._supervisor
 
     async def info(self) -> RootInfo:
         """Get root info."""

@@ -1,0 +1,49 @@
+{
+  "result": "ok",
+  "data": {
+    "version": "2024.09.1",
+    "version_latest": "2024.09.1",
+    "update_available": true,
+    "channel": "stable",
+    "arch": "aarch64",
+    "supported": true,
+    "healthy": true,
+    "ip_address": "172.30.32.2",
+    "timezone": "America/New_York",
+    "logging": "info",
+    "debug": true,
+    "debug_block": false,
+    "diagnostics": false,
+    "auto_update": true,
+    "wait_boot": 5,
+    "addons": [
+      {
+        "name": "Terminal & SSH",
+        "slug": "core_ssh",
+        "version": "9.14.0",
+        "version_latest": "9.14.0",
+        "update_available": false,
+        "state": "started",
+        "repository": "core",
+        "icon": true
+      },
+      {
+        "name": "Mosquitto broker",
+        "slug": "core_mosquitto",
+        "version": "6.4.1",
+        "version_latest": "6.4.1",
+        "update_available": false,
+        "state": "started",
+        "repository": "core",
+        "icon": true
+      }
+    ],
+    "addons_repositories": [
+      { "name": "Local add-ons", "slug": "local" },
+      { "name": "Music Assistant", "slug": "d5369777" },
+      { "name": "Official add-ons", "slug": "core" },
+      { "name": "ESPHome", "slug": "5c53de3b" },
+      { "name": "Home Assistant Community Add-ons", "slug": "a0d7b954" }
+    ]
+  }
+}

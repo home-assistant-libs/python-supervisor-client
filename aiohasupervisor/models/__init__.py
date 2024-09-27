@@ -45,6 +45,12 @@ from aiohasupervisor.models.root import (
     UpdateChannel,
     UpdateType,
 )
+from aiohasupervisor.models.supervisor import (
+    SupervisorInfo,
+    SupervisorOptions,
+    SupervisorStats,
+    SupervisorUpdateOptions,
+)
 
 __all__ = [
     "HostFeature",
@@ -86,4 +92,8 @@ __all__ = [
     "SuggestionType",
     "UnhealthyReason",
     "UnsupportedReason",
+    "SupervisorInfo",
+    "SupervisorOptions",
+    "SupervisorStats",
+    "SupervisorUpdateOptions",
 ]
