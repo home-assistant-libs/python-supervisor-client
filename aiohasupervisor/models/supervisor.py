@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from .base import Options, Request, ResponseData
+from .base import ContainerStats, Options, Request, ResponseData
 from .root import LogLevel, UpdateChannel
 
 
@@ -27,17 +27,8 @@ class SupervisorInfo(ResponseData):
 
 
 @dataclass(frozen=True, slots=True)
-class SupervisorStats(ResponseData):
+class SupervisorStats(ContainerStats):
     """SupervisorStats model."""
-
-    cpu_percent: float
-    memory_usage: int
-    memory_limit: int
-    memory_percent: float
-    network_rx: int
-    network_tx: int
-    blk_read: int
-    blk_write: int
 
 
 @dataclass(frozen=True, slots=True)
