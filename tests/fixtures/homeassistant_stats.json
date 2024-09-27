@@ -1,0 +1,13 @@
+{
+  "result": "ok",
+  "data": {
+    "cpu_percent": 0.01,
+    "memory_usage": 678883328,
+    "memory_limit": 3899138048,
+    "memory_percent": 17.41,
+    "network_rx": 0,
+    "network_tx": 0,
+    "blk_read": 0,
+    "blk_write": 0
+  }
+}

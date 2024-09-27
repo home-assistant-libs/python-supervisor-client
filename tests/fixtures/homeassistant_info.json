@@ -1,0 +1,19 @@
+{
+  "result": "ok",
+  "data": {
+    "version": "2024.9.0",
+    "version_latest": "2024.9.0",
+    "update_available": false,
+    "machine": "odroid-n2",
+    "ip_address": "172.30.32.1",
+    "arch": "aarch64",
+    "image": "ghcr.io/home-assistant/odroid-n2-homeassistant",
+    "boot": true,
+    "port": 8123,
+    "ssl": false,
+    "watchdog": true,
+    "audio_input": null,
+    "audio_output": null,
+    "backups_exclude_database": false
+  }
+}

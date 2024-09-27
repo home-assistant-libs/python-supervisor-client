@@ -9,7 +9,7 @@ from typing import Any
 from mashumaro import field_options
 from mashumaro.config import TO_DICT_ADD_BY_ALIAS_FLAG, BaseConfig
 
-from .base import DEFAULT, Options, Request, RequestConfig, ResponseData
+from .base import DEFAULT, ContainerStats, Options, Request, RequestConfig, ResponseData
 
 # --- ENUMS ----
 
@@ -296,17 +296,8 @@ class AddonsSecurityOptions(Options):
 
 
 @dataclass(frozen=True, slots=True)
-class AddonsStats(ResponseData):
+class AddonsStats(ContainerStats):
     """AddonsStats model."""
-
-    cpu_percent: float
-    memory_usage: int
-    memory_limit: int
-    memory_percent: float
-    network_rx: int
-    network_tx: int
-    blk_read: int
-    blk_write: int
 
 
 @dataclass(frozen=True, slots=True)

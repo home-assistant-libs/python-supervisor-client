@@ -6,6 +6,7 @@ from aiohttp import ClientSession
 
 from .addons import AddonsClient
 from .client import _SupervisorClient
+from .homeassistant import HomeAssistantClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .resolution import ResolutionClient
 from .store import StoreClient
@@ -28,11 +29,17 @@ class SupervisorClient:
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
         self._supervisor = SupervisorManagementClient(self._client)
+        self._homeassistant = HomeAssistantClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
         """Get addons component client."""
         return self._addons
+
+    @property
+    def homeassistant(self) -> HomeAssistantClient:
+        """Get Home Assistant component client."""
+        return self._homeassistant
 
     @property
     def resolution(self) -> ResolutionClient:
