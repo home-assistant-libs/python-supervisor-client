@@ -40,6 +40,11 @@ from aiohasupervisor.models.backups import (
     PartialBackupOptions,
     PartialRestoreOptions,
 )
+from aiohasupervisor.models.discovery import (
+    Discovery,
+    DiscoveryConfig,
+    DiscoveryList,
+)
 from aiohasupervisor.models.homeassistant import (
     HomeAssistantInfo,
     HomeAssistantOptions,
@@ -170,4 +175,7 @@ __all__ = [
     "NewBackup",
     "PartialBackupOptions",
     "PartialRestoreOptions",
+    "Discovery",
+    "DiscoveryConfig",
+    "DiscoveryList",
 ]

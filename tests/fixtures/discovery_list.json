@@ -1,0 +1,45 @@
+{
+  "result": "ok",
+  "data": {
+    "discovery": [
+      {
+        "addon": "core_mosquitto",
+        "service": "mqtt",
+        "uuid": "889ca604cff84004894e53d181655b3a",
+        "config": {
+          "host": "core-mosquitto",
+          "port": 1883,
+          "ssl": false,
+          "protocol": "3.1.1",
+          "username": "homeassistant",
+          "password": "abc123"
+        }
+      }
+    ],
+    "services": {
+      "vlc_telnet": ["core_vlc"],
+      "esphome": [
+        "5c53de3b_esphome-beta",
+        "5c53de3b_esphome-dev",
+        "5c53de3b_esphome"
+      ],
+      "zwave_js": [
+        "core_zwave_js",
+        "a0d7b954_zwavejs2mqtt",
+        "77f1785d_zwave_mock_server"
+      ],
+      "matter": ["core_matter_server"],
+      "wyoming": [
+        "core_whisper",
+        "core_assist_microphone",
+        "core_piper",
+        "core_openwakeword"
+      ],
+      "otbr": ["core_openthread_border_router", "core_silabs_multiprotocol"],
+      "mqtt": ["core_mosquitto"],
+      "motioneye": ["a0d7b954_motioneye"],
+      "deconz": ["core_deconz"],
+      "adguard": ["a0d7b954_adguard"]
+    }
+  }
+}

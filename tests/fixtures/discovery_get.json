@@ -1,0 +1,16 @@
+{
+  "result": "ok",
+  "data": {
+    "addon": "core_mosquitto",
+    "service": "mqtt",
+    "uuid": "889ca604cff84004894e53d181655b3a",
+    "config": {
+      "host": "core-mosquitto",
+      "port": 1883,
+      "ssl": false,
+      "protocol": "3.1.1",
+      "username": "homeassistant",
+      "password": "abc123"
+    }
+  }
+}
