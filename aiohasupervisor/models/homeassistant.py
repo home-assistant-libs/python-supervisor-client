@@ -1,6 +1,7 @@
 """Models for Home Assistant."""
 
 from dataclasses import dataclass
+from ipaddress import IPv4Address
 
 from .base import DEFAULT, ContainerStats, Options, Request, ResponseData
 
@@ -15,7 +16,7 @@ class HomeAssistantInfo(ResponseData):
     version_latest: str | None
     update_available: bool
     machine: str
-    ip_address: str
+    ip_address: IPv4Address
     arch: str
     image: str
     boot: bool

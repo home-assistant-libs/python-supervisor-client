@@ -1,5 +1,7 @@
 """Test Home Assistant supervisor client."""
 
+from ipaddress import IPv4Address
+
 from aioresponses import aioresponses
 from yarl import URL
 
@@ -27,6 +29,7 @@ async def test_homeassistant_info(
     assert info.ssl is False
     assert info.port == 8123
     assert info.audio_output is None
+    assert info.ip_address == IPv4Address("172.30.32.1")
 
 
 async def test_homeassistant_stats(
