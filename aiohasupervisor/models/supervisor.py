@@ -1,6 +1,7 @@
 """Models for supervisor component."""
 
 from dataclasses import dataclass
+from ipaddress import IPv4Address
 
 from .base import ContainerStats, Options, Request, ResponseData
 from .root import LogLevel, UpdateChannel
@@ -17,7 +18,7 @@ class SupervisorInfo(ResponseData):
     arch: str
     supported: bool
     healthy: bool
-    ip_address: str
+    ip_address: IPv4Address
     timezone: str | None
     logging: LogLevel
     debug: bool

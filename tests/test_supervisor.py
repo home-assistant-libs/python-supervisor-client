@@ -1,5 +1,7 @@
 """Test for supervisor management client."""
 
+from ipaddress import IPv4Address
+
 from aioresponses import aioresponses
 from yarl import URL
 
@@ -38,6 +40,7 @@ async def test_supervisor_info(
     assert info.supported is True
     assert info.healthy is True
     assert info.logging == "info"
+    assert info.ip_address == IPv4Address("172.30.32.2")
 
 
 async def test_supervisor_stats(
