@@ -3,6 +3,7 @@
 from abc import ABC
 from dataclasses import dataclass, field
 from enum import StrEnum
+from ipaddress import IPv4Address
 from typing import Any
 
 from mashumaro import field_options
@@ -242,7 +243,7 @@ class InstalledAddonComplete(
     audio_input: str | None
     audio_output: str | None
     auto_update: bool
-    ip_address: bool
+    ip_address: IPv4Address
     watchdog: bool
     devices: list[str]
 
