@@ -1,5 +1,7 @@
 """Test OS supervisor client."""
 
+from pathlib import PurePath
+
 from aioresponses import aioresponses
 from yarl import URL
 
@@ -84,7 +86,7 @@ async def test_os_list_data_disks(
     assert datadisks.disks[0].model == "SSK Storage"
     assert datadisks.disks[0].serial == "DF123"
     assert datadisks.disks[0].name == "SSK SSK Storage (DF123)"
-    assert datadisks.disks[0].dev_path == "/dev/sda"
+    assert datadisks.disks[0].dev_path == PurePath("/dev/sda")
 
 
 async def test_os_wipe_data(

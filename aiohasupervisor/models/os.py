@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import PurePath
 
 from .base import Options, Request, ResponseData
 
@@ -72,7 +73,7 @@ class DataDisk(ResponseData):
     serial: str
     size: int
     id: str
-    dev_path: str
+    dev_path: PurePath
 
 
 @dataclass(frozen=True, slots=True)
