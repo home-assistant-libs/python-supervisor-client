@@ -1,0 +1,46 @@
+{
+  "result": "ok",
+  "data": {
+    "backups": [
+      {
+        "slug": "58bc7491",
+        "name": "Full Backup 2024-04-06 00:05:39",
+        "date": "2024-04-06T07:05:40.000000+00:00",
+        "type": "full",
+        "size": 828.81,
+        "location": null,
+        "protected": false,
+        "compressed": true,
+        "content": {
+          "homeassistant": true,
+          "addons": [
+            "core_matter_server",
+            "core_samba",
+            "core_ssh",
+            "a0d7b954_vscode",
+            "core_configurator",
+            "core_mosquitto",
+            "d5369777_music_assistant_beta",
+            "cebe7a76_hassio_google_drive_backup"
+          ],
+          "folders": ["share", "addons/local", "ssl", "media"]
+        }
+      },
+      {
+        "slug": "69558789",
+        "name": "addon_core_mosquitto_6.4.0",
+        "date": "2024-05-31T20:48:03.838030+00:00",
+        "type": "partial",
+        "size": 0.01,
+        "location": null,
+        "protected": false,
+        "compressed": true,
+        "content": {
+          "homeassistant": false,
+          "addons": ["core_mosquitto"],
+          "folders": []
+        }
+      }
+    ]
+  }
+}

@@ -5,6 +5,7 @@ from typing import Self
 from aiohttp import ClientSession
 
 from .addons import AddonsClient
+from .backups import BackupsClient
 from .client import _SupervisorClient
 from .homeassistant import HomeAssistantClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
@@ -28,6 +29,7 @@ class SupervisorClient:
         self._client = _SupervisorClient(api_host, token, request_timeout, session)
         self._addons = AddonsClient(self._client)
         self._os = OSClient(self._client)
+        self._backups = BackupsClient(self._client)
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
         self._supervisor = SupervisorManagementClient(self._client)
@@ -47,6 +49,11 @@ class SupervisorClient:
     def os(self) -> OSClient:
         """Get OS component client."""
         return self._os
+
+    @property
+    def backups(self) -> BackupsClient:
+        """Get backups component client."""
+        return self._backups
 
     @property
     def resolution(self) -> ResolutionClient:
