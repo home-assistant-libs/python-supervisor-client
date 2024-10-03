@@ -1,5 +1,7 @@
 """Test addons supervisor client."""
 
+from ipaddress import IPv4Address
+
 from aioresponses import aioresponses
 from yarl import URL
 
@@ -55,7 +57,7 @@ async def test_addons_info(
     assert addon.changelog is True
     assert addon.watchdog is False
     assert addon.auto_update is False
-    assert addon.ip_address == "172.30.33.0"
+    assert addon.ip_address == IPv4Address("172.30.33.0")
     assert Capability.NET_RAW in addon.privileged
     assert "not_real" in addon.privileged
     assert addon.supervisor_api is True
