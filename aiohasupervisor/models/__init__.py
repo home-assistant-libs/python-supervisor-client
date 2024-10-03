@@ -53,6 +53,13 @@ from aiohasupervisor.models.homeassistant import (
     HomeAssistantStopOptions,
     HomeAssistantUpdateOptions,
 )
+from aiohasupervisor.models.host import (
+    HostInfo,
+    HostOptions,
+    Service,
+    ServiceState,
+    ShutdownOptions,
+)
 from aiohasupervisor.models.network import (
     AccessPoint,
     AuthMethod,
@@ -212,4 +219,9 @@ __all__ = [
     "Wifi",
     "WifiConfig",
     "WifiMode",
+    "HostInfo",
+    "HostOptions",
+    "Service",
+    "ServiceState",
+    "ShutdownOptions",
 ]
