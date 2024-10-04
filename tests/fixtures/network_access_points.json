@@ -1,0 +1,21 @@
+{
+  "result": "ok",
+  "data": {
+    "accesspoints": [
+      {
+        "mode": "infrastructure",
+        "ssid": "UPC4814466",
+        "frequency": 2462,
+        "signal": 47,
+        "mac": "AA:BB:CC:DD:EE:FF"
+      },
+      {
+        "mode": "infrastructure",
+        "ssid": "VQ@35(55720",
+        "frequency": 5660,
+        "signal": 63,
+        "mac": "FF:EE:DD:CC:BB:AA"
+      }
+    ]
+  }
+}
