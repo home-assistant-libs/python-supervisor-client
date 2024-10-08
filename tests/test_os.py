@@ -81,12 +81,11 @@ async def test_os_list_data_disks(
         body=load_fixture("os_datadisk_list.json"),
     )
     datadisks = await supervisor_client.os.list_data_disks()
-    assert datadisks.devices == ["SSK-SSK-Storage-DF123"]
-    assert datadisks.disks[0].vendor == "SSK"
-    assert datadisks.disks[0].model == "SSK Storage"
-    assert datadisks.disks[0].serial == "DF123"
-    assert datadisks.disks[0].name == "SSK SSK Storage (DF123)"
-    assert datadisks.disks[0].dev_path == PurePath("/dev/sda")
+    assert datadisks[0].vendor == "SSK"
+    assert datadisks[0].model == "SSK Storage"
+    assert datadisks[0].serial == "DF123"
+    assert datadisks[0].name == "SSK SSK Storage (DF123)"
+    assert datadisks[0].dev_path == PurePath("/dev/sda")
 
 
 async def test_os_wipe_data(

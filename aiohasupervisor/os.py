@@ -2,6 +2,7 @@
 
 from .client import _SupervisorComponentClient
 from .models.os import (
+    DataDisk,
     DataDiskList,
     GreenInfo,
     GreenOptions,
@@ -36,10 +37,10 @@ class OSClient(_SupervisorComponentClient):
         """Migrate data to new data disk and reboot."""
         await self._client.post("os/datadisk/move", json=options.to_dict())
 
-    async def list_data_disks(self) -> DataDiskList:
+    async def list_data_disks(self) -> list[DataDisk]:
         """Get all data disks."""
         result = await self._client.get("os/datadisk/list")
-        return DataDiskList.from_dict(result.data)
+        return DataDiskList.from_dict(result.data).disks
 
     async def wipe_data(self) -> None:
         """Trigger data disk wipe on host and reboot."""

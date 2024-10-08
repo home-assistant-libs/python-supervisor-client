@@ -78,9 +78,8 @@ class DataDisk(ResponseData):
 
 @dataclass(frozen=True, slots=True)
 class DataDiskList(ResponseData):
-    """ListDataDisks model."""
+    """DataDiskList model."""
 
-    devices: list[str]
     disks: list[DataDisk]
 
 
