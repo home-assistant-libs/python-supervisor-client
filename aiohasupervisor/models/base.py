@@ -84,3 +84,17 @@ class Response(DataClassORJSONMixin):
     data: Any | None = None
     message: str | None = None
     job_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ContainerStats(ResponseData):
+    """ContainerStats model."""
+
+    cpu_percent: float
+    memory_usage: int
+    memory_limit: int
+    memory_percent: float
+    network_rx: int
+    network_tx: int
+    blk_read: int
+    blk_write: int
