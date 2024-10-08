@@ -3,10 +3,17 @@
 from ipaddress import IPv4Address
 
 from aioresponses import aioresponses
+import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models import HomeAssistantOptions
+from aiohasupervisor.models import (
+    HomeAssistantOptions,
+    HomeAssistantRebuildOptions,
+    HomeAssistantRestartOptions,
+    HomeAssistantStopOptions,
+    HomeAssistantUpdateOptions,
+)
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -64,32 +71,41 @@ async def test_homeassistant_options(
     }
 
 
+@pytest.mark.parametrize("options", [None, HomeAssistantUpdateOptions(backup=False)])
 async def test_homeassistant_update(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: HomeAssistantUpdateOptions | None,
 ) -> None:
     """Test Home Assistant update API."""
     responses.post(f"{SUPERVISOR_URL}/core/update", status=200)
-    assert await supervisor_client.homeassistant.update() is None
+    assert await supervisor_client.homeassistant.update(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/update"))}
 
 
+@pytest.mark.parametrize("options", [None, HomeAssistantRestartOptions(safe_mode=True)])
 async def test_homeassistant_restart(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: HomeAssistantRestartOptions | None,
 ) -> None:
     """Test Home Assistant restart API."""
     responses.post(f"{SUPERVISOR_URL}/core/restart", status=200)
-    assert await supervisor_client.homeassistant.restart() is None
+    assert await supervisor_client.homeassistant.restart(options) is None
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/core/restart"))
     }
 
 
+@pytest.mark.parametrize("options", [None, HomeAssistantStopOptions(force=True)])
 async def test_homeassistant_stop(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: HomeAssistantStopOptions | None,
 ) -> None:
     """Test Home Assistant stop API."""
     responses.post(f"{SUPERVISOR_URL}/core/stop", status=200)
-    assert await supervisor_client.homeassistant.stop() is None
+    assert await supervisor_client.homeassistant.stop(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/stop"))}
 
 
@@ -111,12 +127,15 @@ async def test_homeassistant_check_config(
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/check"))}
 
 
+@pytest.mark.parametrize("options", [None, HomeAssistantRebuildOptions(safe_mode=True)])
 async def test_homeassistant_rebuild(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: HomeAssistantRebuildOptions | None,
 ) -> None:
     """Test Home Assistant rebuild API."""
     responses.post(f"{SUPERVISOR_URL}/core/rebuild", status=200)
-    assert await supervisor_client.homeassistant.rebuild() is None
+    assert await supervisor_client.homeassistant.rebuild(options) is None
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/core/rebuild"))
     }

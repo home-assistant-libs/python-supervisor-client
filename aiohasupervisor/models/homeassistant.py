@@ -65,6 +65,14 @@ class HomeAssistantRestartOptions(Options):
 
 
 @dataclass(frozen=True, slots=True)
+class HomeAssistantRebuildOptions(Options):
+    """HomeAssistantRebuildOptions model."""
+
+    safe_mode: bool | None = None
+    force: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class HomeAssistantStopOptions(Request):
     """HomeAssistantStopOptions model."""
 

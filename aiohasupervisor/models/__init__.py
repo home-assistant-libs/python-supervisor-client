@@ -26,6 +26,7 @@ from aiohasupervisor.models.addons import (
 from aiohasupervisor.models.homeassistant import (
     HomeAssistantInfo,
     HomeAssistantOptions,
+    HomeAssistantRebuildOptions,
     HomeAssistantRestartOptions,
     HomeAssistantStats,
     HomeAssistantStopOptions,
@@ -106,6 +107,7 @@ __all__ = [
     "SupervisorUpdateOptions",
     "HomeAssistantInfo",
     "HomeAssistantOptions",
+    "HomeAssistantRebuildOptions",
     "HomeAssistantRestartOptions",
     "HomeAssistantStats",
     "HomeAssistantStopOptions",
