@@ -3,10 +3,11 @@
 from ipaddress import IPv4Address
 
 from aioresponses import aioresponses
+import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models import SupervisorOptions
+from aiohasupervisor.models import SupervisorOptions, SupervisorUpdateOptions
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -60,12 +61,17 @@ async def test_supervisor_stats(
     assert stats.memory_percent == 6.26
 
 
+@pytest.mark.parametrize(
+    "options", [None, SupervisorUpdateOptions(version="2024.01.0")]
+)
 async def test_supervisor_update(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: SupervisorUpdateOptions | None,
 ) -> None:
     """Test supervisor update API."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/update", status=200)
-    assert await supervisor_client.supervisor.update() is None
+    assert await supervisor_client.supervisor.update(options) is None
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/supervisor/update"))
     }
