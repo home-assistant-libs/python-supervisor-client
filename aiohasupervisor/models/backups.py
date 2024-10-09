@@ -120,7 +120,7 @@ class PartialBackupRestoreOptions(ABC):  # noqa: B024
     def __post_init__(self) -> None:
         """Validate at least one thing to backup/restore is included."""
         if not any((self.addons, self.folders, self.homeassistant)):
-            raise TypeError(
+            raise ValueError(
                 "At least one of addons, folders, or homeassistant must have a value"
             )
 

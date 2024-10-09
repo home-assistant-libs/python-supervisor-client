@@ -109,7 +109,10 @@ async def test_partial_backup_options() -> None:
     assert PartialBackupOptions(name="good", addons={"a"})
     assert PartialBackupOptions(name="good", folders={Folder.SSL})
     assert PartialBackupOptions(name="good", homeassistant=True)
-    with pytest.raises(TypeError):
+    with pytest.raises(
+        ValueError,
+        match="At least one of addons, folders, or homeassistant must have a value",
+    ):
         PartialBackupOptions(name="bad")
 
 
@@ -118,7 +121,10 @@ async def test_partial_restore_options() -> None:
     assert PartialRestoreOptions(addons={"a"})
     assert PartialRestoreOptions(folders={Folder.SSL})
     assert PartialRestoreOptions(homeassistant=True)
-    with pytest.raises(TypeError):
+    with pytest.raises(
+        ValueError,
+        match="At least one of addons, folders, or homeassistant must have a value",
+    ):
         PartialRestoreOptions(background=True)
 
 
