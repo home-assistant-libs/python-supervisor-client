@@ -58,7 +58,7 @@ class Options(ABC, DataClassDictMixin):
     def __post_init__(self) -> None:
         """Validate at least one field is present."""
         if not self.to_dict():
-            raise TypeError("At least one field must have a value")
+            raise ValueError("At least one field must have a value")
 
     class Config(RequestConfig):
         """Mashumaro config."""
