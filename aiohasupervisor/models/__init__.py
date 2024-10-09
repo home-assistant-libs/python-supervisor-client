@@ -56,6 +56,7 @@ from aiohasupervisor.models.homeassistant import (
 from aiohasupervisor.models.host import (
     HostInfo,
     HostOptions,
+    RebootOptions,
     Service,
     ServiceState,
     ShutdownOptions,
@@ -221,6 +222,7 @@ __all__ = [
     "WifiMode",
     "HostInfo",
     "HostOptions",
+    "RebootOptions",
     "Service",
     "ServiceState",
     "ShutdownOptions",

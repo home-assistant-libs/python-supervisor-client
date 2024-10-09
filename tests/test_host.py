@@ -3,10 +3,11 @@
 from datetime import UTC, datetime
 
 from aioresponses import aioresponses
+import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models import HostOptions
+from aiohasupervisor.models import HostOptions, RebootOptions, ShutdownOptions
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -46,21 +47,27 @@ async def test_host_info(
     assert result.startup_time == 1.966311
 
 
+@pytest.mark.parametrize("options", [None, RebootOptions(force=True)])
 async def test_host_reboot(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: RebootOptions | None,
 ) -> None:
     """Test host reboot API."""
     responses.post(f"{SUPERVISOR_URL}/host/reboot", status=200)
-    assert await supervisor_client.host.reboot() is None
+    assert await supervisor_client.host.reboot(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/host/reboot"))}
 
 
+@pytest.mark.parametrize("options", [None, ShutdownOptions(force=True)])
 async def test_host_shutdown(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: ShutdownOptions | None,
 ) -> None:
     """Test host shutdown API."""
     responses.post(f"{SUPERVISOR_URL}/host/shutdown", status=200)
-    assert await supervisor_client.host.shutdown() is None
+    assert await supervisor_client.host.shutdown(options) is None
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/host/shutdown"))
     }

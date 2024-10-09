@@ -69,6 +69,13 @@ class ShutdownOptions(Request):
 
 
 @dataclass(frozen=True, slots=True)
+class RebootOptions(Request):
+    """RebootOptions model."""
+
+    force: bool
+
+
+@dataclass(frozen=True, slots=True)
 class HostOptions(Request):
     """HostOptions model."""
 
