@@ -23,6 +23,15 @@ from aiohasupervisor.models.addons import (
     StoreInfo,
     SupervisorRole,
 )
+from aiohasupervisor.models.homeassistant import (
+    HomeAssistantInfo,
+    HomeAssistantOptions,
+    HomeAssistantRebuildOptions,
+    HomeAssistantRestartOptions,
+    HomeAssistantStats,
+    HomeAssistantStopOptions,
+    HomeAssistantUpdateOptions,
+)
 from aiohasupervisor.models.resolution import (
     Check,
     CheckOptions,
@@ -96,4 +105,11 @@ __all__ = [
     "SupervisorOptions",
     "SupervisorStats",
     "SupervisorUpdateOptions",
+    "HomeAssistantInfo",
+    "HomeAssistantOptions",
+    "HomeAssistantRebuildOptions",
+    "HomeAssistantRestartOptions",
+    "HomeAssistantStats",
+    "HomeAssistantStopOptions",
+    "HomeAssistantUpdateOptions",
 ]
