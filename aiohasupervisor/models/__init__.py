@@ -176,5 +176,4 @@ __all__ = [
     "PartialRestoreOptions",
     "Discovery",
     "DiscoveryConfig",
-    "DiscoveryList",
 ]
