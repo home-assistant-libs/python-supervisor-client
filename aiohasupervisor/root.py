@@ -43,6 +43,7 @@ class SupervisorClient:
         """Get Home Assistant component client."""
         return self._homeassistant
 
+    @property
     def os(self) -> OSClient:
         """Get OS component client."""
         return self._os

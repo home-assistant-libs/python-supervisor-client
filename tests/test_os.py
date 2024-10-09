@@ -3,6 +3,7 @@
 from pathlib import PurePath
 
 from aioresponses import aioresponses
+import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
@@ -10,6 +11,7 @@ from aiohasupervisor.models import (
     BootSlotName,
     GreenOptions,
     MigrateDataOptions,
+    OSUpdate,
     SetBootSlotOptions,
     YellowOptions,
 )
@@ -37,12 +39,15 @@ async def test_os_info(
     assert info.boot_slots["B"].version == "13.0"
 
 
+@pytest.mark.parametrize("options", [None, OSUpdate(version="13.0")])
 async def test_os_update(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: OSUpdate | None,
 ) -> None:
     """Test OS update API."""
     responses.post(f"{SUPERVISOR_URL}/os/update", status=200)
-    assert await supervisor_client.os.update() is None
+    assert await supervisor_client.os.update(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/os/update"))}
 
 
