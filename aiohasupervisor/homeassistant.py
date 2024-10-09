@@ -4,6 +4,7 @@ from .client import _SupervisorComponentClient
 from .models.homeassistant import (
     HomeAssistantInfo,
     HomeAssistantOptions,
+    HomeAssistantRebuildOptions,
     HomeAssistantRestartOptions,
     HomeAssistantStats,
     HomeAssistantStopOptions,
@@ -54,7 +55,7 @@ class HomeAssistantClient(_SupervisorComponentClient):
         """Check Home Assistant config."""
         await self._client.post("core/check")
 
-    async def rebuild(self, options: HomeAssistantRestartOptions | None = None) -> None:
+    async def rebuild(self, options: HomeAssistantRebuildOptions | None = None) -> None:
         """Rebuild Home Assistant."""
         await self._client.post(
             "core/rebuild", json=options.to_dict() if options else None
