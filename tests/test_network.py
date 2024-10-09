@@ -96,11 +96,6 @@ async def test_network_update_interface(
 ) -> None:
     """Test network interface update API."""
     responses.post(f"{SUPERVISOR_URL}/network/interface/end0/update", status=200)
-
-    # Must set something
-    with pytest.raises(TypeError):
-        config = NetworkInterfaceConfig()
-
     config = NetworkInterfaceConfig(
         ipv4=IPv4Config(
             method=InterfaceMethod.STATIC,
@@ -135,18 +130,29 @@ async def test_network_access_points(
     assert result[1].ssid == "VQ@35(55720"
 
 
+@pytest.mark.parametrize(
+    "config",
+    [None, NetworkInterfaceConfig(ipv4=IPv4Config(method=InterfaceMethod.AUTO))],
+)
 async def test_network_save_vlan(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    config: NetworkInterfaceConfig | None,
 ) -> None:
     """Test network save vlan API."""
     responses.post(f"{SUPERVISOR_URL}/network/interface/end0/vlan/1", status=200)
-
-    # Must set something
-    with pytest.raises(TypeError):
-        config = VlanConfig()
-
-    config = NetworkInterfaceConfig(ipv4=IPv4Config(method=InterfaceMethod.AUTO))
     assert await supervisor_client.network.save_vlan("end0", 1, config=config) is None
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/network/interface/end0/vlan/1"))
     }
+
+
+async def test_network_configs_cannot_be_empty() -> None:
+    """Test network config instances require at least one field specified."""
+    # Network interface config for update calls
+    with pytest.raises(ValueError, match="At least one field must have a value"):
+        NetworkInterfaceConfig()
+
+    # Vlan config for save vlan calls
+    with pytest.raises(ValueError, match="At least one field must have a value"):
+        VlanConfig()

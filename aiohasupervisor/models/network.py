@@ -194,5 +194,5 @@ class AccessPointList(ResponseData):
 class VlanConfig(Options):
     """VlanConfig model."""
 
-    ipv4: IPv4Config
-    ipv6: IPv6Config
+    ipv4: IPv4Config | None = None
+    ipv6: IPv6Config | None = None
