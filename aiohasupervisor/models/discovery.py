@@ -30,7 +30,6 @@ class DiscoveryList(ResponseData):
     """DiscoveryList model."""
 
     discovery: list[Discovery]
-    services: dict[str, list[str]]
 
 
 @dataclass(frozen=True, slots=True)

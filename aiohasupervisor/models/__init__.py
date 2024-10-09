@@ -43,7 +43,6 @@ from aiohasupervisor.models.backups import (
 from aiohasupervisor.models.discovery import (
     Discovery,
     DiscoveryConfig,
-    DiscoveryList,
 )
 from aiohasupervisor.models.homeassistant import (
     HomeAssistantInfo,

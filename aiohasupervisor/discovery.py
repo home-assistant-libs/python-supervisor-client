@@ -10,10 +10,10 @@ from .models.discovery import Discovery, DiscoveryConfig, DiscoveryList, SetDisc
 class DiscoveryClient(_SupervisorComponentClient):
     """Handles discovery access in supervisor."""
 
-    async def list(self) -> DiscoveryList:
-        """List discovered and available services."""
+    async def list(self) -> list[Discovery]:
+        """List discovered active services."""
         result = await self._client.get("discovery")
-        return DiscoveryList.from_dict(result.data)
+        return DiscoveryList.from_dict(result.data).discovery
 
     async def get(self, uuid: UUID) -> Discovery:
         """Get discovery details for a service."""

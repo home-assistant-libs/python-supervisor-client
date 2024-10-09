@@ -22,16 +22,10 @@ async def test_discovery_list(
         body=load_fixture("discovery_list.json"),
     )
     disc_list = await supervisor_client.discovery.list()
-    assert disc_list.discovery[0].addon == "core_mosquitto"
-    assert disc_list.discovery[0].service == "mqtt"
-    assert disc_list.discovery[0].uuid.hex == "889ca604cff84004894e53d181655b3a"
-    assert disc_list.discovery[0].config["host"] == "core-mosquitto"
-    assert disc_list.services["vlc_telnet"] == ["core_vlc"]
-    assert disc_list.services["zwave_js"] == [
-        "core_zwave_js",
-        "a0d7b954_zwavejs2mqtt",
-        "77f1785d_zwave_mock_server",
-    ]
+    assert disc_list[0].addon == "core_mosquitto"
+    assert disc_list[0].service == "mqtt"
+    assert disc_list[0].uuid.hex == "889ca604cff84004894e53d181655b3a"
+    assert disc_list[0].config["host"] == "core-mosquitto"
 
 
 async def test_get_discovery(
