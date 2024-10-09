@@ -1,0 +1,19 @@
+{
+  "result": "ok",
+  "data": {
+    "version": "13.0",
+    "version_latest": "13.1",
+    "update_available": true,
+    "board": "odroid-n2",
+    "boot": "B",
+    "data_disk": "BJTD4R-0xaabbccdd",
+    "boot_slots": {
+      "A": { "state": "inactive", "status": "good", "version": null },
+      "B": {
+        "state": "booted",
+        "status": "good",
+        "version": "13.0"
+      }
+    }
+  }
+}

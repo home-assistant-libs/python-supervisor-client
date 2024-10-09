@@ -1,0 +1,4 @@
+{
+  "result": "ok",
+  "data": { "disk_led": true, "heartbeat_led": true, "power_led": true }
+}

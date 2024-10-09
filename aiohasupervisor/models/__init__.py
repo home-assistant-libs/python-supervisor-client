@@ -32,6 +32,20 @@ from aiohasupervisor.models.homeassistant import (
     HomeAssistantStopOptions,
     HomeAssistantUpdateOptions,
 )
+from aiohasupervisor.models.os import (
+    BootSlot,
+    BootSlotName,
+    DataDisk,
+    GreenInfo,
+    GreenOptions,
+    MigrateDataOptions,
+    OSInfo,
+    OSUpdate,
+    RaucState,
+    SetBootSlotOptions,
+    YellowInfo,
+    YellowOptions,
+)
 from aiohasupervisor.models.resolution import (
     Check,
     CheckOptions,
@@ -112,4 +126,16 @@ __all__ = [
     "HomeAssistantStats",
     "HomeAssistantStopOptions",
     "HomeAssistantUpdateOptions",
+    "RaucState",
+    "BootSlotName",
+    "BootSlot",
+    "OSInfo",
+    "OSUpdate",
+    "MigrateDataOptions",
+    "DataDisk",
+    "SetBootSlotOptions",
+    "GreenInfo",
+    "GreenOptions",
+    "YellowInfo",
+    "YellowOptions",
 ]

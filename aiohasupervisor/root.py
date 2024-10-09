@@ -8,6 +8,7 @@ from .addons import AddonsClient
 from .client import _SupervisorClient
 from .homeassistant import HomeAssistantClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
+from .os import OSClient
 from .resolution import ResolutionClient
 from .store import StoreClient
 from .supervisor import SupervisorManagementClient
@@ -26,6 +27,7 @@ class SupervisorClient:
         """Initialize client."""
         self._client = _SupervisorClient(api_host, token, request_timeout, session)
         self._addons = AddonsClient(self._client)
+        self._os = OSClient(self._client)
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
         self._supervisor = SupervisorManagementClient(self._client)
@@ -40,6 +42,11 @@ class SupervisorClient:
     def homeassistant(self) -> HomeAssistantClient:
         """Get Home Assistant component client."""
         return self._homeassistant
+
+    @property
+    def os(self) -> OSClient:
+        """Get OS component client."""
+        return self._os
 
     @property
     def resolution(self) -> ResolutionClient:
