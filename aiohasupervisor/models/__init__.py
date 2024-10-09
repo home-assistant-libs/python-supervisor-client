@@ -23,6 +23,23 @@ from aiohasupervisor.models.addons import (
     StoreInfo,
     SupervisorRole,
 )
+from aiohasupervisor.models.backups import (
+    Backup,
+    BackupAddon,
+    BackupComplete,
+    BackupContent,
+    BackupJob,
+    BackupsInfo,
+    BackupsOptions,
+    BackupType,
+    Folder,
+    FreezeOptions,
+    FullBackupOptions,
+    FullRestoreOptions,
+    NewBackup,
+    PartialBackupOptions,
+    PartialRestoreOptions,
+)
 from aiohasupervisor.models.homeassistant import (
     HomeAssistantInfo,
     HomeAssistantOptions,
@@ -45,22 +62,6 @@ from aiohasupervisor.models.os import (
     SetBootSlotOptions,
     YellowInfo,
     YellowOptions,
-)
-from aiohasupervisor.models.backups import (
-    Backup,
-    BackupAddon,
-    BackupComplete,
-    BackupContent,
-    BackupJob,
-    BackupsInfo,
-    BackupsOptions,
-    BackupType,
-    Folder,
-    FullBackupOptions,
-    FullRestoreOptions,
-    NewBackup,
-    PartialBackupOptions,
-    PartialRestoreOptions,
 )
 from aiohasupervisor.models.resolution import (
     Check,
@@ -163,6 +164,7 @@ __all__ = [
     "BackupsOptions",
     "BackupType",
     "Folder",
+    "FreezeOptions",
     "FullBackupOptions",
     "FullRestoreOptions",
     "NewBackup",

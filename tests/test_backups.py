@@ -11,6 +11,7 @@ from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
     BackupsOptions,
     Folder,
+    FreezeOptions,
     FullBackupOptions,
     PartialBackupOptions,
     PartialRestoreOptions,
@@ -78,12 +79,15 @@ async def test_backups_reload(
     }
 
 
+@pytest.mark.parametrize("options", [None, FreezeOptions(timeout=1000)])
 async def test_backups_freeze(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: FreezeOptions | None,
 ) -> None:
     """Test backups freeze API."""
     responses.post(f"{SUPERVISOR_URL}/backups/freeze", status=200)
-    assert await supervisor_client.backups.freeze() is None
+    assert await supervisor_client.backups.freeze(options) is None
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/backups/freeze"))
     }
@@ -120,7 +124,7 @@ async def test_partial_restore_options() -> None:
 
 def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # noqa: ARG001
     """Return response based on whether backup was in background or not."""
-    if kwargs["json"]["background"]:
+    if kwargs["json"] and kwargs["json"]["background"]:
         fixture = "backup_background.json"
     else:
         fixture = "backup_foreground.json"
@@ -128,13 +132,17 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
 
 
 @pytest.mark.parametrize(
-    ("background", "slug"),
-    [(True, None), (False, "9ecf0028")],
+    ("options", "slug"),
+    [
+        (FullBackupOptions(name="Test", background=True), None),
+        (FullBackupOptions(name="Test", background=False), "9ecf0028"),
+        (None, "9ecf0028"),
+    ],
 )
 async def test_backups_full_backup(
     responses: aioresponses,
     supervisor_client: SupervisorClient,
-    background: bool,  # noqa: FBT001
+    options: FullBackupOptions | None,
     slug: str | None,
 ) -> None:
     """Test backups full backup API."""
@@ -142,9 +150,7 @@ async def test_backups_full_backup(
         f"{SUPERVISOR_URL}/backups/new/full",
         callback=backup_callback,
     )
-    result = await supervisor_client.backups.full_backup(
-        FullBackupOptions(name="test", background=background)
-    )
+    result = await supervisor_client.backups.full_backup(options)
     assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
 
