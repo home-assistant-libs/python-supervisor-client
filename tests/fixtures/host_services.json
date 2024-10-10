@@ -1,0 +1,47 @@
+{
+  "result": "ok",
+  "data": {
+    "services": [
+      {
+        "name": "emergency.service",
+        "description": "Emergency Shell",
+        "state": "inactive"
+      },
+      {
+        "name": "bluetooth.service",
+        "description": "Bluetooth service",
+        "state": "inactive"
+      },
+      {
+        "name": "haos-swapfile.service",
+        "description": "HAOS swap",
+        "state": "inactive"
+      },
+      {
+        "name": "hassos-config.service",
+        "description": "HassOS Configuration Manager",
+        "state": "inactive"
+      },
+      {
+        "name": "dropbear.service",
+        "description": "Dropbear SSH daemon",
+        "state": "active"
+      },
+      {
+        "name": "systemd-time-wait-sync.service",
+        "description": "Wait Until Kernel Time Synchronized",
+        "state": "active"
+      },
+      {
+        "name": "systemd-journald.service",
+        "description": "Journal Service",
+        "state": "active"
+      },
+      {
+        "name": "systemd-resolved.service",
+        "description": "Network Name Resolution",
+        "state": "active"
+      }
+    ]
+  }
+}

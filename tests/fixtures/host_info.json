@@ -1,0 +1,41 @@
+{
+  "result": "ok",
+  "data": {
+    "agent_version": "1.6.0",
+    "apparmor_version": "3.1.2",
+    "chassis": "embedded",
+    "virtualization": "",
+    "cpe": "cpe:2.3:o:home-assistant:haos:12.4.dev20240527:*:development:*:*:*:odroid-n2:*",
+    "deployment": "development",
+    "disk_free": 20.1,
+    "disk_total": 27.9,
+    "disk_used": 6.7,
+    "disk_life_time": 10.0,
+    "features": [
+      "reboot",
+      "shutdown",
+      "services",
+      "network",
+      "hostname",
+      "timedate",
+      "os_agent",
+      "haos",
+      "resolved",
+      "journal",
+      "disk",
+      "mount"
+    ],
+    "hostname": "homeassistant",
+    "llmnr_hostname": "homeassistant3",
+    "kernel": "6.6.32-haos",
+    "operating_system": "Home Assistant OS 12.4.dev20240527",
+    "timezone": "Etc/UTC",
+    "dt_utc": "2024-10-03T00:00:00.000000+00:00",
+    "dt_synchronized": true,
+    "use_ntp": true,
+    "startup_time": 1.966311,
+    "boot_timestamp": 1716927644219811,
+    "broadcast_llmnr": true,
+    "broadcast_mdns": true
+  }
+}

@@ -9,6 +9,7 @@ from .backups import BackupsClient
 from .client import _SupervisorClient
 from .discovery import DiscoveryClient
 from .homeassistant import HomeAssistantClient
+from .host import HostClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .network import NetworkClient
 from .os import OSClient
@@ -34,6 +35,7 @@ class SupervisorClient:
         self._backups = BackupsClient(self._client)
         self._discovery = DiscoveryClient(self._client)
         self._network = NetworkClient(self._client)
+        self._host = HostClient(self._client)
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
         self._supervisor = SupervisorManagementClient(self._client)
@@ -68,6 +70,11 @@ class SupervisorClient:
     def network(self) -> NetworkClient:
         """Get network component client."""
         return self._network
+
+    @property
+    def host(self) -> HostClient:
+        """Get host component client."""
+        return self._host
 
     @property
     def resolution(self) -> ResolutionClient:
