@@ -1,7 +1,14 @@
 """Host client for supervisor."""
 
 from .client import _SupervisorComponentClient
-from .models.host import HostInfo, HostOptions, Service, ServiceList, ShutdownOptions
+from .models.host import (
+    HostInfo,
+    HostOptions,
+    RebootOptions,
+    Service,
+    ServiceList,
+    ShutdownOptions,
+)
 
 
 class HostClient(_SupervisorComponentClient):
@@ -12,7 +19,7 @@ class HostClient(_SupervisorComponentClient):
         result = await self._client.get("host/info")
         return HostInfo.from_dict(result.data)
 
-    async def reboot(self, options: ShutdownOptions | None = None) -> None:
+    async def reboot(self, options: RebootOptions | None = None) -> None:
         """Reboot host."""
         await self._client.post(
             "host/reboot", json=options.to_dict() if options else None
