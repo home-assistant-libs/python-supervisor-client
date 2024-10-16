@@ -91,4 +91,9 @@ class AddonsClient(_SupervisorComponentClient):
         result = await self._client.get(f"addons/{addon}/stats")
         return AddonsStats.from_dict(result.data)
 
+    # Aliases for clarity
+    set_addon_options = addon_options
+    write_addon_stdin = addon_stdin
+    set_addon_security = addon_security
+
     # Omitted for now - Log endpoints
