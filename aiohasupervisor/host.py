@@ -1,6 +1,7 @@
 """Host client for supervisor."""
 
 from .client import _SupervisorComponentClient
+from .const import TIMEOUT_60_SECONDS
 from .models.host import (
     HostInfo,
     HostOptions,
@@ -22,7 +23,9 @@ class HostClient(_SupervisorComponentClient):
     async def reboot(self, options: RebootOptions | None = None) -> None:
         """Reboot host."""
         await self._client.post(
-            "host/reboot", json=options.to_dict() if options else None
+            "host/reboot",
+            json=options.to_dict() if options else None,
+            timeout=TIMEOUT_60_SECONDS,
         )
 
     async def shutdown(self, options: ShutdownOptions | None = None) -> None:

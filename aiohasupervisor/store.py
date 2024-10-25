@@ -47,14 +47,16 @@ class StoreClient(_SupervisorComponentClient):
 
     async def install_addon(self, addon: str) -> None:
         """Install an addon."""
-        await self._client.post(f"store/addons/{addon}/install")
+        await self._client.post(f"store/addons/{addon}/install", timeout=None)
 
     async def update_addon(
         self, addon: str, options: StoreAddonUpdate | None = None
     ) -> None:
         """Update an addon to latest version."""
         await self._client.post(
-            f"store/addons/{addon}/update", json=options.to_dict() if options else None
+            f"store/addons/{addon}/update",
+            json=options.to_dict() if options else None,
+            timeout=None,
         )
 
     async def reload(self) -> None:

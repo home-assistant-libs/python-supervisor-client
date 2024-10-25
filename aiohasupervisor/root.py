@@ -2,7 +2,7 @@
 
 from typing import Self
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientTimeout
 
 from .addons import AddonsClient
 from .backups import BackupsClient
@@ -25,11 +25,10 @@ class SupervisorClient:
         self,
         api_host: str,
         token: str,
-        request_timeout: int = 10,
         session: ClientSession | None = None,
     ) -> None:
         """Initialize client."""
-        self._client = _SupervisorClient(api_host, token, request_timeout, session)
+        self._client = _SupervisorClient(api_host, token, session)
         self._addons = AddonsClient(self._client)
         self._os = OSClient(self._client)
         self._backups = BackupsClient(self._client)
@@ -98,7 +97,7 @@ class SupervisorClient:
 
     async def refresh_updates(self) -> None:
         """Refresh updates."""
-        await self._client.post("refresh_updates")
+        await self._client.post("refresh_updates", timeout=ClientTimeout(total=300))
 
     async def available_updates(self) -> list[AvailableUpdate]:
         """Get available updates."""

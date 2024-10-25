@@ -26,7 +26,7 @@ class OSClient(_SupervisorComponentClient):
     async def update(self, options: OSUpdate | None = None) -> None:
         """Update OS."""
         await self._client.post(
-            "os/update", json=options.to_dict() if options else None
+            "os/update", json=options.to_dict() if options else None, timeout=None
         )
 
     async def config_sync(self) -> None:
