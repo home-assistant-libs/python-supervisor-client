@@ -87,7 +87,9 @@ async def test_host_options(
 ) -> None:
     """Test host options API."""
     responses.post(f"{SUPERVISOR_URL}/host/options", status=200)
-    assert await supervisor_client.host.options(HostOptions(hostname="test")) is None
+    assert (
+        await supervisor_client.host.set_options(HostOptions(hostname="test")) is None
+    )
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/host/options"))
     }

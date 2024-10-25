@@ -55,7 +55,7 @@ class OSClient(_SupervisorComponentClient):
         result = await self._client.get("os/boards/green")
         return GreenInfo.from_dict(result.data)
 
-    async def green_options(self, options: GreenOptions) -> None:
+    async def set_green_options(self, options: GreenOptions) -> None:
         """Set options for green board (if in use)."""
         await self._client.post("os/boards/green", json=options.to_dict())
 
@@ -64,6 +64,6 @@ class OSClient(_SupervisorComponentClient):
         result = await self._client.get("os/boards/yellow")
         return YellowInfo.from_dict(result.data)
 
-    async def yellow_options(self, options: YellowOptions) -> None:
+    async def set_yellow_options(self, options: YellowOptions) -> None:
         """Set options for yellow board (if in use)."""
         await self._client.post("os/boards/yellow", json=options.to_dict())

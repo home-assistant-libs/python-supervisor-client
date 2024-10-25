@@ -46,7 +46,7 @@ class SupervisorManagementClient(_SupervisorComponentClient):
         """Restart supervisor."""
         await self._client.post("supervisor/restart")
 
-    async def options(self, options: SupervisorOptions) -> None:
+    async def set_options(self, options: SupervisorOptions) -> None:
         """Set supervisor options."""
         await self._client.post("supervisor/options", json=options.to_dict())
 

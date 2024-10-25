@@ -52,7 +52,7 @@ class AddonsClient(_SupervisorComponentClient):
         """Restart an addon."""
         await self._client.post(f"addons/{addon}/restart")
 
-    async def addon_options(self, addon: str, options: AddonsOptions) -> None:
+    async def set_addon_options(self, addon: str, options: AddonsOptions) -> None:
         """Set options for addon."""
         await self._client.post(f"addons/{addon}/options", json=options.to_dict())
 
@@ -78,11 +78,13 @@ class AddonsClient(_SupervisorComponentClient):
         """Rebuild an addon (only available for local addons built from source)."""
         await self._client.post(f"addons/{addon}/rebuild")
 
-    async def addon_stdin(self, addon: str, stdin: bytes) -> None:
+    async def write_addon_stdin(self, addon: str, stdin: bytes) -> None:
         """Write to stdin of an addon (if supported by addon)."""
         await self._client.post(f"addons/{addon}/stdin", data=stdin)
 
-    async def addon_security(self, addon: str, options: AddonsSecurityOptions) -> None:
+    async def set_addon_security(
+        self, addon: str, options: AddonsSecurityOptions
+    ) -> None:
         """Set security options for addon."""
         await self._client.post(f"addons/{addon}/security", json=options.to_dict())
 
@@ -90,10 +92,5 @@ class AddonsClient(_SupervisorComponentClient):
         """Get stats for addon."""
         result = await self._client.get(f"addons/{addon}/stats")
         return AddonsStats.from_dict(result.data)
-
-    # Aliases for clarity
-    set_addon_options = addon_options
-    write_addon_stdin = addon_stdin
-    set_addon_security = addon_security
 
     # Omitted for now - Log endpoints

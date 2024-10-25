@@ -35,7 +35,7 @@ class HostClient(_SupervisorComponentClient):
         """Reload host info cache."""
         await self._client.post("host/reload")
 
-    async def options(self, options: HostOptions) -> None:
+    async def set_options(self, options: HostOptions) -> None:
         """Set host options."""
         await self._client.post("host/options", json=options.to_dict())
 

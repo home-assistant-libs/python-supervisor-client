@@ -61,7 +61,7 @@ async def test_homeassistant_options(
     """Test Home Assistant options API."""
     responses.post(f"{SUPERVISOR_URL}/core/options", status=200)
     assert (
-        await supervisor_client.homeassistant.options(
+        await supervisor_client.homeassistant.set_options(
             HomeAssistantOptions(watchdog=False, backups_exclude_database=True)
         )
         is None

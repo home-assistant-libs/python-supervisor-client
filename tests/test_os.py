@@ -141,7 +141,7 @@ async def test_os_green_options(
     """Test OS green board options API."""
     responses.post(f"{SUPERVISOR_URL}/os/boards/green", status=200)
     assert (
-        await supervisor_client.os.green_options(GreenOptions(activity_led=False))
+        await supervisor_client.os.set_green_options(GreenOptions(activity_led=False))
         is None
     )
     assert responses.requests.keys() == {
@@ -170,7 +170,9 @@ async def test_os_yellow_options(
     """Test OS yellow board options API."""
     responses.post(f"{SUPERVISOR_URL}/os/boards/yellow", status=200)
     assert (
-        await supervisor_client.os.yellow_options(YellowOptions(heartbeat_led=False))
+        await supervisor_client.os.set_yellow_options(
+            YellowOptions(heartbeat_led=False)
+        )
         is None
     )
     assert responses.requests.keys() == {
