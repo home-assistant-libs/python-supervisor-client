@@ -55,6 +55,7 @@ class BackupsClient(_SupervisorComponentClient):
             "backups/new/full",
             json=options.to_dict() if options else None,
             response_type=ResponseType.JSON,
+            timeout=None,
         )
         return NewBackup.from_dict(result.data)
 
@@ -64,6 +65,7 @@ class BackupsClient(_SupervisorComponentClient):
             "backups/new/partial",
             json=options.to_dict(),
             response_type=ResponseType.JSON,
+            timeout=None,
         )
         return NewBackup.from_dict(result.data)
 
@@ -84,6 +86,7 @@ class BackupsClient(_SupervisorComponentClient):
             f"backups/{backup}/restore/full",
             json=options.to_dict() if options else None,
             response_type=ResponseType.JSON,
+            timeout=None,
         )
         return BackupJob.from_dict(result.data)
 
@@ -95,6 +98,7 @@ class BackupsClient(_SupervisorComponentClient):
             f"backups/{backup}/restore/partial",
             json=options.to_dict(),
             response_type=ResponseType.JSON,
+            timeout=None,
         )
         return BackupJob.from_dict(result.data)
 

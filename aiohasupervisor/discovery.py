@@ -3,7 +3,7 @@
 from uuid import UUID
 
 from .client import _SupervisorComponentClient
-from .const import ResponseType
+from .const import TIMEOUT_60_SECONDS, ResponseType
 from .models.discovery import Discovery, DiscoveryConfig, DiscoveryList, SetDiscovery
 
 
@@ -12,7 +12,7 @@ class DiscoveryClient(_SupervisorComponentClient):
 
     async def list(self) -> list[Discovery]:
         """List discovered active services."""
-        result = await self._client.get("discovery")
+        result = await self._client.get("discovery", timeout=TIMEOUT_60_SECONDS)
         return DiscoveryList.from_dict(result.data).discovery
 
     async def get(self, uuid: UUID) -> Discovery:

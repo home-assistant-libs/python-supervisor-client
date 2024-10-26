@@ -34,7 +34,7 @@ class ResolutionClient(_SupervisorComponentClient):
 
     async def apply_suggestion(self, suggestion: UUID) -> None:
         """Apply a suggestion."""
-        await self._client.post(f"resolution/suggestion/{suggestion.hex}")
+        await self._client.post(f"resolution/suggestion/{suggestion.hex}", timeout=None)
 
     async def dismiss_suggestion(self, suggestion: UUID) -> None:
         """Dismiss a suggestion."""

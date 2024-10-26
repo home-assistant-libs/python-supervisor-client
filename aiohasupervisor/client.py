@@ -14,7 +14,7 @@ from aiohttp import (
 )
 from yarl import URL
 
-from .const import ResponseType
+from .const import DEFAULT_TIMEOUT, ResponseType
 from .exceptions import (
     SupervisorAuthenticationError,
     SupervisorBadRequestError,
@@ -50,14 +50,8 @@ class _SupervisorClient:
 
     api_host: str
     token: str
-    request_timeout: int
     session: ClientSession | None = None
     _close_session: bool = field(default=False, init=False)
-
-    @property
-    def timeout(self) -> ClientTimeout:
-        """Timeout for requests."""
-        return ClientTimeout(total=self.request_timeout)
 
     async def _request(
         self,
@@ -68,6 +62,7 @@ class _SupervisorClient:
         response_type: ResponseType,
         json: dict[str, Any] | None = None,
         data: Any = None,
+        timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a request to Supervisor."""
         try:
@@ -102,7 +97,7 @@ class _SupervisorClient:
             async with self.session.request(
                 method.value,
                 url,
-                timeout=self.timeout,
+                timeout=timeout,
                 headers=headers,
                 params=params,
                 json=json,
@@ -153,6 +148,7 @@ class _SupervisorClient:
         *,
         params: dict[str, str] | None = None,
         response_type: ResponseType = ResponseType.JSON,
+        timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a GET request to Supervisor."""
         return await self._request(
@@ -160,6 +156,7 @@ class _SupervisorClient:
             uri,
             params=params,
             response_type=response_type,
+            timeout=timeout,
         )
 
     async def post(
@@ -170,6 +167,7 @@ class _SupervisorClient:
         response_type: ResponseType = ResponseType.NONE,
         json: dict[str, Any] | None = None,
         data: Any = None,
+        timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a POST request to Supervisor."""
         return await self._request(
@@ -179,6 +177,7 @@ class _SupervisorClient:
             response_type=response_type,
             json=json,
             data=data,
+            timeout=timeout,
         )
 
     async def put(
@@ -187,6 +186,7 @@ class _SupervisorClient:
         *,
         params: dict[str, str] | None = None,
         json: dict[str, Any] | None = None,
+        timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a PUT request to Supervisor."""
         return await self._request(
@@ -195,6 +195,7 @@ class _SupervisorClient:
             params=params,
             response_type=ResponseType.NONE,
             json=json,
+            timeout=timeout,
         )
 
     async def delete(
@@ -202,6 +203,7 @@ class _SupervisorClient:
         uri: str,
         *,
         params: dict[str, str] | None = None,
+        timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a DELETE request to Supervisor."""
         return await self._request(
@@ -209,6 +211,7 @@ class _SupervisorClient:
             uri,
             params=params,
             response_type=ResponseType.NONE,
+            timeout=timeout,
         )
 
     async def close(self) -> None:

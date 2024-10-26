@@ -32,7 +32,7 @@ class HomeAssistantClient(_SupervisorComponentClient):
     async def update(self, options: HomeAssistantUpdateOptions | None = None) -> None:
         """Update Home Assistant."""
         await self._client.post(
-            "core/update", json=options.to_dict() if options else None
+            "core/update", json=options.to_dict() if options else None, timeout=None
         )
 
     async def restart(self, options: HomeAssistantRestartOptions | None = None) -> None:

@@ -3,7 +3,7 @@
 from typing import Any
 
 from .client import _SupervisorComponentClient
-from .const import ResponseType
+from .const import TIMEOUT_60_SECONDS, ResponseType
 from .models.addons import (
     AddonsConfigValidate,
     AddonsList,
@@ -38,19 +38,20 @@ class AddonsClient(_SupervisorComponentClient):
         await self._client.post(
             f"addons/{addon}/uninstall",
             json=options.to_dict() if options else None,
+            timeout=TIMEOUT_60_SECONDS,
         )
 
     async def start_addon(self, addon: str) -> None:
         """Start an addon."""
-        await self._client.post(f"addons/{addon}/start")
+        await self._client.post(f"addons/{addon}/start", timeout=TIMEOUT_60_SECONDS)
 
     async def stop_addon(self, addon: str) -> None:
         """Stop an addon."""
-        await self._client.post(f"addons/{addon}/stop")
+        await self._client.post(f"addons/{addon}/stop", timeout=TIMEOUT_60_SECONDS)
 
     async def restart_addon(self, addon: str) -> None:
         """Restart an addon."""
-        await self._client.post(f"addons/{addon}/restart")
+        await self._client.post(f"addons/{addon}/restart", timeout=None)
 
     async def addon_options(self, addon: str, options: AddonsOptions) -> None:
         """Set options for addon."""

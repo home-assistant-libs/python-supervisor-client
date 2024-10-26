@@ -1,5 +1,7 @@
 """Supervisor client for supervisor."""
 
+from aiohttp import ClientTimeout
+
 from .client import _SupervisorComponentClient
 from .const import ResponseType
 from .models.supervisor import (
@@ -15,7 +17,11 @@ class SupervisorManagementClient(_SupervisorComponentClient):
 
     async def ping(self) -> None:
         """Check connection to supervisor."""
-        await self._client.get("supervisor/ping", response_type=ResponseType.NONE)
+        await self._client.get(
+            "supervisor/ping",
+            response_type=ResponseType.NONE,
+            timeout=ClientTimeout(total=15),
+        )
 
     async def info(self) -> SupervisorInfo:
         """Get supervisor info."""
@@ -35,7 +41,9 @@ class SupervisorManagementClient(_SupervisorComponentClient):
         latest version and ignore that field.
         """
         await self._client.post(
-            "supervisor/update", json=options.to_dict() if options else None
+            "supervisor/update",
+            json=options.to_dict() if options else None,
+            timeout=None,
         )
 
     async def reload(self) -> None:
