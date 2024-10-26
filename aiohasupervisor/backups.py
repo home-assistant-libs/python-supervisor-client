@@ -31,7 +31,7 @@ class BackupsClient(_SupervisorComponentClient):
         result = await self._client.get("backups/info")
         return BackupsInfo.from_dict(result.data)
 
-    async def options(self, options: BackupsOptions) -> None:
+    async def set_options(self, options: BackupsOptions) -> None:
         """Set options for backups."""
         await self._client.post("backups/options", json=options.to_dict())
 

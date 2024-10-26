@@ -119,7 +119,7 @@ async def test_addons_options(
     """Test addon options API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/options", status=200)
     assert (
-        await supervisor_client.addons.addon_options(
+        await supervisor_client.addons.set_addon_options(
             "core_ssh",
             AddonsOptions(
                 config=None,
@@ -195,7 +195,8 @@ async def test_addons_stdin(
     """Test addon stdin API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/stdin", status=200)
     assert (
-        await supervisor_client.addons.addon_stdin("core_ssh", b"hello world") is None
+        await supervisor_client.addons.write_addon_stdin("core_ssh", b"hello world")
+        is None
     )
     assert len(responses.requests) == 1
     assert (
@@ -212,7 +213,7 @@ async def test_addons_security(
     """Test addon security API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/security", status=200)
     assert (
-        await supervisor_client.addons.addon_security(
+        await supervisor_client.addons.set_addon_security(
             "core_ssh", AddonsSecurityOptions(protected=True)
         )
         is None

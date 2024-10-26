@@ -60,7 +60,7 @@ async def test_backups_options(
     """Test backups options API."""
     responses.post(f"{SUPERVISOR_URL}/backups/options", status=200)
     assert (
-        await supervisor_client.backups.options(BackupsOptions(days_until_stale=10))
+        await supervisor_client.backups.set_options(BackupsOptions(days_until_stale=10))
         is None
     )
     assert responses.requests.keys() == {

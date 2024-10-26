@@ -105,7 +105,7 @@ async def test_supervisor_options(
     """Test supervisor options API."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/options", status=200)
     assert (
-        await supervisor_client.supervisor.options(
+        await supervisor_client.supervisor.set_options(
             SupervisorOptions(debug=True, debug_block=True)
         )
         is None

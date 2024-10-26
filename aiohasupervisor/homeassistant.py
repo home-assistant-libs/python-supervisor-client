@@ -25,7 +25,7 @@ class HomeAssistantClient(_SupervisorComponentClient):
         result = await self._client.get("core/stats")
         return HomeAssistantStats.from_dict(result.data)
 
-    async def options(self, options: HomeAssistantOptions) -> None:
+    async def set_options(self, options: HomeAssistantOptions) -> None:
         """Set Home Assistant options."""
         await self._client.post("core/options", json=options.to_dict())
 
