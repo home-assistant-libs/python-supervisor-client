@@ -56,6 +56,9 @@ platforms = ["any"]
 zip-safe = false
 include-package-data = true
 
+[tool.setuptools.package-data]
+"aiohasupervisor" = ["py.typed"]
+
 [tool.setuptools.packages.find]
 include = ["aiohasupervisor*"]
 
