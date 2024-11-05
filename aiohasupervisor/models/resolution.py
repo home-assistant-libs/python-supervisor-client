@@ -20,6 +20,7 @@ class SuggestionType(StrEnum):
     ADOPT_DATA_DISK = "adopt_data_disk"
     CLEAR_FULL_BACKUP = "clear_full_backup"
     CREATE_FULL_BACKUP = "create_full_backup"
+    DISABLE_BOOT = "disable_boot"
     EXECUTE_INTEGRITY = "execute_integrity"
     EXECUTE_REBOOT = "execute_reboot"
     EXECUTE_REBUILD = "execute_rebuild"
@@ -27,6 +28,7 @@ class SuggestionType(StrEnum):
     EXECUTE_REMOVE = "execute_remove"
     EXECUTE_REPAIR = "execute_repair"
     EXECUTE_RESET = "execute_reset"
+    EXECUTE_START = "execute_start"
     EXECUTE_STOP = "execute_stop"
     EXECUTE_UPDATE = "execute_update"
     REGISTRY_LOGIN = "registry_login"
@@ -41,6 +43,7 @@ class IssueType(StrEnum):
     in this list parsed as strings on older versions of the client.
     """
 
+    BOOT_FAIL = "boot_fail"
     CORRUPT_DOCKER = "corrupt_docker"
     CORRUPT_REPOSITORY = "corrupt_repository"
     CORRUPT_FILESYSTEM = "corrupt_filesystem"
