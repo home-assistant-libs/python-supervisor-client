@@ -11,6 +11,7 @@ from aiohasupervisor.models import (
     AddonsOptions,
     AddonsSecurityOptions,
     AddonStage,
+    AddonStartup,
     AddonState,
     AddonsUninstall,
     Capability,
@@ -64,6 +65,7 @@ async def test_addons_info(
     assert addon.supervisor_role == SupervisorRole.MANAGER
     assert addon.system_managed is False
     assert addon.system_managed_config_entry is None
+    assert addon.startup == AddonStartup.SERVICES
 
 
 async def test_addons_uninstall(
