@@ -246,6 +246,8 @@ class InstalledAddonComplete(
     ip_address: IPv4Address
     watchdog: bool
     devices: list[str]
+    system_managed: bool
+    system_managed_config_entry: str | None
 
 
 @dataclass(frozen=True, slots=True)

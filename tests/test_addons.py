@@ -62,6 +62,8 @@ async def test_addons_info(
     assert "not_real" in addon.privileged
     assert addon.supervisor_api is True
     assert addon.supervisor_role == SupervisorRole.MANAGER
+    assert addon.system_managed is False
+    assert addon.system_managed_config_entry is None
 
 
 async def test_addons_uninstall(
