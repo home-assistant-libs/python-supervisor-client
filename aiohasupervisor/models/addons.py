@@ -102,11 +102,11 @@ class AddonState(StrEnum):
 class AddonStartup(StrEnum):
     """AddonStartup type."""
 
-    INITIALIZE = "initialize"
-    SYSTEM = "system"
-    SERVICES = "services"
     APPLICATION = "application"
+    INITIALIZE = "initialize"
     ONCE = "once"
+    SERVICES = "services"
+    SYSTEM = "system"
 
 
 # --- OBJECTS ----
