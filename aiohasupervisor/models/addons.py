@@ -99,6 +99,16 @@ class AddonState(StrEnum):
     ERROR = "error"
 
 
+class AddonStartup(StrEnum):
+    """AddonStartup type."""
+
+    APPLICATION = "application"
+    INITIALIZE = "initialize"
+    ONCE = "once"
+    SERVICES = "services"
+    SYSTEM = "system"
+
+
 # --- OBJECTS ----
 
 
@@ -232,6 +242,7 @@ class InstalledAddonComplete(
     udev: bool
     video: bool
     audio: bool
+    startup: AddonStartup
     services: list[str]
     discovery: list[str]
     translations: dict[str, Any]
