@@ -15,6 +15,7 @@ from .models.backups import (
     NewBackup,
     PartialBackupOptions,
     PartialRestoreOptions,
+    ReloadOptions,
 )
 
 
@@ -35,9 +36,11 @@ class BackupsClient(_SupervisorComponentClient):
         """Set options for backups."""
         await self._client.post("backups/options", json=options.to_dict())
 
-    async def reload(self) -> None:
+    async def reload(self, options: ReloadOptions | None = None) -> None:
         """Reload backups cache."""
-        await self._client.post("backups/reload")
+        await self._client.post(
+            "backups/reload", json=options.to_dict() if options else None
+        )
 
     async def freeze(self, options: FreezeOptions | None = None) -> None:
         """Start a freeze for external snapshot process."""

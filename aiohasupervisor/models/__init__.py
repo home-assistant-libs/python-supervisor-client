@@ -40,6 +40,7 @@ from aiohasupervisor.models.backups import (
     NewBackup,
     PartialBackupOptions,
     PartialRestoreOptions,
+    ReloadOptions,
 )
 from aiohasupervisor.models.discovery import (
     Discovery,
@@ -203,6 +204,7 @@ __all__ = [
     "NewBackup",
     "PartialBackupOptions",
     "PartialRestoreOptions",
+    "ReloadOptions",
     "Discovery",
     "DiscoveryConfig",
     "AccessPoint",

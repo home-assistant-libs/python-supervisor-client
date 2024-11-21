@@ -15,6 +15,7 @@ from aiohasupervisor.models import (
     FullBackupOptions,
     PartialBackupOptions,
     PartialRestoreOptions,
+    ReloadOptions,
 )
 
 from . import load_fixture
@@ -74,6 +75,22 @@ async def test_backups_reload(
     """Test backups reload API."""
     responses.post(f"{SUPERVISOR_URL}/backups/reload", status=200)
     assert await supervisor_client.backups.reload() is None
+    assert responses.requests.keys() == {
+        ("POST", URL(f"{SUPERVISOR_URL}/backups/reload"))
+    }
+
+
+async def test_backups_partial_reload(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test backups partial reload API."""
+    responses.post(f"{SUPERVISOR_URL}/backups/reload", status=200)
+    assert (
+        await supervisor_client.backups.reload(
+            ReloadOptions(location=None, filename="test.tar")
+        )
+        is None
+    )
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/backups/reload"))
     }

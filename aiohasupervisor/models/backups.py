@@ -48,6 +48,7 @@ class BackupBaseFields(ABC):
     type: BackupType
     size: float
     location: str | None
+    locations: list[str | None]
     protected: bool
     compressed: bool
 
@@ -167,3 +168,11 @@ class FullRestoreOptions(Request):
 @dataclass(frozen=True, slots=True)
 class PartialRestoreOptions(FullRestoreOptions, PartialBackupRestoreOptions):
     """PartialRestoreOptions model."""
+
+
+@dataclass(frozen=True, slots=True)
+class ReloadOptions(Request):
+    """ReloadOptions model."""
+
+    location: str | None
+    filename: str
