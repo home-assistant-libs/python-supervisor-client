@@ -35,7 +35,7 @@ class BackupContent(ResponseData):
 
     homeassistant: bool
     addons: list[str]
-    folders: list[str]
+    folders: list[Folder]
 
 
 @dataclass(frozen=True)
@@ -73,11 +73,11 @@ class BackupAddon(ResponseData):
 class BackupComplete(BackupBaseFields, ResponseData):
     """BackupComplete model."""
 
-    supervisor_version: str
+    supervisor_version: str | None
     homeassistant: str
     addons: list[BackupAddon]
     repositories: list[str]
-    folders: list[str]
+    folders: list[Folder]
     homeassistant_exclude_database: bool | None
 
 
