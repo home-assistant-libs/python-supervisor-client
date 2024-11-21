@@ -213,6 +213,21 @@ async def test_backup_info(
     assert result.homeassistant_exclude_database is None
 
 
+async def test_backup_info_no_homeassistant(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test backup info API with no home assistant."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/d13dedd0/info",
+        status=200,
+        body=load_fixture("backup_info_no_homeassistant.json"),
+    )
+    result = await supervisor_client.backups.backup_info("d13dedd0")
+    assert result.slug == "d13dedd0"
+    assert result.type == "partial"
+    assert result.homeassistant is None
+
+
 async def test_remove_backup(
     responses: aioresponses, supervisor_client: SupervisorClient
 ) -> None:
