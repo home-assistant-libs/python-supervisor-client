@@ -62,6 +62,18 @@ from aiohasupervisor.models.host import (
     ServiceState,
     ShutdownOptions,
 )
+from aiohasupervisor.models.mounts import (
+    CIFSMountRequest,
+    CIFSMountResponse,
+    MountCifsVersion,
+    MountsInfo,
+    MountsOptions,
+    MountState,
+    MountType,
+    MountUsage,
+    NFSMountRequest,
+    NFSMountResponse,
+)
 from aiohasupervisor.models.network import (
     AccessPoint,
     AuthMethod,
@@ -228,4 +240,14 @@ __all__ = [
     "Service",
     "ServiceState",
     "ShutdownOptions",
+    "CIFSMountRequest",
+    "CIFSMountResponse",
+    "MountCifsVersion",
+    "MountsInfo",
+    "MountsOptions",
+    "MountState",
+    "MountType",
+    "MountUsage",
+    "NFSMountRequest",
+    "NFSMountResponse",
 ]
