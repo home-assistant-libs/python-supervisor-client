@@ -1,0 +1,38 @@
+{
+  "result": "ok",
+  "data": {
+    "default_backup_mount": "Test",
+    "mounts": [
+      {
+        "share": "backup",
+        "server": "test.local",
+        "name": "Test",
+        "type": "cifs",
+        "usage": "backup",
+        "read_only": false,
+        "version": null,
+        "state": "active"
+      },
+      {
+        "share": "share",
+        "server": "test2.local",
+        "name": "Test2",
+        "type": "cifs",
+        "usage": "share",
+        "read_only": true,
+        "version": "2.0",
+        "port": 12345,
+        "state": "active"
+      },
+      {
+        "server": "test3.local",
+        "name": "Test2",
+        "type": "nfs",
+        "usage": "media",
+        "read_only": false,
+        "path": "media",
+        "state": "active"
+      }
+    ]
+  }
+}
