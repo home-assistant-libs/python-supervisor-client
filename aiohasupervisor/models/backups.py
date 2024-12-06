@@ -73,8 +73,8 @@ class BackupAddon(ResponseData):
 class BackupComplete(BackupBaseFields, ResponseData):
     """BackupComplete model."""
 
-    supervisor_version: str | None
-    homeassistant: str
+    supervisor_version: str
+    homeassistant: str | None
     addons: list[BackupAddon]
     repositories: list[str]
     folders: list[Folder]
@@ -132,9 +132,10 @@ class FullBackupOptions(Request):
     name: str | None = None
     password: str | None = None
     compressed: bool | None = None
-    location: str | None = None
+    location: list[str | None] | str | None = None
     homeassistant_exclude_database: bool | None = None
     background: bool | None = None
+    extra: dict | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -167,3 +168,17 @@ class FullRestoreOptions(Request):
 @dataclass(frozen=True, slots=True)
 class PartialRestoreOptions(FullRestoreOptions, PartialBackupRestoreOptions):
     """PartialRestoreOptions model."""
+
+
+@dataclass(frozen=True, slots=True)
+class UploadBackupOptions(Request):
+    """UploadBackupOptions model."""
+
+    location: set[str | None] = None
+
+
+@dataclass(frozen=True, slots=True)
+class UploadedBackup(ResponseData):
+    """UploadedBackup model."""
+
+    slug: str

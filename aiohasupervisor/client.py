@@ -12,6 +12,7 @@ from aiohttp import (
     ClientSession,
     ClientTimeout,
 )
+from multidict import MultiDict
 from yarl import URL
 
 from .const import DEFAULT_TIMEOUT, ResponseType
@@ -27,6 +28,7 @@ from .exceptions import (
     SupervisorTimeoutError,
 )
 from .models.base import Response, ResultType
+from .utils.aiohttp import ChunkAsyncStreamIterator
 
 VERSION = metadata.version(__package__)
 
@@ -53,12 +55,33 @@ class _SupervisorClient:
     session: ClientSession | None = None
     _close_session: bool = field(default=False, init=False)
 
+    async def _raise_on_status(self, response: ClientResponse) -> None:
+        """Raise appropriate exception on status."""
+        if response.status >= HTTPStatus.BAD_REQUEST.value:
+            exc_type: type[SupervisorError] = SupervisorError
+            match response.status:
+                case HTTPStatus.BAD_REQUEST:
+                    exc_type = SupervisorBadRequestError
+                case HTTPStatus.UNAUTHORIZED:
+                    exc_type = SupervisorAuthenticationError
+                case HTTPStatus.FORBIDDEN:
+                    exc_type = SupervisorForbiddenError
+                case HTTPStatus.NOT_FOUND:
+                    exc_type = SupervisorNotFoundError
+                case HTTPStatus.SERVICE_UNAVAILABLE:
+                    exc_type = SupervisorServiceUnavailableError
+
+            if is_json(response):
+                result = Response.from_json(await response.text())
+                raise exc_type(result.message, result.job_id)
+            raise exc_type()
+
     async def _request(
         self,
         method: HTTPMethod,
         uri: str,
         *,
-        params: dict[str, str] | None,
+        params: dict[str, str] | MultiDict[str, str] | None,
         response_type: ResponseType,
         json: dict[str, Any] | None = None,
         data: Any = None,
@@ -94,7 +117,7 @@ class _SupervisorClient:
             self._close_session = True
 
         try:
-            async with self.session.request(
+            response = await self.session.request(
                 method.value,
                 url,
                 timeout=timeout,
@@ -102,34 +125,20 @@ class _SupervisorClient:
                 params=params,
                 json=json,
                 data=data,
-            ) as response:
-                if response.status >= HTTPStatus.BAD_REQUEST.value:
-                    exc_type: type[SupervisorError] = SupervisorError
-                    match response.status:
-                        case HTTPStatus.BAD_REQUEST:
-                            exc_type = SupervisorBadRequestError
-                        case HTTPStatus.UNAUTHORIZED:
-                            exc_type = SupervisorAuthenticationError
-                        case HTTPStatus.FORBIDDEN:
-                            exc_type = SupervisorForbiddenError
-                        case HTTPStatus.NOT_FOUND:
-                            exc_type = SupervisorNotFoundError
-                        case HTTPStatus.SERVICE_UNAVAILABLE:
-                            exc_type = SupervisorServiceUnavailableError
-
-                    if is_json(response):
-                        result = Response.from_json(await response.text())
-                        raise exc_type(result.message, result.job_id)
-                    raise exc_type()
-
-                match response_type:
-                    case ResponseType.JSON:
-                        is_json(response, raise_on_fail=True)
-                        return Response.from_json(await response.text())
-                    case ResponseType.TEXT:
-                        return Response(ResultType.OK, await response.text())
-                    case _:
-                        return Response(ResultType.OK)
+            )
+            await self._raise_on_status(response)
+            match response_type:
+                case ResponseType.JSON:
+                    is_json(response, raise_on_fail=True)
+                    return Response.from_json(await response.text())
+                case ResponseType.TEXT:
+                    return Response(ResultType.OK, await response.text())
+                case ResponseType.STREAM:
+                    return Response(
+                        ResultType.OK, ChunkAsyncStreamIterator(response.content)
+                    )
+                case _:
+                    return Response(ResultType.OK)
 
         except (UnicodeDecodeError, ClientResponseError) as err:
             raise SupervisorResponseError(
@@ -146,7 +155,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str, str] | None = None,
         response_type: ResponseType = ResponseType.JSON,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
@@ -163,7 +172,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str, str] | None = None,
         response_type: ResponseType = ResponseType.NONE,
         json: dict[str, Any] | None = None,
         data: Any = None,
@@ -184,7 +193,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str, str] | None = None,
         json: dict[str, Any] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
@@ -202,7 +211,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str, str] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a DELETE request to Supervisor."""

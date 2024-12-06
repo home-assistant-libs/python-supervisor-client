@@ -1,5 +1,10 @@
 """Backups client for supervisor."""
 
+from collections.abc import AsyncIterator
+
+from aiohttp import MultipartWriter
+from multidict import MultiDict
+
 from .client import _SupervisorComponentClient
 from .const import ResponseType
 from .models.backups import (
@@ -15,6 +20,8 @@ from .models.backups import (
     NewBackup,
     PartialBackupOptions,
     PartialRestoreOptions,
+    UploadBackupOptions,
+    UploadedBackup,
 )
 
 
@@ -102,4 +109,29 @@ class BackupsClient(_SupervisorComponentClient):
         )
         return BackupJob.from_dict(result.data)
 
-    # Omitted for now - Upload and download backup
+    async def upload_backup(
+        self, stream: AsyncIterator[bytes], options: UploadBackupOptions | None = None
+    ) -> str:
+        """Upload backup by stream and return slug."""
+        params = MultiDict()
+        if options and options.location:
+            for location in options.location:
+                params.add("location", location or "")
+
+        with MultipartWriter("form-data") as mp:
+            mp.append(stream)
+            result = await self._client.post(
+                "backups/new/upload",
+                params=params,
+                data=mp,
+                response_type=ResponseType.JSON,
+            )
+
+        return UploadedBackup.from_dict(result.data).slug
+
+    async def download_backup(self, backup: str) -> AsyncIterator[bytes]:
+        """Download backup and return stream."""
+        result = await self._client.get(
+            f"backups/{backup}/download", response_type=ResponseType.STREAM
+        )
+        return result.data

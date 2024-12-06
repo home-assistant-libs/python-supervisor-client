@@ -1,5 +1,7 @@
 """Test backups supervisor client."""
 
+import asyncio
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
@@ -15,6 +17,7 @@ from aiohasupervisor.models import (
     FullBackupOptions,
     PartialBackupOptions,
     PartialRestoreOptions,
+    UploadBackupOptions,
 )
 
 from . import load_fixture
@@ -265,3 +268,52 @@ async def test_partial_restore(
         "abc123", PartialRestoreOptions(addons={"core_ssh"})
     )
     assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+
+
+async def test_upload_backup(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test upload backup API."""
+    responses.post(
+        f"{SUPERVISOR_URL}/backups/new/upload",
+        status=200,
+        body=load_fixture("backup_uploaded.json"),
+    )
+    data = asyncio.StreamReader(loop=asyncio.get_running_loop())
+    data.feed_data(b"backup test")
+    data.feed_eof()
+
+    result = await supervisor_client.backups.upload_backup(data)
+    assert result == "7fed74c8"
+
+
+async def test_upload_backup_to_locations(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test upload backup API with multiple locations."""
+    responses.post(
+        f"{SUPERVISOR_URL}/backups/new/upload?location=&location=test",
+        status=200,
+        body=load_fixture("backup_uploaded.json"),
+    )
+    data = asyncio.StreamReader(loop=asyncio.get_running_loop())
+    data.feed_data(b"backup test")
+    data.feed_eof()
+
+    result = await supervisor_client.backups.upload_backup(
+        data, UploadBackupOptions(location={None, "test"})
+    )
+    assert result == "7fed74c8"
+
+
+async def test_download_backup(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test download backup API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/7fed74c8/download", status=200, body=b"backup test"
+    )
+    result = await supervisor_client.backups.download_backup("7fed74c8")
+    assert isinstance(result, AsyncIterator)
+    async for chunk in result:
+        assert chunk == b"backup test"
