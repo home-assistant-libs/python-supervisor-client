@@ -133,7 +133,7 @@ async def test_partial_restore_options() -> None:
 
 def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # noqa: ARG001
     """Return response based on whether backup was in background or not."""
-    if kwargs["json"] and kwargs["json"]["background"]:
+    if kwargs["json"] and kwargs["json"].get("background"):
         fixture = "backup_background.json"
     else:
         fixture = "backup_foreground.json"
@@ -145,6 +145,19 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
     [
         (FullBackupOptions(name="Test", background=True), None),
         (FullBackupOptions(name="Test", background=False), "9ecf0028"),
+        (FullBackupOptions(name="Test", background=False, location=None), "9ecf0028"),
+        (FullBackupOptions(name="Test", background=False, location="test"), "9ecf0028"),
+        (
+            FullBackupOptions(name="Test", background=False, location={None, "test"}),
+            "9ecf0028",
+        ),
+        (
+            FullBackupOptions(
+                name="Test", background=False, extra={"user": "test", "scheduled": True}
+            ),
+            "9ecf0028",
+        ),
+        (FullBackupOptions(name="Test", background=False, extra=None), "9ecf0028"),
         (None, "9ecf0028"),
     ],
 )
@@ -165,13 +178,59 @@ async def test_backups_full_backup(
 
 
 @pytest.mark.parametrize(
-    ("background", "slug"),
-    [(True, None), (False, "9ecf0028")],
+    ("options", "slug"),
+    [
+        (PartialBackupOptions(name="Test", background=True, addons={"core_ssh"}), None),
+        (
+            PartialBackupOptions(name="Test", background=False, addons={"core_ssh"}),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(
+                name="Test", background=False, location=None, addons={"core_ssh"}
+            ),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(
+                name="Test", background=False, location="test", addons={"core_ssh"}
+            ),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(
+                name="Test",
+                background=False,
+                location={None, "test"},
+                addons={"core_ssh"},
+            ),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(
+                name="Test",
+                background=False,
+                addons={"core_ssh"},
+                extra={"user": "test", "scheduled": True},
+            ),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(
+                name="Test", background=False, addons={"core_ssh"}, extra=None
+            ),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(name="Test", background=None, addons={"core_ssh"}),
+            "9ecf0028",
+        ),
+    ],
 )
 async def test_backups_partial_backup(
     responses: aioresponses,
     supervisor_client: SupervisorClient,
-    background: bool,  # noqa: FBT001
+    options: PartialBackupOptions,
     slug: str | None,
 ) -> None:
     """Test backups full backup API."""
@@ -179,9 +238,7 @@ async def test_backups_partial_backup(
         f"{SUPERVISOR_URL}/backups/new/partial",
         callback=backup_callback,
     )
-    result = await supervisor_client.backups.partial_backup(
-        PartialBackupOptions(name="test", background=background, addons={"core_ssh"})
-    )
+    result = await supervisor_client.backups.partial_backup(options)
     assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
 
@@ -200,6 +257,7 @@ async def test_backup_info(
     assert result.type == "partial"
     assert result.date == datetime(2024, 5, 31, 0, 0, 0, 0, UTC)
     assert result.size == 0.01
+    assert result.size_bytes == 10123
     assert result.compressed is True
     assert result.addons[0].slug == "core_mosquitto"
     assert result.addons[0].name == "Mosquitto broker"
@@ -214,6 +272,9 @@ async def test_backup_info(
     ]
     assert result.folders == []
     assert result.homeassistant_exclude_database is None
+    assert result.extra is None
+    assert result.location is None
+    assert result.locations == {None}
 
 
 async def test_backup_info_no_homeassistant(
@@ -229,6 +290,37 @@ async def test_backup_info_no_homeassistant(
     assert result.slug == "d13dedd0"
     assert result.type == "partial"
     assert result.homeassistant is None
+
+
+async def test_backup_info_with_extra(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test backup info API with extras set by client."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/d13dedd0/info",
+        status=200,
+        body=load_fixture("backup_info_with_extra.json"),
+    )
+    result = await supervisor_client.backups.backup_info("d13dedd0")
+    assert result.slug == "69558789"
+    assert result.type == "partial"
+    assert result.extra == {"user": "test", "scheduled": True}
+
+
+async def test_backup_info_with_multiple_locations(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test backup info API with multiple locations."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/d13dedd0/info",
+        status=200,
+        body=load_fixture("backup_info_with_locations.json"),
+    )
+    result = await supervisor_client.backups.backup_info("d13dedd0")
+    assert result.slug == "69558789"
+    assert result.type == "partial"
+    assert result.location is None
+    assert result.locations == {None, "Test"}
 
 
 async def test_remove_backup(

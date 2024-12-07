@@ -47,7 +47,9 @@ class BackupBaseFields(ABC):
     date: datetime
     type: BackupType
     size: float
+    size_bytes: int
     location: str | None
+    locations: set[str | None]
     protected: bool
     compressed: bool
 
@@ -79,6 +81,7 @@ class BackupComplete(BackupBaseFields, ResponseData):
     repositories: list[str]
     folders: list[Folder]
     homeassistant_exclude_database: bool | None
+    extra: dict | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,7 +135,7 @@ class FullBackupOptions(Request):
     name: str | None = None
     password: str | None = None
     compressed: bool | None = None
-    location: list[str | None] | str | None = None
+    location: set[str | None] | str | None = None
     homeassistant_exclude_database: bool | None = None
     background: bool | None = None
     extra: dict | None = None

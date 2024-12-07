@@ -12,7 +12,7 @@
     "supervisor_version": "2024.05.0",
     "homeassistant": null,
     "location": null,
-    "locations": [null],
+    "locations": [null, "Test"],
     "addons": [
       {
         "slug": "core_mosquitto",

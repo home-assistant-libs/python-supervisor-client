@@ -79,6 +79,7 @@ class MountResponse(ABC):
     name: str
     read_only: bool
     state: MountState | None
+    user_path: PurePath | None
 
 
 @dataclass(frozen=True)
