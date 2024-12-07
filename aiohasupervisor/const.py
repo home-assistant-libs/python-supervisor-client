@@ -13,4 +13,5 @@ class ResponseType(StrEnum):
 
     NONE = "none"
     JSON = "json"
+    STREAM = "stream"
     TEXT = "text"

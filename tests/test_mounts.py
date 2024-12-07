@@ -37,15 +37,18 @@ async def test_mounts_info(
     assert info.mounts[0].read_only is False
     assert info.mounts[0].version is None
     assert info.mounts[0].state == "active"
+    assert info.mounts[0].user_path is None
 
     assert info.mounts[1].usage == "share"
     assert info.mounts[1].read_only is True
     assert info.mounts[1].version == "2.0"
     assert info.mounts[1].port == 12345
+    assert info.mounts[1].user_path == PurePath("/share/Test2")
 
     assert info.mounts[2].type == "nfs"
     assert info.mounts[2].usage == "media"
     assert info.mounts[2].path.as_posix() == "media"
+    assert info.mounts[2].user_path == PurePath("/media/Test3")
 
 
 @pytest.mark.parametrize("mount_name", ["test", None])

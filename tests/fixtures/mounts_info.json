@@ -11,7 +11,8 @@
         "usage": "backup",
         "read_only": false,
         "version": null,
-        "state": "active"
+        "state": "active",
+        "user_path": null
       },
       {
         "share": "share",
@@ -22,16 +23,18 @@
         "read_only": true,
         "version": "2.0",
         "port": 12345,
-        "state": "active"
+        "state": "active",
+        "user_path": "/share/Test2"
       },
       {
         "server": "test3.local",
-        "name": "Test2",
+        "name": "Test3",
         "type": "nfs",
         "usage": "media",
         "read_only": false,
         "path": "media",
-        "state": "active"
+        "state": "active",
+        "user_path": "/media/Test3"
       }
     ]
   }

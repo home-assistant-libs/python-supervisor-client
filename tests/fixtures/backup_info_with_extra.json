@@ -30,6 +30,9 @@
     ],
     "folders": [],
     "homeassistant_exclude_database": null,
-    "extra": null
+    "extra": {
+      "user": "test",
+      "scheduled": true
+    }
   }
 }
