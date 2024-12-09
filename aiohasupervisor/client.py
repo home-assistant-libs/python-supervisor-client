@@ -81,7 +81,7 @@ class _SupervisorClient:
         method: HTTPMethod,
         uri: str,
         *,
-        params: dict[str, str] | MultiDict[str, str] | None,
+        params: dict[str, str] | MultiDict[str] | None,
         response_type: ResponseType,
         json: dict[str, Any] | None = None,
         data: Any = None,
@@ -155,7 +155,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | MultiDict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str] | None = None,
         response_type: ResponseType = ResponseType.JSON,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
@@ -172,7 +172,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | MultiDict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str] | None = None,
         response_type: ResponseType = ResponseType.NONE,
         json: dict[str, Any] | None = None,
         data: Any = None,
@@ -193,7 +193,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | MultiDict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str] | None = None,
         json: dict[str, Any] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
@@ -211,7 +211,7 @@ class _SupervisorClient:
         self,
         uri: str,
         *,
-        params: dict[str, str] | MultiDict[str, str] | None = None,
+        params: dict[str, str] | MultiDict[str] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a DELETE request to Supervisor."""
