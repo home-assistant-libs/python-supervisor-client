@@ -12,11 +12,13 @@ from yarl import URL
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
     BackupsOptions,
+    DownloadBackupOptions,
     Folder,
     FreezeOptions,
     FullBackupOptions,
     PartialBackupOptions,
     PartialRestoreOptions,
+    RemoveBackupOptions,
     UploadBackupOptions,
 )
 
@@ -129,6 +131,32 @@ async def test_partial_restore_options() -> None:
         match="At least one of addons, folders, or homeassistant must have a value",
     ):
         PartialRestoreOptions(background=True)
+
+
+async def test_backup_options_location() -> None:
+    """Test location field in backup options."""
+    assert FullBackupOptions(location=["test", None]).to_dict() == {
+        "location": ["test", None]
+    }
+    assert FullBackupOptions(location="test").to_dict() == {"location": "test"}
+    assert FullBackupOptions(location=None).to_dict() == {"location": None}
+    assert FullBackupOptions().to_dict() == {}
+
+    assert PartialBackupOptions(
+        location=["test", None], folders={Folder.SSL}
+    ).to_dict() == {
+        "location": ["test", None],
+        "folders": ["ssl"],
+    }
+    assert PartialBackupOptions(location="test", folders={Folder.SSL}).to_dict() == {
+        "location": "test",
+        "folders": ["ssl"],
+    }
+    assert PartialBackupOptions(location=None, folders={Folder.SSL}).to_dict() == {
+        "location": None,
+        "folders": ["ssl"],
+    }
+    assert PartialBackupOptions(folders={Folder.SSL}).to_dict() == {"folders": ["ssl"]}
 
 
 def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # noqa: ARG001
@@ -323,12 +351,17 @@ async def test_backup_info_with_multiple_locations(
     assert result.locations == {None, "Test"}
 
 
+@pytest.mark.parametrize(
+    "options", [None, RemoveBackupOptions(location={"test", None})]
+)
 async def test_remove_backup(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: RemoveBackupOptions | None,
 ) -> None:
     """Test remove backup API."""
     responses.delete(f"{SUPERVISOR_URL}/backups/abc123", status=200)
-    assert await supervisor_client.backups.remove_backup("abc123") is None
+    assert await supervisor_client.backups.remove_backup("abc123", options) is None
     assert responses.requests.keys() == {
         ("DELETE", URL(f"{SUPERVISOR_URL}/backups/abc123"))
     }
@@ -398,14 +431,27 @@ async def test_upload_backup_to_locations(
     assert result == "7fed74c8"
 
 
+@pytest.mark.parametrize(
+    ("options", "query"),
+    [
+        (None, ""),
+        (DownloadBackupOptions(location="test"), "?location=test"),
+        (DownloadBackupOptions(location=None), "?location="),
+    ],
+)
 async def test_download_backup(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: DownloadBackupOptions | None,
+    query: str,
 ) -> None:
     """Test download backup API."""
     responses.get(
-        f"{SUPERVISOR_URL}/backups/7fed74c8/download", status=200, body=b"backup test"
+        f"{SUPERVISOR_URL}/backups/7fed74c8/download{query}",
+        status=200,
+        body=b"backup test",
     )
-    result = await supervisor_client.backups.download_backup("7fed74c8")
+    result = await supervisor_client.backups.download_backup("7fed74c8", options)
     assert isinstance(result, AsyncIterator)
     async for chunk in result:
         assert chunk == b"backup test"
