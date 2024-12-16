@@ -33,6 +33,7 @@ from aiohasupervisor.models.backups import (
     BackupsInfo,
     BackupsOptions,
     BackupType,
+    DownloadBackupOptions,
     Folder,
     FreezeOptions,
     FullBackupOptions,
@@ -40,6 +41,7 @@ from aiohasupervisor.models.backups import (
     NewBackup,
     PartialBackupOptions,
     PartialRestoreOptions,
+    RemoveBackupOptions,
     UploadBackupOptions,
 )
 from aiohasupervisor.models.discovery import (
@@ -209,6 +211,7 @@ __all__ = [
     "BackupsInfo",
     "BackupsOptions",
     "BackupType",
+    "DownloadBackupOptions",
     "Folder",
     "FreezeOptions",
     "FullBackupOptions",
@@ -216,6 +219,7 @@ __all__ = [
     "NewBackup",
     "PartialBackupOptions",
     "PartialRestoreOptions",
+    "RemoveBackupOptions",
     "UploadBackupOptions",
     "Discovery",
     "DiscoveryConfig",

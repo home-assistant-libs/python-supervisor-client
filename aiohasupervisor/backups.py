@@ -14,12 +14,14 @@ from .models.backups import (
     BackupList,
     BackupsInfo,
     BackupsOptions,
+    DownloadBackupOptions,
     FreezeOptions,
     FullBackupOptions,
     FullRestoreOptions,
     NewBackup,
     PartialBackupOptions,
     PartialRestoreOptions,
+    RemoveBackupOptions,
     UploadBackupOptions,
     UploadedBackup,
 )
@@ -81,9 +83,13 @@ class BackupsClient(_SupervisorComponentClient):
         result = await self._client.get(f"backups/{backup}/info")
         return BackupComplete.from_dict(result.data)
 
-    async def remove_backup(self, backup: str) -> None:
+    async def remove_backup(
+        self, backup: str, options: RemoveBackupOptions | None = None
+    ) -> None:
         """Remove a backup."""
-        await self._client.delete(f"backups/{backup}")
+        await self._client.delete(
+            f"backups/{backup}", json=options.to_dict() if options else None
+        )
 
     async def full_restore(
         self, backup: str, options: FullRestoreOptions | None = None
@@ -129,9 +135,17 @@ class BackupsClient(_SupervisorComponentClient):
 
         return UploadedBackup.from_dict(result.data).slug
 
-    async def download_backup(self, backup: str) -> AsyncIterator[bytes]:
+    async def download_backup(
+        self, backup: str, options: DownloadBackupOptions | None = None
+    ) -> AsyncIterator[bytes]:
         """Download backup and return stream."""
+        params = MultiDict()
+        if options and options.location:
+            params.add("location", options.location or "")
+
         result = await self._client.get(
-            f"backups/{backup}/download", response_type=ResponseType.STREAM
+            f"backups/{backup}/download",
+            params=params,
+            response_type=ResponseType.STREAM,
         )
         return result.data

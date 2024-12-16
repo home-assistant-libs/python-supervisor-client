@@ -212,6 +212,7 @@ class _SupervisorClient:
         uri: str,
         *,
         params: dict[str, str] | MultiDict[str] | None = None,
+        json: dict[str, Any] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
     ) -> Response:
         """Handle a DELETE request to Supervisor."""
@@ -220,6 +221,7 @@ class _SupervisorClient:
             uri,
             params=params,
             response_type=ResponseType.NONE,
+            json=json,
             timeout=timeout,
         )
 

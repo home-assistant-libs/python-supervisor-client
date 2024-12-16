@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
 
-from .base import Request, ResponseData
+from .base import DEFAULT, Request, ResponseData
 
 # --- ENUMS ----
 
@@ -135,7 +135,7 @@ class FullBackupOptions(Request):
     name: str | None = None
     password: str | None = None
     compressed: bool | None = None
-    location: set[str | None] | str | None = None
+    location: list[str | None] | str | None = DEFAULT  # type: ignore[assignment]
     homeassistant_exclude_database: bool | None = None
     background: bool | None = None
     extra: dict | None = None
@@ -185,3 +185,17 @@ class UploadedBackup(ResponseData):
     """UploadedBackup model."""
 
     slug: str
+
+
+@dataclass(frozen=True, slots=True)
+class RemoveBackupOptions(Request):
+    """RemoveBackupOptions model."""
+
+    location: set[str | None] = None
+
+
+@dataclass(frozen=True, slots=True)
+class DownloadBackupOptions(Request):
+    """DownloadBackupOptions model."""
+
+    location: str | None = DEFAULT  # type: ignore[assignment]
