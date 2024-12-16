@@ -11,6 +11,7 @@ from yarl import URL
 
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
+    AddonSet,
     BackupsOptions,
     DownloadBackupOptions,
     Folder,
@@ -251,6 +252,10 @@ async def test_backups_full_backup(
         ),
         (
             PartialBackupOptions(name="Test", background=None, addons={"core_ssh"}),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(name="Test", background=None, addons=AddonSet.ALL),
             "9ecf0028",
         ),
     ],

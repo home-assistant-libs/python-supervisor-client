@@ -26,6 +26,12 @@ class Folder(StrEnum):
     MEDIA = "media"
 
 
+class AddonSet(StrEnum):
+    """AddonSet type."""
+
+    ALL = "all"
+
+
 # --- OBJECTS ----
 
 
@@ -144,6 +150,8 @@ class FullBackupOptions(Request):
 @dataclass(frozen=True, slots=True)
 class PartialBackupOptions(FullBackupOptions, PartialBackupRestoreOptions):
     """PartialBackupOptions model."""
+
+    addons: set[str] | AddonSet | None = None
 
 
 @dataclass(frozen=True, slots=True)

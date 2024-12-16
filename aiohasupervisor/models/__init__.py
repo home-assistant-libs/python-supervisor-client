@@ -25,6 +25,7 @@ from aiohasupervisor.models.addons import (
     SupervisorRole,
 )
 from aiohasupervisor.models.backups import (
+    AddonSet,
     Backup,
     BackupAddon,
     BackupComplete,
@@ -203,6 +204,7 @@ __all__ = [
     "GreenOptions",
     "YellowInfo",
     "YellowOptions",
+    "AddonSet",
     "Backup",
     "BackupAddon",
     "BackupComplete",
