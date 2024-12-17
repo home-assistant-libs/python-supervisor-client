@@ -174,6 +174,7 @@ class FullRestoreOptions(Request):
 
     password: str | None = None
     background: bool | None = None
+    location: str | None = DEFAULT  # type: ignore[assignment]
 
 
 @dataclass(frozen=True, slots=True)

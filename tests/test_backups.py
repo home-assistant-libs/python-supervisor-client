@@ -17,6 +17,7 @@ from aiohasupervisor.models import (
     Folder,
     FreezeOptions,
     FullBackupOptions,
+    FullRestoreOptions,
     PartialBackupOptions,
     PartialRestoreOptions,
     RemoveBackupOptions,
@@ -372,8 +373,20 @@ async def test_remove_backup(
     }
 
 
+@pytest.mark.parametrize(
+    "options",
+    [
+        None,
+        FullRestoreOptions(password="abc123"),  # noqa: S106
+        FullRestoreOptions(background=True),
+        FullRestoreOptions(location=None),
+        FullRestoreOptions(location="test"),
+    ],
+)
 async def test_full_restore(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: FullRestoreOptions | None,
 ) -> None:
     """Test full restore API."""
     responses.post(
@@ -381,12 +394,24 @@ async def test_full_restore(
         status=200,
         body=load_fixture("backup_restore.json"),
     )
-    result = await supervisor_client.backups.full_restore("abc123")
+    result = await supervisor_client.backups.full_restore("abc123", options)
     assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
 
 
+@pytest.mark.parametrize(
+    "options",
+    [
+        PartialRestoreOptions(addons={"core_ssh"}),
+        PartialRestoreOptions(homeassistant=True, location=None),
+        PartialRestoreOptions(folders={Folder.SHARE, Folder.SSL}, location="test"),
+        PartialRestoreOptions(addons={"core_ssh"}, background=True),
+        PartialRestoreOptions(addons={"core_ssh"}, password="abc123"),  # noqa: S106
+    ],
+)
 async def test_partial_restore(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: PartialRestoreOptions,
 ) -> None:
     """Test partial restore API."""
     responses.post(
@@ -394,9 +419,7 @@ async def test_partial_restore(
         status=200,
         body=load_fixture("backup_restore.json"),
     )
-    result = await supervisor_client.backups.partial_restore(
-        "abc123", PartialRestoreOptions(addons={"core_ssh"})
-    )
+    result = await supervisor_client.backups.partial_restore("abc123", options)
     assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
 
 
