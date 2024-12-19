@@ -141,7 +141,7 @@ class FullBackupOptions(Request):
     name: str | None = None
     password: str | None = None
     compressed: bool | None = None
-    location: list[str | None] | str | None = DEFAULT  # type: ignore[assignment]
+    location: str | list[str | None] | None = DEFAULT  # type: ignore[assignment]
     homeassistant_exclude_database: bool | None = None
     background: bool | None = None
     extra: dict | None = None
@@ -151,7 +151,7 @@ class FullBackupOptions(Request):
 class PartialBackupOptions(FullBackupOptions, PartialBackupRestoreOptions):
     """PartialBackupOptions model."""
 
-    addons: set[str] | AddonSet | None = None
+    addons: AddonSet | set[str] | None = None
 
 
 @dataclass(frozen=True, slots=True)

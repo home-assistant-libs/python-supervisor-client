@@ -483,3 +483,48 @@ async def test_download_backup(
     assert isinstance(result, AsyncIterator)
     async for chunk in result:
         assert chunk == b"backup test"
+
+
+@pytest.mark.parametrize(
+    ("options", "as_dict"),
+    [
+        (
+            PartialBackupOptions(name="Test", folders={Folder.SHARE}),
+            {"name": "Test", "folders": ["share"]},
+        ),
+        (PartialBackupOptions(addons={"core_ssh"}), {"addons": ["core_ssh"]}),
+        (PartialBackupOptions(addons=AddonSet.ALL), {"addons": "all"}),
+        (
+            PartialBackupOptions(
+                homeassistant=True, homeassistant_exclude_database=True
+            ),
+            {"homeassistant": True, "homeassistant_exclude_database": True},
+        ),
+        (
+            PartialBackupOptions(
+                folders={Folder.SSL}, compressed=True, background=True
+            ),
+            {"folders": ["ssl"], "compressed": True, "background": True},
+        ),
+        (
+            PartialBackupOptions(
+                homeassistant=True, location=[".cloud_backup", "test"]
+            ),
+            {"homeassistant": True, "location": [".cloud_backup", "test"]},
+        ),
+        (
+            PartialBackupOptions(homeassistant=True, location="test"),
+            {"homeassistant": True, "location": "test"},
+        ),
+        (
+            PartialBackupOptions(homeassistant=True, location=None),
+            {"homeassistant": True, "location": None},
+        ),
+    ],
+)
+async def test_partial_backup_model(
+    options: PartialBackupOptions, as_dict: dict[str, Any]
+) -> None:
+    """Test partial backup model parsing and serializing."""
+    assert PartialBackupOptions.from_dict(as_dict) == options
+    assert options.to_dict() == as_dict
