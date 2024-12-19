@@ -528,3 +528,30 @@ async def test_partial_backup_model(
     """Test partial backup model parsing and serializing."""
     assert PartialBackupOptions.from_dict(as_dict) == options
     assert options.to_dict() == as_dict
+
+
+@pytest.mark.parametrize(
+    ("options", "as_dict"),
+    [
+        (FullBackupOptions(name="Test"), {"name": "Test"}),
+        (FullBackupOptions(password="test"), {"password": "test"}),  # noqa: S106
+        (FullBackupOptions(compressed=True), {"compressed": True}),
+        (
+            FullBackupOptions(homeassistant_exclude_database=True),
+            {"homeassistant_exclude_database": True},
+        ),
+        (FullBackupOptions(background=True), {"background": True}),
+        (
+            FullBackupOptions(location=[".cloud_backup", "test"]),
+            {"location": [".cloud_backup", "test"]},
+        ),
+        (FullBackupOptions(location="test"), {"location": "test"}),
+        (FullBackupOptions(location=None), {"location": None}),
+    ],
+)
+async def test_full_backup_model(
+    options: FullBackupOptions, as_dict: dict[str, Any]
+) -> None:
+    """Test full backup model parsing and serializing."""
+    assert FullBackupOptions.from_dict(as_dict) == options
+    assert options.to_dict() == as_dict
