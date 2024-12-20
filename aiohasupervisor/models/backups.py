@@ -29,7 +29,7 @@ class Folder(StrEnum):
 class AddonSet(StrEnum):
     """AddonSet type."""
 
-    ALL = "all"
+    ALL = "ALL"
 
 
 # --- OBJECTS ----
