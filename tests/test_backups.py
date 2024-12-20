@@ -493,7 +493,7 @@ async def test_download_backup(
             {"name": "Test", "folders": ["share"]},
         ),
         (PartialBackupOptions(addons={"core_ssh"}), {"addons": ["core_ssh"]}),
-        (PartialBackupOptions(addons=AddonSet.ALL), {"addons": "all"}),
+        (PartialBackupOptions(addons=AddonSet.ALL), {"addons": "ALL"}),
         (
             PartialBackupOptions(
                 homeassistant=True, homeassistant_exclude_database=True
