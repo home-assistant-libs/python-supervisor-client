@@ -131,6 +131,7 @@ class BackupsClient(_SupervisorComponentClient):
                 params=params,
                 data=mp,
                 response_type=ResponseType.JSON,
+                timeout=None,
             )
 
         return UploadedBackup.from_dict(result.data).slug
@@ -147,5 +148,6 @@ class BackupsClient(_SupervisorComponentClient):
             f"backups/{backup}/download",
             params=params,
             response_type=ResponseType.STREAM,
+            timeout=None,
         )
         return result.data
