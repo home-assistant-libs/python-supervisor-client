@@ -66,6 +66,13 @@ from aiohasupervisor.models.host import (
     ServiceState,
     ShutdownOptions,
 )
+from aiohasupervisor.models.jobs import (
+    Job,
+    JobCondition,
+    JobError,
+    JobsInfo,
+    JobsOptions,
+)
 from aiohasupervisor.models.mounts import (
     CIFSMountRequest,
     CIFSMountResponse,
@@ -248,6 +255,11 @@ __all__ = [
     "Service",
     "ServiceState",
     "ShutdownOptions",
+    "Job",
+    "JobCondition",
+    "JobError",
+    "JobsInfo",
+    "JobsOptions",
     "CIFSMountRequest",
     "CIFSMountResponse",
     "MountCifsVersion",

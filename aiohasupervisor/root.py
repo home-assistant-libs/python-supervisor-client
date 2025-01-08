@@ -10,6 +10,7 @@ from .client import _SupervisorClient
 from .discovery import DiscoveryClient
 from .homeassistant import HomeAssistantClient
 from .host import HostClient
+from .jobs import JobsClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .mounts import MountsClient
 from .network import NetworkClient
@@ -34,6 +35,7 @@ class SupervisorClient:
         self._os = OSClient(self._client)
         self._backups = BackupsClient(self._client)
         self._discovery = DiscoveryClient(self._client)
+        self._jobs = JobsClient(self._client)
         self._mounts = MountsClient(self._client)
         self._network = NetworkClient(self._client)
         self._host = HostClient(self._client)
@@ -66,6 +68,11 @@ class SupervisorClient:
     def discovery(self) -> DiscoveryClient:
         """Get discovery component client."""
         return self._discovery
+
+    @property
+    def jobs(self) -> JobsClient:
+        """Get jobs component client."""
+        return self._jobs
 
     @property
     def mounts(self) -> MountsClient:

@@ -1,0 +1,55 @@
+{
+  "result": "ok",
+  "data": {
+    "ignore_conditions": ["free_space"],
+    "jobs": [
+      {
+        "name": "backup_manager_partial_backup",
+        "reference": "89cafa67",
+        "uuid": "2febe59311f94d6ba36f6f9f73357ca8",
+        "progress": 0,
+        "stage": "finishing_file",
+        "done": true,
+        "errors": [],
+        "child_jobs": [
+          {
+            "name": "backup_store_folders",
+            "reference": "89cafa67",
+            "uuid": "f4bac7d9240f434a9f6a21aff7f7ade3",
+            "progress": 0,
+            "stage": null,
+            "done": true,
+            "errors": [],
+            "child_jobs": [
+              {
+                "name": "backup_folder_save",
+                "reference": "ssl",
+                "uuid": "fb328a1a048d4b9b982bf6b9070c03a6",
+                "progress": 0,
+                "stage": null,
+                "done": true,
+                "errors": [],
+                "child_jobs": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "backup_manager_partial_restore",
+        "reference": "cfddca18",
+        "uuid": "6e61e9629669499981780b700ec730ec",
+        "progress": 0,
+        "stage": null,
+        "done": true,
+        "errors": [
+          {
+            "type": "BackupInvalidError",
+            "message": "Invalid password for backup cfddca18"
+          }
+        ],
+        "child_jobs": []
+      }
+    ]
+  }
+}
