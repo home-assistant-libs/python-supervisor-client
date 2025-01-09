@@ -14,7 +14,7 @@ class JobsClient(_SupervisorComponentClient):
         result = await self._client.get("jobs/info")
         return JobsInfo.from_dict(result.data)
 
-    async def options(self, options: JobsOptions) -> None:
+    async def set_options(self, options: JobsOptions) -> None:
         """Set Jobs options."""
         await self._client.post("jobs/options", json=options.to_dict())
 

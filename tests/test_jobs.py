@@ -40,13 +40,13 @@ async def test_jobs_info(
     assert info.jobs[1].errors[0].message == "Invalid password for backup cfddca18"
 
 
-async def test_jobs_options(
+async def test_jobs_set_options(
     responses: aioresponses, supervisor_client: SupervisorClient
 ) -> None:
-    """Test jobs options API."""
+    """Test jobs set options API."""
     responses.post(f"{SUPERVISOR_URL}/jobs/options", status=200)
     assert (
-        await supervisor_client.jobs.options(
+        await supervisor_client.jobs.set_options(
             JobsOptions(ignore_conditions=[JobCondition.FREE_SPACE])
         )
         is None
