@@ -57,6 +57,7 @@ class BackupBaseFields(ABC):
     location: str | None
     locations: set[str | None]
     protected: bool
+    protected_locations: set[str | None]
     compressed: bool
 
 

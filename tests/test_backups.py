@@ -555,3 +555,33 @@ async def test_full_backup_model(
     """Test full backup model parsing and serializing."""
     assert FullBackupOptions.from_dict(as_dict) == options
     assert options.to_dict() == as_dict
+
+
+async def test_backups_list_protected_locations(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+) -> None:
+    """Test protected locations field in backups list."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups",
+        status=200,
+        body=load_fixture("backups_list_protected_locations.json"),
+    )
+
+    result = await supervisor_client.backups.list()
+    assert result[0].protected_locations == {None, "test"}
+
+
+async def test_backup_info_protected_locations(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+) -> None:
+    """Test protected locations field in backup info."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/d9c48f8b/info",
+        status=200,
+        body=load_fixture("backup_info_protected_locations.json"),
+    )
+
+    result = await supervisor_client.backups.backup_info("d9c48f8b")
+    assert result.protected_locations == {None, "test"}

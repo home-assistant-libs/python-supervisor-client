@@ -1,0 +1,29 @@
+{
+  "result": "ok",
+  "data": {
+    "slug": "d9c48f8b",
+    "type": "partial",
+    "name": "test_consolidate",
+    "date": "2025-01-22T18:09:28.196333+00:00",
+    "size": 0.01,
+    "size_bytes": 10240,
+    "compressed": true,
+    "protected": true,
+    "protected_locations": [null, "test"],
+    "supervisor_version": "2025.01.1.dev2104",
+    "homeassistant": null,
+    "location": null,
+    "locations": [null, "test"],
+    "addons": [],
+    "repositories": [
+      "https://github.com/esphome/home-assistant-addon",
+      "https://github.com/hassio-addons/repository",
+      "https://github.com/music-assistant/home-assistant-addon",
+      "local",
+      "core"
+    ],
+    "folders": ["ssl"],
+    "homeassistant_exclude_database": null,
+    "extra": {}
+  }
+}
