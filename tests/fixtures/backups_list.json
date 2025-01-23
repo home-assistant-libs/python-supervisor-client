@@ -12,6 +12,7 @@
         "location": null,
         "locations": [null],
         "protected": false,
+        "protected_locations": [],
         "compressed": true,
         "content": {
           "homeassistant": true,
@@ -38,6 +39,7 @@
         "location": null,
         "locations": [null],
         "protected": false,
+        "protected_locations": [],
         "compressed": true,
         "content": {
           "homeassistant": false,

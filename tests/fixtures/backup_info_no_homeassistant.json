@@ -9,6 +9,7 @@
     "size_bytes": 120123,
     "compressed": true,
     "protected": false,
+    "protected_locations": [],
     "supervisor_version": "2023.08.2.dev1002",
     "homeassistant": null,
     "location": "Test",
