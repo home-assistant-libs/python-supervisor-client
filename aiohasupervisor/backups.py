@@ -120,9 +120,12 @@ class BackupsClient(_SupervisorComponentClient):
     ) -> str:
         """Upload backup by stream and return slug."""
         params = MultiDict()
-        if options and options.location:
-            for location in options.location:
-                params.add("location", location or "")
+        if options:
+            if options.location:
+                for location in options.location:
+                    params.add("location", location or "")
+            if options.filename:
+                params.add("filename", options.filename.as_posix())
 
         with MultipartWriter("form-data") as mp:
             mp.append(stream)

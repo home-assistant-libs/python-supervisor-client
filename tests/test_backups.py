@@ -3,6 +3,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from pathlib import PurePath
 from typing import Any
 
 from aioresponses import CallbackResult, aioresponses
@@ -423,12 +424,23 @@ async def test_partial_restore(
     assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
 
 
+@pytest.mark.parametrize(
+    ("options", "query"),
+    [
+        (None, ""),
+        (UploadBackupOptions(location={None, "test"}), "?location=&location=test"),
+        (UploadBackupOptions(filename=PurePath("backup.tar")), "?filename=backup.tar"),
+    ],
+)
 async def test_upload_backup(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: UploadBackupOptions | None,
+    query: str,
 ) -> None:
     """Test upload backup API."""
     responses.post(
-        f"{SUPERVISOR_URL}/backups/new/upload",
+        f"{SUPERVISOR_URL}/backups/new/upload{query}",
         status=200,
         body=load_fixture("backup_uploaded.json"),
     )
@@ -436,26 +448,7 @@ async def test_upload_backup(
     data.feed_data(b"backup test")
     data.feed_eof()
 
-    result = await supervisor_client.backups.upload_backup(data)
-    assert result == "7fed74c8"
-
-
-async def test_upload_backup_to_locations(
-    responses: aioresponses, supervisor_client: SupervisorClient
-) -> None:
-    """Test upload backup API with multiple locations."""
-    responses.post(
-        f"{SUPERVISOR_URL}/backups/new/upload?location=&location=test",
-        status=200,
-        body=load_fixture("backup_uploaded.json"),
-    )
-    data = asyncio.StreamReader(loop=asyncio.get_running_loop())
-    data.feed_data(b"backup test")
-    data.feed_eof()
-
-    result = await supervisor_client.backups.upload_backup(
-        data, UploadBackupOptions(location={None, "test"})
-    )
+    result = await supervisor_client.backups.upload_backup(data, options)
     assert result == "7fed74c8"
 
 
