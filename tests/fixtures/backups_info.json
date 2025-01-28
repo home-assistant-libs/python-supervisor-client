@@ -12,6 +12,12 @@
         "location": null,
         "locations": [null],
         "protected": false,
+        "location_attributes": {
+          ".local": {
+            "protected": false,
+            "size_bytes": 828810000
+          }
+        },
         "compressed": true,
         "content": {
           "homeassistant": true,
@@ -38,6 +44,12 @@
         "location": null,
         "locations": [null],
         "protected": false,
+        "location_attributes": {
+          ".local": {
+            "protected": false,
+            "size_bytes": 120123
+          }
+        },
         "compressed": true,
         "content": {
           "homeassistant": false,

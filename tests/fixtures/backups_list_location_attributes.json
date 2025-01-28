@@ -1,0 +1,34 @@
+{
+  "result": "ok",
+  "data": {
+    "backups": [
+      {
+        "slug": "d9c48f8b",
+        "name": "test_consolidate",
+        "date": "2025-01-22T18:09:28.196333+00:00",
+        "type": "partial",
+        "size": 0.01,
+        "size_bytes": 10240,
+        "location": null,
+        "locations": [null, "test"],
+        "protected": true,
+        "location_attributes": {
+          ".local": {
+            "protected": true,
+            "size_bytes": 10240
+          },
+          "test": {
+            "protected": true,
+            "size_bytes": 10240
+          }
+        },
+        "compressed": true,
+        "content": {
+          "homeassistant": false,
+          "addons": [],
+          "folders": ["ssl"]
+        }
+      }
+    ]
+  }
+}

@@ -46,6 +46,14 @@ class BackupContent(ResponseData):
 
 
 @dataclass(frozen=True)
+class BackupLocationAttributes(ABC):
+    """BackupLocationAttributes model."""
+
+    protected: bool
+    size_bytes: int
+
+
+@dataclass(frozen=True)
 class BackupBaseFields(ABC):
     """BackupBaseFields ABC type."""
 
@@ -58,6 +66,7 @@ class BackupBaseFields(ABC):
     location: str | None
     locations: set[str | None]
     protected: bool
+    location_attributes: dict[str, BackupLocationAttributes]
     compressed: bool
 
 
