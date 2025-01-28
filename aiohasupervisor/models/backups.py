@@ -45,8 +45,8 @@ class BackupContent(ResponseData):
     folders: list[Folder]
 
 
-@dataclass(frozen=True)
-class BackupLocationAttributes(ABC):
+@dataclass(frozen=True, slots=True)
+class BackupLocationAttributes(ResponseData):
     """BackupLocationAttributes model."""
 
     protected: bool
