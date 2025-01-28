@@ -4,6 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from pathlib import PurePath
 
 from .base import DEFAULT, Request, ResponseData
 
@@ -145,6 +146,7 @@ class FullBackupOptions(Request):
     homeassistant_exclude_database: bool | None = None
     background: bool | None = None
     extra: dict | None = None
+    filename: PurePath | None = None
 
 
 @dataclass(frozen=True, slots=True)

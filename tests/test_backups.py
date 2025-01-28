@@ -3,6 +3,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from pathlib import PurePath
 from typing import Any
 
 from aioresponses import CallbackResult, aioresponses
@@ -188,6 +189,12 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
             "9ecf0028",
         ),
         (FullBackupOptions(name="Test", background=False, extra=None), "9ecf0028"),
+        (
+            FullBackupOptions(
+                name="test", background=False, filename=PurePath("backup.tar")
+            ),
+            "9ecf0028",
+        ),
         (None, "9ecf0028"),
     ],
 )
@@ -248,6 +255,15 @@ async def test_backups_full_backup(
         (
             PartialBackupOptions(
                 name="Test", background=False, addons={"core_ssh"}, extra=None
+            ),
+            "9ecf0028",
+        ),
+        (
+            PartialBackupOptions(
+                name="Test",
+                background=False,
+                addons={"core_ssh"},
+                filename=PurePath("backup.tar"),
             ),
             "9ecf0028",
         ),
@@ -520,6 +536,10 @@ async def test_download_backup(
             PartialBackupOptions(homeassistant=True, location=None),
             {"homeassistant": True, "location": None},
         ),
+        (
+            PartialBackupOptions(homeassistant=True, filename=PurePath("backup.tar")),
+            {"homeassistant": True, "filename": "backup.tar"},
+        ),
     ],
 )
 async def test_partial_backup_model(
@@ -547,6 +567,10 @@ async def test_partial_backup_model(
         ),
         (FullBackupOptions(location="test"), {"location": "test"}),
         (FullBackupOptions(location=None), {"location": None}),
+        (
+            FullBackupOptions(filename=PurePath("backup.tar")),
+            {"filename": "backup.tar"},
+        ),
     ],
 )
 async def test_full_backup_model(
