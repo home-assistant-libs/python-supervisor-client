@@ -24,6 +24,7 @@ from aiohasupervisor.models import (
     RemoveBackupOptions,
     UploadBackupOptions,
 )
+from aiohasupervisor.models.backups import BackupLocationAttributes
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -571,3 +572,51 @@ async def test_full_backup_model(
     """Test full backup model parsing and serializing."""
     assert FullBackupOptions.from_dict(as_dict) == options
     assert options.to_dict() == as_dict
+
+
+async def test_backups_list_location_attributes(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+) -> None:
+    """Test location attributes field in backups list."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups",
+        status=200,
+        body=load_fixture("backups_list_location_attributes.json"),
+    )
+
+    result = await supervisor_client.backups.list()
+    assert result[0].location_attributes == {
+        ".local": BackupLocationAttributes(
+            protected=True,
+            size_bytes=10240,
+        ),
+        "test": BackupLocationAttributes(
+            protected=True,
+            size_bytes=10240,
+        ),
+    }
+
+
+async def test_backup_info_location_attributes(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+) -> None:
+    """Test location attributes field in backup info."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/d9c48f8b/info",
+        status=200,
+        body=load_fixture("backup_info_location_attributes.json"),
+    )
+
+    result = await supervisor_client.backups.backup_info("d9c48f8b")
+    assert result.location_attributes == {
+        ".local": BackupLocationAttributes(
+            protected=True,
+            size_bytes=10240,
+        ),
+        "test": BackupLocationAttributes(
+            protected=True,
+            size_bytes=10240,
+        ),
+    }
