@@ -13,6 +13,7 @@ from yarl import URL
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
     AddonSet,
+    BackupLocationAttributes,
     BackupsOptions,
     DownloadBackupOptions,
     Folder,
@@ -24,7 +25,6 @@ from aiohasupervisor.models import (
     RemoveBackupOptions,
     UploadBackupOptions,
 )
-from aiohasupervisor.models.backups import BackupLocationAttributes
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -143,21 +143,16 @@ async def test_backup_options_location() -> None:
         "location": ["test", None]
     }
     assert FullBackupOptions(location="test").to_dict() == {"location": "test"}
-    assert FullBackupOptions(location=None).to_dict() == {"location": None}
     assert FullBackupOptions().to_dict() == {}
 
     assert PartialBackupOptions(
-        location=["test", None], folders={Folder.SSL}
+        location=["test", ".local"], folders={Folder.SSL}
     ).to_dict() == {
-        "location": ["test", None],
+        "location": ["test", ".local"],
         "folders": ["ssl"],
     }
     assert PartialBackupOptions(location="test", folders={Folder.SSL}).to_dict() == {
         "location": "test",
-        "folders": ["ssl"],
-    }
-    assert PartialBackupOptions(location=None, folders={Folder.SSL}).to_dict() == {
-        "location": None,
         "folders": ["ssl"],
     }
     assert PartialBackupOptions(folders={Folder.SSL}).to_dict() == {"folders": ["ssl"]}
@@ -177,10 +172,11 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
     [
         (FullBackupOptions(name="Test", background=True), None),
         (FullBackupOptions(name="Test", background=False), "9ecf0028"),
-        (FullBackupOptions(name="Test", background=False, location=None), "9ecf0028"),
         (FullBackupOptions(name="Test", background=False, location="test"), "9ecf0028"),
         (
-            FullBackupOptions(name="Test", background=False, location={None, "test"}),
+            FullBackupOptions(
+                name="Test", background=False, location={".local", "test"}
+            ),
             "9ecf0028",
         ),
         (
@@ -225,12 +221,6 @@ async def test_backups_full_backup(
         ),
         (
             PartialBackupOptions(
-                name="Test", background=False, location=None, addons={"core_ssh"}
-            ),
-            "9ecf0028",
-        ),
-        (
-            PartialBackupOptions(
                 name="Test", background=False, location="test", addons={"core_ssh"}
             ),
             "9ecf0028",
@@ -239,7 +229,7 @@ async def test_backups_full_backup(
             PartialBackupOptions(
                 name="Test",
                 background=False,
-                location={None, "test"},
+                location={".local", "test"},
                 addons={"core_ssh"},
             ),
             "9ecf0028",
@@ -307,8 +297,6 @@ async def test_backup_info(
     assert result.slug == "69558789"
     assert result.type == "partial"
     assert result.date == datetime(2024, 5, 31, 0, 0, 0, 0, UTC)
-    assert result.size == 0.01
-    assert result.size_bytes == 10123
     assert result.compressed is True
     assert result.addons[0].slug == "core_mosquitto"
     assert result.addons[0].name == "Mosquitto broker"
@@ -324,8 +312,8 @@ async def test_backup_info(
     assert result.folders == []
     assert result.homeassistant_exclude_database is None
     assert result.extra is None
-    assert result.location is None
-    assert result.locations == {None}
+    assert result.location_attributes[".local"].protected is False
+    assert result.location_attributes[".local"].size_bytes == 10123
 
 
 async def test_backup_info_no_homeassistant(
@@ -370,8 +358,10 @@ async def test_backup_info_with_multiple_locations(
     result = await supervisor_client.backups.backup_info("d13dedd0")
     assert result.slug == "69558789"
     assert result.type == "partial"
-    assert result.location is None
-    assert result.locations == {None, "Test"}
+    assert result.location_attributes[".local"].protected is False
+    assert result.location_attributes[".local"].size_bytes == 10123
+    assert result.location_attributes["Test"].protected is False
+    assert result.location_attributes["Test"].size_bytes == 10123
 
 
 @pytest.mark.parametrize(
@@ -396,7 +386,6 @@ async def test_remove_backup(
         None,
         FullRestoreOptions(password="abc123"),  # noqa: S106
         FullRestoreOptions(background=True),
-        FullRestoreOptions(location=None),
         FullRestoreOptions(location="test"),
     ],
 )
@@ -419,7 +408,7 @@ async def test_full_restore(
     "options",
     [
         PartialRestoreOptions(addons={"core_ssh"}),
-        PartialRestoreOptions(homeassistant=True, location=None),
+        PartialRestoreOptions(homeassistant=True, location=".local"),
         PartialRestoreOptions(folders={Folder.SHARE, Folder.SSL}, location="test"),
         PartialRestoreOptions(addons={"core_ssh"}, background=True),
         PartialRestoreOptions(addons={"core_ssh"}, password="abc123"),  # noqa: S106
@@ -444,7 +433,10 @@ async def test_partial_restore(
     ("options", "query"),
     [
         (None, ""),
-        (UploadBackupOptions(location={None, "test"}), "?location=&location=test"),
+        (
+            UploadBackupOptions(location={".local", "test"}),
+            "?location=.local&location=test",
+        ),
         (UploadBackupOptions(filename=PurePath("backup.tar")), "?filename=backup.tar"),
     ],
 )
@@ -526,10 +518,6 @@ async def test_download_backup(
             {"homeassistant": True, "location": "test"},
         ),
         (
-            PartialBackupOptions(homeassistant=True, location=None),
-            {"homeassistant": True, "location": None},
-        ),
-        (
             PartialBackupOptions(homeassistant=True, filename=PurePath("backup.tar")),
             {"homeassistant": True, "filename": "backup.tar"},
         ),
@@ -559,7 +547,6 @@ async def test_partial_backup_model(
             {"location": [".cloud_backup", "test"]},
         ),
         (FullBackupOptions(location="test"), {"location": "test"}),
-        (FullBackupOptions(location=None), {"location": None}),
         (
             FullBackupOptions(filename=PurePath("backup.tar")),
             {"filename": "backup.tar"},
