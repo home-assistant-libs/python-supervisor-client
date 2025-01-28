@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import StrEnum
 from pathlib import PurePath
 
-from .base import DEFAULT, Request, ResponseData
+from .base import DEFAULT, Options, Request, ResponseData
 
 # --- ENUMS ----
 
@@ -185,10 +185,11 @@ class PartialRestoreOptions(FullRestoreOptions, PartialBackupRestoreOptions):
 
 
 @dataclass(frozen=True, slots=True)
-class UploadBackupOptions(Request):
+class UploadBackupOptions(Options):
     """UploadBackupOptions model."""
 
     location: set[str | None] = None
+    filename: PurePath | None = None
 
 
 @dataclass(frozen=True, slots=True)
