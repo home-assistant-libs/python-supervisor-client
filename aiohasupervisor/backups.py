@@ -123,7 +123,7 @@ class BackupsClient(_SupervisorComponentClient):
         if options:
             if options.location:
                 for location in options.location:
-                    params.add("location", location or "")
+                    params.add("location", location)
             if options.filename:
                 params.add("filename", options.filename.as_posix())
 
@@ -145,7 +145,7 @@ class BackupsClient(_SupervisorComponentClient):
         """Download backup and return stream."""
         params = MultiDict()
         if options and options.location:
-            params.add("location", options.location or "")
+            params.add("location", options.location)
 
         result = await self._client.get(
             f"backups/{backup}/download",
