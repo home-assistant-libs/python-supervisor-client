@@ -6,7 +6,10 @@ from datetime import datetime
 from enum import StrEnum
 from pathlib import PurePath
 
-from .base import DEFAULT, Options, Request, ResponseData
+from .base import Options, Request, ResponseData
+
+LOCATION_LOCAL_STORAGE = ".local"
+LOCATION_CLOUD_BACKUP = ".cloud_backup"
 
 # --- ENUMS ----
 
@@ -61,11 +64,6 @@ class BackupBaseFields(ABC):
     name: str
     date: datetime
     type: BackupType
-    size: float
-    size_bytes: int
-    location: str | None
-    locations: set[str | None]
-    protected: bool
     location_attributes: dict[str, BackupLocationAttributes]
     compressed: bool
 
@@ -151,7 +149,7 @@ class FullBackupOptions(Request):
     name: str | None = None
     password: str | None = None
     compressed: bool | None = None
-    location: str | list[str | None] | None = DEFAULT  # type: ignore[assignment]
+    location: str | list[str] = None  # type: ignore[assignment]
     homeassistant_exclude_database: bool | None = None
     background: bool | None = None
     extra: dict | None = None
@@ -185,7 +183,7 @@ class FullRestoreOptions(Request):
 
     password: str | None = None
     background: bool | None = None
-    location: str | None = DEFAULT  # type: ignore[assignment]
+    location: str = None  # type: ignore[assignment]
 
 
 @dataclass(frozen=True, slots=True)
@@ -197,7 +195,7 @@ class PartialRestoreOptions(FullRestoreOptions, PartialBackupRestoreOptions):
 class UploadBackupOptions(Options):
     """UploadBackupOptions model."""
 
-    location: set[str | None] = None
+    location: set[str] = None
     filename: PurePath | None = None
 
 
@@ -212,11 +210,11 @@ class UploadedBackup(ResponseData):
 class RemoveBackupOptions(Request):
     """RemoveBackupOptions model."""
 
-    location: set[str | None] = None
+    location: set[str] = None
 
 
 @dataclass(frozen=True, slots=True)
 class DownloadBackupOptions(Request):
     """DownloadBackupOptions model."""
 
-    location: str | None = DEFAULT  # type: ignore[assignment]
+    location: str = None  # type: ignore[assignment]
