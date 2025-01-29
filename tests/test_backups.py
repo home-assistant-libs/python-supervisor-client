@@ -207,7 +207,7 @@ async def test_backups_full_backup(
         callback=backup_callback,
     )
     result = await supervisor_client.backups.full_backup(options)
-    assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+    assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
 
 
@@ -280,7 +280,7 @@ async def test_backups_partial_backup(
         callback=backup_callback,
     )
     result = await supervisor_client.backups.partial_backup(options)
-    assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+    assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
 
 
@@ -401,7 +401,7 @@ async def test_full_restore(
         body=load_fixture("backup_restore.json"),
     )
     result = await supervisor_client.backups.full_restore("abc123", options)
-    assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+    assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
 
 
 @pytest.mark.parametrize(
@@ -426,7 +426,7 @@ async def test_partial_restore(
         body=load_fixture("backup_restore.json"),
     )
     result = await supervisor_client.backups.partial_restore("abc123", options)
-    assert result.job_id == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+    assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
 
 
 @pytest.mark.parametrize(

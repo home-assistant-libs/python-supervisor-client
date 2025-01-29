@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
 from pathlib import PurePath
+from uuid import UUID
 
 from .base import Options, Request, ResponseData
 
@@ -167,7 +168,7 @@ class PartialBackupOptions(FullBackupOptions, PartialBackupRestoreOptions):
 class BackupJob(ResponseData):
     """BackupJob model."""
 
-    job_id: str
+    job_id: UUID
 
 
 @dataclass(frozen=True, slots=True)
