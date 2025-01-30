@@ -1,5 +1,6 @@
 """Test jobs supervisor client."""
 
+from datetime import datetime
 from uuid import UUID
 
 from aioresponses import aioresponses
@@ -29,6 +30,9 @@ async def test_jobs_info(
     assert info.jobs[0].stage == "finishing_file"
     assert info.jobs[0].done is True
     assert info.jobs[0].errors == []
+    assert info.jobs[0].created == datetime.fromisoformat(
+        "2025-01-30T20:55:12.859349+00:00"
+    )
     assert info.jobs[0].child_jobs[0].name == "backup_store_folders"
     assert info.jobs[0].child_jobs[0].child_jobs[0].name == "backup_folder_save"
     assert info.jobs[0].child_jobs[0].child_jobs[0].reference == "ssl"
@@ -85,6 +89,7 @@ async def test_jobs_get_job(
     assert info.stage == "finishing_file"
     assert info.done is True
     assert info.errors == []
+    assert info.created == datetime.fromisoformat("2025-01-30T20:55:12.859349+00:00")
     assert info.child_jobs[0].name == "backup_store_folders"
     assert info.child_jobs[0].child_jobs[0].name == "backup_folder_save"
     assert info.child_jobs[0].child_jobs[0].reference == "ssl"

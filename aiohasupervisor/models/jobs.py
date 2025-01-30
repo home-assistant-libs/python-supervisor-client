@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime  # noqa: TCH003
 from enum import StrEnum
 from uuid import UUID  # noqa: TCH003
 
@@ -57,6 +58,7 @@ class Job(ResponseData):
     stage: str | None
     done: bool | None
     errors: list[JobError]
+    created: datetime
     child_jobs: list[Job]
 
 

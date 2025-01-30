@@ -11,6 +11,7 @@
         "stage": "finishing_file",
         "done": true,
         "errors": [],
+        "created": "2025-01-30T20:55:12.859349+00:00",
         "child_jobs": [
           {
             "name": "backup_store_folders",
@@ -20,6 +21,7 @@
             "stage": null,
             "done": true,
             "errors": [],
+            "created": "2025-01-30T20:55:12.892008+00:00",
             "child_jobs": [
               {
                 "name": "backup_folder_save",
@@ -29,6 +31,7 @@
                 "stage": null,
                 "done": true,
                 "errors": [],
+                "created": "2025-01-30T20:55:12.892699+00:00",
                 "child_jobs": []
               }
             ]
@@ -48,6 +51,7 @@
             "message": "Invalid password for backup cfddca18"
           }
         ],
+        "created": "2025-01-30T20:55:15.000000+00:00",
         "child_jobs": []
       }
     ]
