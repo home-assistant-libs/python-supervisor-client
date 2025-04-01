@@ -124,3 +124,19 @@ class YellowOptions(Options):
     disk_led: bool | None = None
     heartbeat_led: bool | None = None
     power_led: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SwapInfo(Options):
+    """SwapInfo model."""
+
+    swap_size: str | None
+    swappiness: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class SwapOptions(Options):
+    """SwapOptions model."""
+
+    swap_size: str | None = None
+    swappiness: int | None = None

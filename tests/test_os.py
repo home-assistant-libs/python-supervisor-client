@@ -15,6 +15,7 @@ from aiohasupervisor.models import (
     SetBootSlotOptions,
     YellowOptions,
 )
+from aiohasupervisor.models.os import SwapOptions
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -49,6 +50,36 @@ async def test_os_update(
     responses.post(f"{SUPERVISOR_URL}/os/update", status=200)
     assert await supervisor_client.os.update(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/os/update"))}
+
+
+async def test_os_swap_info(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test OS config swap API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/os/config/swap",
+        status=200,
+        body=load_fixture("os_config_swap.json"),
+    )
+    info = await supervisor_client.os.swap_info()
+    assert info.swap_size == "1G"
+    assert info.swappiness == 1
+
+
+async def test_os_set_swap_options(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test OS set swap options API."""
+    responses.post(f"{SUPERVISOR_URL}/os/config/swap", status=200)
+    assert (
+        await supervisor_client.os.set_swap_options(
+            SwapOptions(swap_size="1G", swappiness=20)
+        )
+        is None
+    )
+    assert responses.requests.keys() == {
+        ("POST", URL(f"{SUPERVISOR_URL}/os/config/swap"))
+    }
 
 
 async def test_os_config_sync(

@@ -1,0 +1,7 @@
+{
+  "result": "ok",
+  "data": {
+    "swappiness": 1,
+    "swap_size": "1G"
+  }
+}
