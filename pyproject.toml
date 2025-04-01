@@ -31,7 +31,7 @@ dev = [
 
     # Test requirements
     "aioresponses==0.7.6",
-    "codespell==2.3.0",
+    "codespell==2.4.1",
     "coverage==7.8.0",
     "mypy==1.15.0",
     "pre-commit==3.7.1",
