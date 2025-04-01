@@ -26,7 +26,7 @@ dev = [
     # Production requirements
     "aiohttp==3.9.5",
     "mashumaro==3.13.1",
-    "orjson==3.10.6",
+    "orjson==3.10.16",
     "yarl==1.9.4",
 
     # Test requirements
