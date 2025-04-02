@@ -127,7 +127,7 @@ class YellowOptions(Options):
 
 
 @dataclass(frozen=True, slots=True)
-class SwapInfo(Options):
+class SwapInfo(ResponseData):
     """SwapInfo model."""
 
     swap_size: str | None
