@@ -10,6 +10,8 @@ from .models.os import (
     OSInfo,
     OSUpdate,
     SetBootSlotOptions,
+    SwapInfo,
+    SwapOptions,
     YellowInfo,
     YellowOptions,
 )
@@ -28,6 +30,15 @@ class OSClient(_SupervisorComponentClient):
         await self._client.post(
             "os/update", json=options.to_dict() if options else None, timeout=None
         )
+
+    async def swap_info(self) -> SwapInfo:
+        """Get swap settings."""
+        result = await self._client.get("os/config/swap")
+        return SwapInfo.from_dict(result.data)
+
+    async def set_swap_options(self, options: SwapOptions) -> None:
+        """Set swap settings."""
+        await self._client.post("os/config/swap", json=options.to_dict())
 
     async def config_sync(self) -> None:
         """Trigger config reload on OS."""
