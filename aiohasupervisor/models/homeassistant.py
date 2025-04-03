@@ -15,9 +15,9 @@ class HomeAssistantInfo(ResponseData):
     version: str | None
     version_latest: str | None
     update_available: bool
-    machine: str
+    machine: str | None
     ip_address: IPv4Address
-    arch: str
+    arch: str | None
     image: str
     boot: bool
     port: int
