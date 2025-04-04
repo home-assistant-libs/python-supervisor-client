@@ -45,7 +45,7 @@ class HostInfo(ResponseData):
     disk_free: float
     disk_total: float
     disk_used: float
-    disk_life_time: float
+    disk_life_time: float | None
     features: list[HostFeature]
     hostname: str | None
     llmnr_hostname: str | None
