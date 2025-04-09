@@ -35,6 +35,7 @@ async def test_homeassistant_info(
     assert info.arch == "aarch64"
     assert info.ssl is False
     assert info.port == 8123
+    assert info.audio_input is None
     assert info.audio_output is None
     assert info.ip_address == IPv4Address("172.30.32.1")
 

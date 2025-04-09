@@ -23,8 +23,8 @@ class HomeAssistantInfo(ResponseData):
     port: int
     ssl: bool
     watchdog: bool
-    audio_input: str
-    audio_output: str
+    audio_input: str | None
+    audio_output: str | None
     backups_exclude_database: bool
 
 
