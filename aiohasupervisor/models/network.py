@@ -93,7 +93,7 @@ class Vlan(ResponseData):
     """Vlan model."""
 
     id: int
-    interface: str
+    interface: str | None
 
 
 @dataclass(frozen=True, slots=True)
