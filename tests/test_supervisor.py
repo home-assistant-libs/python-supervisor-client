@@ -42,6 +42,7 @@ async def test_supervisor_info(
     assert info.healthy is True
     assert info.logging == "info"
     assert info.ip_address == IPv4Address("172.30.32.2")
+    assert info.country is None
 
 
 async def test_supervisor_stats(
