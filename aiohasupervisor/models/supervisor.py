@@ -25,6 +25,7 @@ class SupervisorInfo(ResponseData):
     debug_block: bool
     diagnostics: bool | None
     auto_update: bool
+    country: str | None
 
 
 @dataclass(frozen=True, slots=True)

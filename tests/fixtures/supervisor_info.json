@@ -15,6 +15,7 @@
     "debug_block": false,
     "diagnostics": false,
     "auto_update": true,
+    "country": null,
     "wait_boot": 5,
     "addons": [
       {
