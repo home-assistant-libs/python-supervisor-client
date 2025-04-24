@@ -119,7 +119,8 @@ class SupervisorClient:
     async def refresh_updates(self) -> None:
         """Refresh updates.
 
-        Discouraged. Use the `reload_updates()` and `store.reload()` instead.
+        Discouraged as this endpoint does two things at once. Use the `reload_updates()`
+        and `store.reload()` instead.
         """
         await self._client.post("refresh_updates", timeout=ClientTimeout(total=300))
 
