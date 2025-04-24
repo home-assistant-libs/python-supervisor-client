@@ -88,6 +88,17 @@ async def test_available_updates(
     assert updates[1].update_type == UpdateType.OS
 
 
+async def test_reload_updates(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test reload updates API."""
+    responses.post(f"{SUPERVISOR_URL}/reload_updates", status=200)
+    assert await supervisor_client.reload_updates() is None
+    assert responses.requests.keys() == {
+        ("POST", URL(f"{SUPERVISOR_URL}/reload_updates"))
+    }
+
+
 async def test_refresh_updates(
     responses: aioresponses, supervisor_client: SupervisorClient
 ) -> None:
