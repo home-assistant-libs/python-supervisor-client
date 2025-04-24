@@ -117,11 +117,14 @@ class SupervisorClient:
         await self._client.post("reload_updates", timeout=ClientTimeout(total=300))
 
     async def refresh_updates(self) -> None:
-        """Refresh updates (discouraged)."""
+        """Refresh updates.
+
+        Discouraged. Use the `reload_updates()` and `store.reload()` instead.
+        """
         await self._client.post("refresh_updates", timeout=ClientTimeout(total=300))
 
     async def available_updates(self) -> list[AvailableUpdate]:
-        """Get available updates (discouraged)."""
+        """Get available updates."""
         result = await self._client.get("available_updates")
         return AvailableUpdates.from_dict(result.data).available_updates
 
