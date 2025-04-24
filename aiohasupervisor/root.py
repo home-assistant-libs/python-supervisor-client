@@ -109,8 +109,19 @@ class SupervisorClient:
         result = await self._client.get("info")
         return RootInfo.from_dict(result.data)
 
+    async def reload_updates(self) -> None:
+        """Reload updates.
+
+        Reload main components update information (OS, Supervisor, Core and plug-ins).
+        """
+        await self._client.post("reload_updates", timeout=ClientTimeout(total=300))
+
     async def refresh_updates(self) -> None:
-        """Refresh updates."""
+        """Refresh updates.
+
+        Discouraged as this endpoint does two things at once. Use the `reload_updates()`
+        and `store.reload()` instead.
+        """
         await self._client.post("refresh_updates", timeout=ClientTimeout(total=300))
 
     async def available_updates(self) -> list[AvailableUpdate]:
