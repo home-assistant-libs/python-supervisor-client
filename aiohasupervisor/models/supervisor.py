@@ -53,3 +53,4 @@ class SupervisorOptions(Options):
     content_trust: bool | None = None
     force_security: bool | None = None
     auto_update: bool | None = None
+    country: str | None = None
