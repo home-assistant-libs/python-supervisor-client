@@ -107,12 +107,22 @@ async def test_supervisor_options(
     responses.post(f"{SUPERVISOR_URL}/supervisor/options", status=200)
     assert (
         await supervisor_client.supervisor.set_options(
-            SupervisorOptions(debug=True, debug_block=True)
+            SupervisorOptions(debug=True, debug_block=True, country="NL")
         )
         is None
     )
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/supervisor/options"))
+    }
+    assert (
+        request := responses.requests[
+            ("POST", URL(f"{SUPERVISOR_URL}/supervisor/options"))
+        ]
+    )
+    assert request[0].kwargs["json"] == {
+        "debug": True,
+        "debug_block": True,
+        "country": "NL",
     }
 
 
