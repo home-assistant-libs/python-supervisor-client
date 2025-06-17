@@ -23,6 +23,7 @@
       "not_real"
     ],
     "machine": "odroid-n2",
+    "machine_id": "2403f24a7b9840c0a6c63ae9357948e8",
     "arch": "aarch64",
     "state": "running",
     "supported_arch": ["aarch64", "armv7", "armhf"],
