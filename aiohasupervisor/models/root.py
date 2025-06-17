@@ -86,6 +86,7 @@ class RootInfo(ResponseData):
     operating_system: str | None
     features: list[HostFeature | str]
     machine: str | None
+    machine_id: str | None
     arch: str
     state: SupervisorState
     supported_arch: list[str]
