@@ -8,6 +8,7 @@ from .models.addons import (
     AddonsConfigValidate,
     AddonsList,
     AddonsOptions,
+    AddonsRebuild,
     AddonsSecurityOptions,
     AddonsStats,
     AddonsUninstall,
@@ -75,9 +76,16 @@ class AddonsClient(_SupervisorComponentClient):
         result = await self._client.get(f"addons/{addon}/options/config")
         return result.data
 
-    async def rebuild_addon(self, addon: str) -> None:
+    async def rebuild_addon(
+        self,
+        addon: str,
+        options: AddonsRebuild | None = None,
+    ) -> None:
         """Rebuild an addon (only available for local addons built from source)."""
-        await self._client.post(f"addons/{addon}/rebuild")
+        await self._client.post(
+            f"addons/{addon}/rebuild",
+            json=options.to_dict() if options else None,
+        )
 
     async def write_addon_stdin(self, addon: str, stdin: bytes) -> None:
         """Write to stdin of an addon (if supported by addon)."""

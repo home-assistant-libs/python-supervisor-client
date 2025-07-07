@@ -9,6 +9,7 @@ from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
     AddonBoot,
     AddonsOptions,
+    AddonsRebuild,
     AddonsSecurityOptions,
     AddonStage,
     AddonStartup,
@@ -191,6 +192,25 @@ async def test_addons_rebuild(
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/addons/local_example/rebuild"))
     }
+
+
+async def test_addons_rebuild_with_force(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test rebuild addon API with force option."""
+    responses.post(f"{SUPERVISOR_URL}/addons/local_example/rebuild", status=200)
+    assert (
+        await supervisor_client.addons.rebuild_addon(
+            "local_example", AddonsRebuild(force=True)
+        )
+        is None
+    )
+
+    request_key = ("POST", URL(f"{SUPERVISOR_URL}/addons/local_example/rebuild"))
+    assert request_key in responses.requests
+
+    request_call = responses.requests[request_key][0]
+    assert request_call.kwargs["json"] == {"force": True}
 
 
 async def test_addons_stdin(
