@@ -321,6 +321,13 @@ class AddonsUninstall(Request):
 
 
 @dataclass(frozen=True, slots=True)
+class AddonsRebuild(Request):
+    """AddonsRebuild model."""
+
+    force: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Repository(ResponseData):
     """Repository model."""
 
