@@ -1,12 +1,15 @@
 """Test host supervisor client."""
 
 from datetime import UTC, datetime
+from pathlib import PurePath
+from urllib.parse import quote
 
 from aioresponses import aioresponses
 import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
+from aiohasupervisor.exceptions import SupervisorError
 from aiohasupervisor.models import HostOptions, RebootOptions, ShutdownOptions
 
 from . import load_fixture
@@ -45,6 +48,8 @@ async def test_host_info(
     assert result.dt_utc == datetime(2024, 10, 3, 0, 0, 0, 0, UTC)
     assert result.dt_synchronized is True
     assert result.startup_time == 1.966311
+    assert result.nvme_devices[0].id == "00000000-0000-0000-0000-000000000000"
+    assert result.nvme_devices[0].path == PurePath("/dev/nvme0n1")
 
 
 @pytest.mark.parametrize("options", [None, RebootOptions(force=True)])
@@ -111,3 +116,72 @@ async def test_host_services(
     assert result[-1].name == "systemd-resolved.service"
     assert result[-1].description == "Network Name Resolution"
     assert result[-1].state == "active"
+
+
+async def test_host_nvme_status(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test host nvme_status API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/nvme/status",
+        status=200,
+        body=load_fixture("host_nvme_status.json"),
+    )
+    result = await supervisor_client.host.nvme_status()
+    assert result.available_spare == 100
+    assert result.critical_warning == 0
+    assert result.data_units_read == 44707691
+    assert result.data_units_written == 54117388
+    assert result.percent_used == 1
+    assert result.temperature_kelvin == 312
+    assert result.host_read_commands == 428871098
+    assert result.host_write_commands == 900245782
+    assert result.controller_busy_minutes == 2678
+    assert result.power_cycles == 652
+    assert result.power_on_hours == 3192
+    assert result.unsafe_shutdowns == 107
+    assert result.media_errors == 0
+    assert result.number_error_log_entries == 1069
+    assert result.warning_temp_minutes == 0
+    assert result.critical_composite_temp_minutes == 0
+
+
+@pytest.mark.parametrize("device", ["1234-5678", "/dev/nvme0n1"])
+async def test_host_nvme_status_device(
+    responses: aioresponses, supervisor_client: SupervisorClient, device: str
+) -> None:
+    """Test host nvme_status API with device argument."""
+    encoded = quote(device, safe="")
+    responses.get(
+        f"{SUPERVISOR_URL}/host/nvme/{encoded}/status",
+        status=200,
+        body=load_fixture("host_nvme_status.json"),
+    )
+    result = await supervisor_client.host.nvme_status(device)
+    assert result.available_spare == 100
+    assert result.critical_warning == 0
+    assert result.data_units_read == 44707691
+    assert result.data_units_written == 54117388
+    assert result.percent_used == 1
+    assert result.temperature_kelvin == 312
+    assert result.host_read_commands == 428871098
+    assert result.host_write_commands == 900245782
+    assert result.controller_busy_minutes == 2678
+    assert result.power_cycles == 652
+    assert result.power_on_hours == 3192
+    assert result.unsafe_shutdowns == 107
+    assert result.media_errors == 0
+    assert result.number_error_log_entries == 1069
+    assert result.warning_temp_minutes == 0
+    assert result.critical_composite_temp_minutes == 0
+
+
+@pytest.mark.parametrize(
+    "device", ["/test/../bad", "test/../bad", "test/%2E%2E/bad", "/dev/../bad"]
+)
+async def test_host_nvme_status_path_manipulation_blocked(
+    supervisor_client: SupervisorClient, device: str
+) -> None:
+    """Test path manipulation prevented."""
+    with pytest.raises(SupervisorError, match=r"^Invalid device: "):
+        await supervisor_client.host.nvme_status(device)

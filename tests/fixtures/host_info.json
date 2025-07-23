@@ -36,6 +36,12 @@
     "startup_time": 1.966311,
     "boot_timestamp": 1716927644219811,
     "broadcast_llmnr": true,
-    "broadcast_mdns": true
+    "broadcast_mdns": true,
+    "nvme_devices": [
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "path": "/dev/nvme0n1"
+      }
+    ]
   }
 }
