@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from pathlib import PurePath
 
 from .base import Request, ResponseData
 from .root import HostFeature
@@ -33,6 +34,14 @@ class ServiceState(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
+class HostInfoNVMeDevice(ResponseData):
+    """HostInfoNVMeDevice model."""
+
+    id: str
+    path: PurePath
+
+
+@dataclass(frozen=True, slots=True)
 class HostInfo(ResponseData):
     """HostInfo model."""
 
@@ -59,6 +68,7 @@ class HostInfo(ResponseData):
     boot_timestamp: int | None
     broadcast_llmnr: bool | None
     broadcast_mdns: bool | None
+    nvme_devices: list[HostInfoNVMeDevice]
 
 
 @dataclass(frozen=True, slots=True)

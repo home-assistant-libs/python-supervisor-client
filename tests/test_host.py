@@ -1,6 +1,7 @@
 """Test host supervisor client."""
 
 from datetime import UTC, datetime
+from pathlib import PurePath
 from urllib.parse import quote
 
 from aioresponses import aioresponses
@@ -47,6 +48,8 @@ async def test_host_info(
     assert result.dt_utc == datetime(2024, 10, 3, 0, 0, 0, 0, UTC)
     assert result.dt_synchronized is True
     assert result.startup_time == 1.966311
+    assert result.nvme_devices[0].id == "00000000-0000-0000-0000-000000000000"
+    assert result.nvme_devices[0].path == PurePath("/dev/nvme0n1")
 
 
 @pytest.mark.parametrize("options", [None, RebootOptions(force=True)])
