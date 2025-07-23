@@ -1,0 +1,21 @@
+{
+  "result": "ok",
+  "data": {
+    "available_spare": 100,
+    "critical_warning": 0,
+    "data_units_read": 44707691,
+    "data_units_written": 54117388,
+    "percent_used": 1,
+    "temperature_kelvin": 312,
+    "host_read_commands": 428871098,
+    "host_write_commands": 900245782,
+    "controller_busy_minutes": 2678,
+    "power_cycles": 652,
+    "power_on_hours": 3192,
+    "unsafe_shutdowns": 107,
+    "media_errors": 0,
+    "number_error_log_entries": 1069,
+    "warning_temp_minutes": 0,
+    "critical_composite_temp_minutes": 0
+  }
+}

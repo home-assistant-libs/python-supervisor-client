@@ -75,15 +75,16 @@ filterwarnings = [
 [tool.ruff]
 lint.select = ["ALL"]
 lint.ignore = [
-    "ANN401",  # Opinionated warning on disallowing dynamically typed expressions
-    "D203",    # Conflicts with other rules
-    "D213",    # Conflicts with other rules
-    "EM",      # flake8-errmsg, more frustration then value
-    "PLR0911", # Too many return statements ({returns} > {max_returns})
-    "PLR0912", # Too many branches ({branches} > {max_branches})
-    "PLR0913", # Too many arguments to function call ({c_args} > {max_args})
-    "PLR0915", # Too many statements ({statements} > {max_statements})
-    "TRY003",  # Avoid specifying long messages outside the exception class
+    "ANN401",   # Opinionated warning on disallowing dynamically typed expressions
+    "ASYNC109", # Opinionated warning on disallowing timeout parameters
+    "D203",     # Conflicts with other rules
+    "D213",     # Conflicts with other rules
+    "EM",       # flake8-errmsg, more frustration then value
+    "PLR0911",  # Too many return statements ({returns} > {max_returns})
+    "PLR0912",  # Too many branches ({branches} > {max_branches})
+    "PLR0913",  # Too many arguments to function call ({c_args} > {max_args})
+    "PLR0915",  # Too many statements ({statements} > {max_statements})
+    "TRY003",   # Avoid specifying long messages outside the exception class
 
     # Recommended to disable due to conflicts with formatter
     # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules

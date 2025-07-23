@@ -96,3 +96,25 @@ class ServiceList(ResponseData):
     """ServiceList model."""
 
     services: list[Service]
+
+
+@dataclass(frozen=True, slots=True)
+class NVMeStatus(ResponseData):
+    """NVMeStatus model."""
+
+    available_spare: int
+    critical_warning: int
+    data_units_read: int
+    data_units_written: int
+    percent_used: int
+    temperature_kelvin: int
+    host_read_commands: int
+    host_write_commands: int
+    controller_busy_minutes: int
+    power_cycles: int
+    power_on_hours: int
+    unsafe_shutdowns: int
+    media_errors: int
+    number_error_log_entries: int
+    warning_temp_minutes: int
+    critical_composite_temp_minutes: int

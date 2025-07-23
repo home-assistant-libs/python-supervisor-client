@@ -86,10 +86,11 @@ class _SupervisorClient:
         json: dict[str, Any] | None = None,
         data: Any = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        uri_encoded: bool = False,
     ) -> Response:
         """Handle a request to Supervisor."""
         try:
-            url = URL(self.api_host).joinpath(uri)
+            url = URL(self.api_host).joinpath(uri, encoded=uri_encoded)
         except ValueError as err:
             raise SupervisorError from err
 
@@ -158,6 +159,7 @@ class _SupervisorClient:
         params: dict[str, str] | MultiDict[str] | None = None,
         response_type: ResponseType = ResponseType.JSON,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        uri_encoded: bool = False,
     ) -> Response:
         """Handle a GET request to Supervisor."""
         return await self._request(
@@ -166,6 +168,7 @@ class _SupervisorClient:
             params=params,
             response_type=response_type,
             timeout=timeout,
+            uri_encoded=uri_encoded,
         )
 
     async def post(
@@ -177,6 +180,7 @@ class _SupervisorClient:
         json: dict[str, Any] | None = None,
         data: Any = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        uri_encoded: bool = False,
     ) -> Response:
         """Handle a POST request to Supervisor."""
         return await self._request(
@@ -187,6 +191,7 @@ class _SupervisorClient:
             json=json,
             data=data,
             timeout=timeout,
+            uri_encoded=uri_encoded,
         )
 
     async def put(
@@ -196,6 +201,7 @@ class _SupervisorClient:
         params: dict[str, str] | MultiDict[str] | None = None,
         json: dict[str, Any] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        uri_encoded: bool = False,
     ) -> Response:
         """Handle a PUT request to Supervisor."""
         return await self._request(
@@ -205,6 +211,7 @@ class _SupervisorClient:
             response_type=ResponseType.NONE,
             json=json,
             timeout=timeout,
+            uri_encoded=uri_encoded,
         )
 
     async def delete(
@@ -214,6 +221,7 @@ class _SupervisorClient:
         params: dict[str, str] | MultiDict[str] | None = None,
         json: dict[str, Any] | None = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        uri_encoded: bool = False,
     ) -> Response:
         """Handle a DELETE request to Supervisor."""
         return await self._request(
@@ -223,6 +231,7 @@ class _SupervisorClient:
             response_type=ResponseType.NONE,
             json=json,
             timeout=timeout,
+            uri_encoded=uri_encoded,
         )
 
     async def close(self) -> None:
