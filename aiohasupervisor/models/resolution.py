@@ -52,6 +52,7 @@ class IssueType(StrEnum):
     DETACHED_ADDON_REMOVED = "detached_addon_removed"
     DEVICE_ACCESS_MISSING = "device_access_missing"
     DISABLED_DATA_DISK = "disabled_data_disk"
+    DISK_LIFETIME = "disk_lifetime"
     DNS_LOOP = "dns_loop"
     DNS_SERVER_FAILED = "dns_server_failed"
     DNS_SERVER_IPV6_ERROR = "dns_server_ipv6_error"
