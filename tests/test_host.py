@@ -111,3 +111,74 @@ async def test_host_services(
     assert result[-1].name == "systemd-resolved.service"
     assert result[-1].description == "Network Name Resolution"
     assert result[-1].state == "active"
+
+
+async def test_host_disk_usage(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test host disk usage API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/disk/default/usage?max_depth=1",
+        status=200,
+        body=load_fixture("host_disk_usage.json"),
+    )
+    result = await supervisor_client.host.get_disk_usage()
+
+    # Test top-level properties
+    assert result.total_space == 503312781312
+    assert result.used_space == 430243422208
+    assert result.children is not None
+
+    # Test children structure
+    children = result.children
+    assert "addons_data" in children
+    assert "addons_config" in children
+    assert "media" in children
+    assert "share" in children
+    assert "backup" in children
+    assert "ssl" in children
+    assert "homeassistant" in children
+    assert "system" in children
+
+    # Test nested children (recursive structure)
+    addons_data = children["addons_data"]
+    assert addons_data.used_space == 42347618720
+    assert addons_data.children is not None
+    assert "77f1785d_remote_api" in addons_data.children
+    assert "core_samba" in addons_data.children
+    assert "a0d7b954_plex" in addons_data.children
+    assert "core_whisper" in addons_data.children
+
+    # Test deeper nesting
+    plex_addon = addons_data.children["a0d7b954_plex"]
+    assert plex_addon.used_space == 757750613
+    assert plex_addon.children is None  # Leaf node
+
+    # Test another branch
+    homeassistant = children["homeassistant"]
+    assert homeassistant.used_space == 444089236
+    assert homeassistant.children is not None
+    assert "image" in homeassistant.children
+    assert "custom_components" in homeassistant.children
+    assert "www" in homeassistant.children
+
+    # Test leaf node without children
+    backup = children["backup"]
+    assert backup.used_space == 268350699520
+    assert backup.children is None
+
+
+async def test_host_disk_usage_with_custom_depth(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test host disk usage API with custom max_depth."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/disk/default/usage?max_depth=3",
+        status=200,
+        body=load_fixture("host_disk_usage.json"),
+    )
+    result = await supervisor_client.host.get_disk_usage(max_depth=3)
+
+    # Test that the custom max_depth parameter was used
+    assert result.total_space == 503312781312
+    assert result.used_space == 430243422208
