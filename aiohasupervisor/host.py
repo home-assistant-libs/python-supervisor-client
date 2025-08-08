@@ -3,6 +3,7 @@
 from .client import _SupervisorComponentClient
 from .const import TIMEOUT_60_SECONDS
 from .models.host import (
+    DiskUsage,
     HostInfo,
     HostOptions,
     RebootOptions,
@@ -46,5 +47,13 @@ class HostClient(_SupervisorComponentClient):
         """Get list of available services on host."""
         result = await self._client.get("host/services")
         return ServiceList.from_dict(result.data).services
+
+    async def get_disk_usage(self, max_depth: int = 1) -> DiskUsage:
+        """Get disk usage."""
+        result = await self._client.get(
+            "host/disk/default/usage",
+            params={"max_depth": str(max_depth)},
+        )
+        return DiskUsage.from_dict(result.data)
 
     # Omitted for now - Log endpoints
