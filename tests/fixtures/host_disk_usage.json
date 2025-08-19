@@ -1,0 +1,149 @@
+{
+  "result": "ok",
+  "data": {
+    "id": "default",
+    "label": "Default",
+    "total_bytes": 503312781312,
+    "used_bytes": 430243422208,
+    "children": [
+      {
+        "id": "addons_data",
+        "label": "Addons Data",
+        "used_bytes": 42347618720,
+        "children": [
+          {
+            "id": "77f1785d_remote_api",
+            "label": "Remote API",
+            "used_bytes": 2,
+            "children": null
+          },
+          {
+            "id": "core_samba",
+            "label": "Core Samba",
+            "used_bytes": 517,
+            "children": null
+          },
+          {
+            "id": "a0d7b954_plex",
+            "label": "Plex",
+            "used_bytes": 757750613,
+            "children": null
+          },
+          {
+            "id": "core_whisper",
+            "label": "Core Whisper",
+            "used_bytes": 560933406,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "addons_config",
+        "label": "Addons Config",
+        "used_bytes": 5283318814,
+        "children": [
+          {
+            "id": "core_zwave_js",
+            "label": "Core Z-Wave JS",
+            "used_bytes": 258064,
+            "children": null
+          },
+          {
+            "id": "db21ed7f_qbittorrent",
+            "label": "QBittorrent",
+            "used_bytes": 9508283,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "media",
+        "label": "Media",
+        "used_bytes": 476680019,
+        "children": [
+          {
+            "id": "jellyfin",
+            "label": "Jellyfin",
+            "used_bytes": 409122725,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "share",
+        "label": "Share",
+        "used_bytes": 37477206419,
+        "children": [
+          {
+            "id": "supervisor",
+            "label": "Supervisor",
+            "used_bytes": 929143825,
+            "children": null
+          },
+          {
+            "id": "openwakeword",
+            "label": "OpenWakeword",
+            "used_bytes": 2263836,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "backup",
+        "label": "Backup",
+        "used_bytes": 268350699520,
+        "children": null
+      },
+      {
+        "id": "ssl",
+        "label": "SSL",
+        "used_bytes": 202912633,
+        "children": [
+          {
+            "id": "nginxproxymanager",
+            "label": "Nginx Proxy Manager",
+            "used_bytes": 202879859,
+            "children": null
+          },
+          {
+            "id": "openvpn_server",
+            "label": "OpenVPN Server",
+            "used_bytes": 27500,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "homeassistant",
+        "label": "Home Assistant",
+        "used_bytes": 444089236,
+        "children": [
+          {
+            "id": "image",
+            "label": "Image",
+            "used_bytes": 571875,
+            "children": null
+          },
+          {
+            "id": "custom_components",
+            "label": "Custom Components",
+            "used_bytes": 58343146,
+            "children": null
+          },
+          {
+            "id": "www",
+            "label": "www",
+            "used_bytes": 70562846,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "system",
+        "label": "System",
+        "used_bytes": 75660896847,
+        "children": null
+      }
+    ]
+  }
+}

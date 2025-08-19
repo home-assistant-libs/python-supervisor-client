@@ -96,3 +96,14 @@ class ServiceList(ResponseData):
     """ServiceList model."""
 
     services: list[Service]
+
+
+@dataclass(frozen=True, slots=True)
+class DiskUsage(ResponseData):
+    """DiskUsage model."""
+
+    id: str
+    used_bytes: int
+    label: str | None = None
+    total_bytes: int | None = None
+    children: list["DiskUsage"] | None = None
