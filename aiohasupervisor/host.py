@@ -51,7 +51,7 @@ class HostClient(_SupervisorComponentClient):
     async def get_disk_usage(self, max_depth: int = 1) -> DiskUsage:
         """Get disk usage."""
         result = await self._client.get(
-            "host/disk/default/usage",
+            "host/disks/default/usage",
             params={"max_depth": str(max_depth)},
         )
         return DiskUsage.from_dict(result.data)

@@ -1,125 +1,149 @@
 {
   "result": "ok",
   "data": {
-    "total_space": 503312781312,
-    "used_space": 430243422208,
-    "children": {
-      "addons_data": {
-        "total_space": null,
-        "used_space": 42347618720,
-        "children": {
-          "77f1785d_remote_api": {
-            "total_space": null,
-            "used_space": 2,
+    "id": "default",
+    "label": "Default",
+    "total_bytes": 503312781312,
+    "used_bytes": 430243422208,
+    "children": [
+      {
+        "id": "addons_data",
+        "label": "Addons Data",
+        "used_bytes": 42347618720,
+        "children": [
+          {
+            "id": "77f1785d_remote_api",
+            "label": "Remote API",
+            "used_bytes": 2,
             "children": null
           },
-          "core_samba": {
-            "total_space": null,
-            "used_space": 517,
+          {
+            "id": "core_samba",
+            "label": "Core Samba",
+            "used_bytes": 517,
             "children": null
           },
-          "a0d7b954_plex": {
-            "total_space": null,
-            "used_space": 757750613,
+          {
+            "id": "a0d7b954_plex",
+            "label": "Plex",
+            "used_bytes": 757750613,
             "children": null
           },
-          "core_whisper": {
-            "total_space": null,
-            "used_space": 560933406,
+          {
+            "id": "core_whisper",
+            "label": "Core Whisper",
+            "used_bytes": 560933406,
             "children": null
           }
-        }
+        ]
       },
-      "addons_config": {
-        "total_space": null,
-        "used_space": 5283318814,
-        "children": {
-          "core_zwave_js": {
-            "total_space": null,
-            "used_space": 258064,
+      {
+        "id": "addons_config",
+        "label": "Addons Config",
+        "used_bytes": 5283318814,
+        "children": [
+          {
+            "id": "core_zwave_js",
+            "label": "Core Z-Wave JS",
+            "used_bytes": 258064,
             "children": null
           },
-          "db21ed7f_qbittorrent": {
-            "total_space": null,
-            "used_space": 9508283,
+          {
+            "id": "db21ed7f_qbittorrent",
+            "label": "QBittorrent",
+            "used_bytes": 9508283,
             "children": null
           }
-        }
+        ]
       },
-      "media": {
-        "total_space": null,
-        "used_space": 476680019,
-        "children": {
-          "jellyfin": {
-            "total_space": null,
-            "used_space": 409122725,
+      {
+        "id": "media",
+        "label": "Media",
+        "used_bytes": 476680019,
+        "children": [
+          {
+            "id": "jellyfin",
+            "label": "Jellyfin",
+            "used_bytes": 409122725,
             "children": null
           }
-        }
+        ]
       },
-      "share": {
-        "total_space": null,
-        "used_space": 37477206419,
-        "children": {
-          "supervisor": {
-            "total_space": null,
-            "used_space": 929143825,
+      {
+        "id": "share",
+        "label": "Share",
+        "used_bytes": 37477206419,
+        "children": [
+          {
+            "id": "supervisor",
+            "label": "Supervisor",
+            "used_bytes": 929143825,
             "children": null
           },
-          "openwakeword": {
-            "total_space": null,
-            "used_space": 2263836,
+          {
+            "id": "openwakeword",
+            "label": "OpenWakeword",
+            "used_bytes": 2263836,
             "children": null
           }
-        }
+        ]
       },
-      "backup": {
-        "total_space": null,
-        "used_space": 268350699520,
+      {
+        "id": "backup",
+        "label": "Backup",
+        "used_bytes": 268350699520,
         "children": null
       },
-      "ssl": {
-        "total_space": null,
-        "used_space": 202912633,
-        "children": {
-          "nginxproxymanager": {
-            "total_space": null,
-            "used_space": 202879859,
+      {
+        "id": "ssl",
+        "label": "SSL",
+        "used_bytes": 202912633,
+        "children": [
+          {
+            "id": "nginxproxymanager",
+            "label": "Nginx Proxy Manager",
+            "used_bytes": 202879859,
             "children": null
           },
-          "openvpn_server": {
-            "total_space": null,
-            "used_space": 27500,
+          {
+            "id": "openvpn_server",
+            "label": "OpenVPN Server",
+            "used_bytes": 27500,
             "children": null
           }
-        }
+        ]
       },
-      "homeassistant": {
-        "total_space": null,
-        "used_space": 444089236,
-        "children": {
-          "image": {
-            "total_space": null,
-            "used_space": 571875,
+      {
+        "id": "homeassistant",
+        "label": "Home Assistant",
+        "used_bytes": 444089236,
+        "children": [
+          {
+            "id": "image",
+            "label": "Image",
+            "used_bytes": 571875,
             "children": null
           },
-          "custom_components": {
-            "total_space": null,
-            "used_space": 58343146,
+          {
+            "id": "custom_components",
+            "label": "Custom Components",
+            "used_bytes": 58343146,
             "children": null
           },
-          "www": {
-            "total_space": null,
-            "used_space": 70562846,
+          {
+            "id": "www",
+            "label": "www",
+            "used_bytes": 70562846,
             "children": null
           }
-        }
+        ]
       },
-      "system": {
-        "total_space": null,
-        "used_space": 75660896847,
+      {
+        "id": "system",
+        "label": "System",
+        "used_bytes": 75660896847,
         "children": null
       }
-    }
+    ]
   }
 }

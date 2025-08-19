@@ -118,53 +118,73 @@ async def test_host_disk_usage(
 ) -> None:
     """Test host disk usage API."""
     responses.get(
-        f"{SUPERVISOR_URL}/host/disk/default/usage?max_depth=1",
+        f"{SUPERVISOR_URL}/host/disks/default/usage?max_depth=1",
         status=200,
         body=load_fixture("host_disk_usage.json"),
     )
     result = await supervisor_client.host.get_disk_usage()
 
     # Test top-level properties
-    assert result.total_space == 503312781312
-    assert result.used_space == 430243422208
+    assert result.total_bytes == 503312781312
+    assert result.used_bytes == 430243422208
     assert result.children is not None
 
     # Test children structure
     children = result.children
-    assert "addons_data" in children
-    assert "addons_config" in children
-    assert "media" in children
-    assert "share" in children
-    assert "backup" in children
-    assert "ssl" in children
-    assert "homeassistant" in children
-    assert "system" in children
+    assert children is not None
+    assert len(children) == 8  # Should have 8 children
+
+    # Find specific children by id
+    assert (
+        addons_data := next(child for child in children if child.id == "addons_data")
+    )
+    assert next(child for child in children if child.id == "addons_config")
+    assert next(child for child in children if child.id == "media")
+    assert next(child for child in children if child.id == "share")
+    assert (backup := next(child for child in children if child.id == "backup"))
+    assert next(child for child in children if child.id == "ssl")
+    assert (
+        homeassistant := next(
+            child for child in children if child.id == "homeassistant"
+        )
+    )
+    assert next(child for child in children if child.id == "system")
 
     # Test nested children (recursive structure)
-    addons_data = children["addons_data"]
-    assert addons_data.used_space == 42347618720
+    assert addons_data.used_bytes == 42347618720
     assert addons_data.children is not None
-    assert "77f1785d_remote_api" in addons_data.children
-    assert "core_samba" in addons_data.children
-    assert "a0d7b954_plex" in addons_data.children
-    assert "core_whisper" in addons_data.children
+    assert len(addons_data.children) == 4
+
+    # Find specific nested children
+    assert next(
+        child for child in addons_data.children if child.id == "77f1785d_remote_api"
+    )
+    assert next(child for child in addons_data.children if child.id == "core_samba")
+    assert (
+        plex_addon := next(
+            child for child in addons_data.children if child.id == "a0d7b954_plex"
+        )
+    )
+    assert next(child for child in addons_data.children if child.id == "core_whisper")
 
     # Test deeper nesting
-    plex_addon = addons_data.children["a0d7b954_plex"]
-    assert plex_addon.used_space == 757750613
+    assert plex_addon.used_bytes == 757750613
     assert plex_addon.children is None  # Leaf node
 
     # Test another branch
-    homeassistant = children["homeassistant"]
-    assert homeassistant.used_space == 444089236
+    assert homeassistant.used_bytes == 444089236
     assert homeassistant.children is not None
-    assert "image" in homeassistant.children
-    assert "custom_components" in homeassistant.children
-    assert "www" in homeassistant.children
+    assert len(homeassistant.children) == 3
+
+    # Find specific homeassistant children
+    assert next(child for child in homeassistant.children if child.id == "image")
+    assert next(
+        child for child in homeassistant.children if child.id == "custom_components"
+    )
+    assert next(child for child in homeassistant.children if child.id == "www")
 
     # Test leaf node without children
-    backup = children["backup"]
-    assert backup.used_space == 268350699520
+    assert backup.used_bytes == 268350699520
     assert backup.children is None
 
 
@@ -173,12 +193,12 @@ async def test_host_disk_usage_with_custom_depth(
 ) -> None:
     """Test host disk usage API with custom max_depth."""
     responses.get(
-        f"{SUPERVISOR_URL}/host/disk/default/usage?max_depth=3",
+        f"{SUPERVISOR_URL}/host/disks/default/usage?max_depth=3",
         status=200,
         body=load_fixture("host_disk_usage.json"),
     )
     result = await supervisor_client.host.get_disk_usage(max_depth=3)
 
     # Test that the custom max_depth parameter was used
-    assert result.total_space == 503312781312
-    assert result.used_space == 430243422208
+    assert result.total_bytes == 503312781312
+    assert result.used_bytes == 430243422208

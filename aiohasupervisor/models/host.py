@@ -102,6 +102,8 @@ class ServiceList(ResponseData):
 class DiskUsage(ResponseData):
     """DiskUsage model."""
 
-    total_space: int | None
-    used_space: int
-    children: dict[str, "DiskUsage"] | None
+    id: str
+    used_bytes: int
+    label: str | None = None
+    total_bytes: int | None = None
+    children: list["DiskUsage"] | None = None
