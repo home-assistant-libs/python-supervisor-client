@@ -117,10 +117,11 @@ class UnhealthyReason(StrEnum):
     """
 
     DOCKER = "docker"
+    DUPLICATE_OS_INSTALLATION = "duplicate_os_installation"
     OSERROR_BAD_MESSAGE = "oserror_bad_message"
     PRIVILEGED = "privileged"
-    SUPERVISOR = "supervisor"
     SETUP = "setup"
+    SUPERVISOR = "supervisor"
     UNTRUSTED = "untrusted"
 
 
