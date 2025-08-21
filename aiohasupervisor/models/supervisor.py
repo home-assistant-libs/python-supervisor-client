@@ -40,6 +40,7 @@ class SupervisorInfo(ResponseData):
     diagnostics: bool | None
     auto_update: bool
     country: str | None
+    detect_blocking_io: bool
 
 
 @dataclass(frozen=True, slots=True)
