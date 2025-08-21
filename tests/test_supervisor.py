@@ -8,6 +8,7 @@ from yarl import URL
 
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import SupervisorOptions, SupervisorUpdateOptions
+from aiohasupervisor.models.supervisor import DetectBlockingIO
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -43,6 +44,7 @@ async def test_supervisor_info(
     assert info.logging == "info"
     assert info.ip_address == IPv4Address("172.30.32.2")
     assert info.country is None
+    assert info.detect_blocking_io is False
 
 
 async def test_supervisor_stats(
@@ -107,7 +109,12 @@ async def test_supervisor_options(
     responses.post(f"{SUPERVISOR_URL}/supervisor/options", status=200)
     assert (
         await supervisor_client.supervisor.set_options(
-            SupervisorOptions(debug=True, debug_block=True, country="NL")
+            SupervisorOptions(
+                debug=True,
+                debug_block=True,
+                country="NL",
+                detect_blocking_io=DetectBlockingIO.ON_AT_STARTUP,
+            )
         )
         is None
     )
@@ -123,6 +130,7 @@ async def test_supervisor_options(
         "debug": True,
         "debug_block": True,
         "country": "NL",
+        "detect_blocking_io": "on_at_startup",
     }
 
 
