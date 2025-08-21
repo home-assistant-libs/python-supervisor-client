@@ -1,10 +1,24 @@
 """Models for supervisor component."""
 
 from dataclasses import dataclass
+from enum import StrEnum
 from ipaddress import IPv4Address
 
 from .base import ContainerStats, Options, Request, ResponseData
 from .root import LogLevel, UpdateChannel
+
+# --- ENUMS ----
+
+
+class DetectBlockingIO(StrEnum):
+    """DetectBlockingIO type."""
+
+    OFF = "off"
+    ON = "on"
+    ON_AT_STARTUP = "on_at_startup"
+
+
+# --- OBJECTS ----
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,3 +68,4 @@ class SupervisorOptions(Options):
     force_security: bool | None = None
     auto_update: bool | None = None
     country: str | None = None
+    detect_blocking_io: DetectBlockingIO | None = None
