@@ -17,6 +17,7 @@
     "auto_update": true,
     "country": null,
     "wait_boot": 5,
+    "detect_blocking_io": false,
     "addons": [
       {
         "name": "Terminal & SSH",
@@ -40,11 +41,26 @@
       }
     ],
     "addons_repositories": [
-      { "name": "Local add-ons", "slug": "local" },
-      { "name": "Music Assistant", "slug": "d5369777" },
-      { "name": "Official add-ons", "slug": "core" },
-      { "name": "ESPHome", "slug": "5c53de3b" },
-      { "name": "Home Assistant Community Add-ons", "slug": "a0d7b954" }
+      {
+        "name": "Local add-ons",
+        "slug": "local"
+      },
+      {
+        "name": "Music Assistant",
+        "slug": "d5369777"
+      },
+      {
+        "name": "Official add-ons",
+        "slug": "core"
+      },
+      {
+        "name": "ESPHome",
+        "slug": "5c53de3b"
+      },
+      {
+        "name": "Home Assistant Community Add-ons",
+        "slug": "a0d7b954"
+      }
     ]
   }
 }
