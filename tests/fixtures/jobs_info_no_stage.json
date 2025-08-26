@@ -1,0 +1,24 @@
+{
+  "result": "ok",
+  "data": {
+    "ignore_conditions": ["free_space"],
+    "jobs": [
+      {
+        "name": "test_job_error_no_stage",
+        "reference": "test123",
+        "uuid": "3febe59311f94d6ba36f6f9f73357ca9",
+        "progress": 0,
+        "stage": null,
+        "done": true,
+        "errors": [
+          {
+            "type": "TestError",
+            "message": "Test error without stage field"
+          }
+        ],
+        "created": "2025-01-30T20:55:12.859349+00:00",
+        "child_jobs": []
+      }
+    ]
+  }
+}

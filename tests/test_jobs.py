@@ -42,6 +42,7 @@ async def test_jobs_info(
     assert info.jobs[1].reference == "cfddca18"
     assert info.jobs[1].errors[0].type == "BackupInvalidError"
     assert info.jobs[1].errors[0].message == "Invalid password for backup cfddca18"
+    assert info.jobs[1].errors[0].stage == "restore_backup"
 
 
 async def test_jobs_set_options(
@@ -112,3 +113,22 @@ async def test_jobs_delete_job(
     assert responses.requests.keys() == {
         ("DELETE", URL(f"{SUPERVISOR_URL}/jobs/2febe59311f94d6ba36f6f9f73357ca8"))
     }
+
+
+async def test_jobs_info_backward_compatibility_no_stage(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test jobs info API with error lacking stage field for backward compatibility."""
+    responses.get(
+        f"{SUPERVISOR_URL}/jobs/info",
+        status=200,
+        body=load_fixture("jobs_info_no_stage.json"),
+    )
+    info = await supervisor_client.jobs.info()
+    assert info.ignore_conditions == [JobCondition.FREE_SPACE]
+
+    assert info.jobs[0].name == "test_job_error_no_stage"
+    assert info.jobs[0].reference == "test123"
+    assert info.jobs[0].errors[0].type == "TestError"
+    assert info.jobs[0].errors[0].message == "Test error without stage field"
+    assert info.jobs[0].errors[0].stage is None
