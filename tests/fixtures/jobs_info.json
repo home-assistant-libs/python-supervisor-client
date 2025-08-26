@@ -48,7 +48,8 @@
         "errors": [
           {
             "type": "BackupInvalidError",
-            "message": "Invalid password for backup cfddca18"
+            "message": "Invalid password for backup cfddca18",
+            "stage": "restore_backup"
           }
         ],
         "created": "2025-01-30T20:55:15.000000+00:00",
