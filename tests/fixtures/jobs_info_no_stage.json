@@ -13,7 +13,8 @@
         "errors": [
           {
             "type": "TestError",
-            "message": "Test error without stage field"
+            "message": "Test error without stage field",
+            "stage": null
           }
         ],
         "created": "2025-01-30T20:55:12.859349+00:00",
