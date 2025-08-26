@@ -10,9 +10,6 @@
 - name: "documentation"
   color: 0052cc
   description: "Solely about the documentation of the project."
-- name: "enhancement"
-  color: 1d76db
-  description: "Enhancement of the code, not introducing new features."
 - name: "refactor"
   color: 1d76db
   description: "Improvement of existing code, not introducing new features."
