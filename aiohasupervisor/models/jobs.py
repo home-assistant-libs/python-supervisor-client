@@ -45,7 +45,7 @@ class JobError(ResponseData):
 
     type: str
     message: str
-    stage: str | None = None
+    stage: str | None
 
 
 @dataclass(slots=True, frozen=True)
