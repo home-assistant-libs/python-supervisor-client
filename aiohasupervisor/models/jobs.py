@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime  # noqa: TCH003
+from datetime import datetime  # noqa: TC003
 from enum import StrEnum
-from uuid import UUID  # noqa: TCH003
+from uuid import UUID  # noqa: TC003
 
 from .base import Request, ResponseData
 
