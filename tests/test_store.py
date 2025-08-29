@@ -5,6 +5,12 @@ import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
+from aiohasupervisor.exceptions import (
+    AddonNotSupportedArchitectureError,
+    AddonNotSupportedError,
+    AddonNotSupportedHomeAssistantVersionError,
+    AddonNotSupportedMachineTypeError,
+)
 from aiohasupervisor.models import StoreAddonUpdate, StoreAddRepository
 from aiohasupervisor.models.addons import StoreAddonInstall
 
@@ -167,6 +173,59 @@ async def test_store_addon_update(
         )
         is has_timeout
     )
+
+
+async def test_store_addon_availability(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test store addon availability API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/availability", status=200
+    )
+
+    assert (await supervisor_client.store.addon_availability("core_mosquitto")) is None
+
+
+@pytest.mark.parametrize(
+    ("error_msg", "exc_type"),
+    [
+        (
+            "Add-on core_mosquitto not supported on this platform, "
+            "supported architectures: i386",
+            AddonNotSupportedArchitectureError,
+        ),
+        (
+            "Add-on core_mosquitto not supported on this machine, "
+            "supported machine types: odroid-n2",
+            AddonNotSupportedMachineTypeError,
+        ),
+        (
+            "Add-on core_mosquitto not supported on this system, "
+            "requires Home Assistant version 2023.1.1 or greater",
+            AddonNotSupportedHomeAssistantVersionError,
+        ),
+        (
+            "Add-on core_mosquitto not supported on this system, "
+            "requires <something new> to be <something else>",
+            AddonNotSupportedError,
+        ),
+    ],
+)
+async def test_store_addon_availability_error(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    error_msg: str,
+    exc_type: type[AddonNotSupportedError],
+) -> None:
+    """Test store addon availability API error."""
+    responses.get(
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/availability",
+        status=400,
+        body=f'{{"result": "error", "message": "{error_msg}"}}',
+    )
+
+    with pytest.raises(exc_type):
+        await supervisor_client.store.addon_availability("core_mosquitto")
 
 
 async def test_store_reload(
