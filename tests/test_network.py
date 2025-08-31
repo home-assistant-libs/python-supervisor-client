@@ -10,6 +10,7 @@ from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
     InterfaceMethod,
     IPv4Config,
+    MulticastDnsMode,
     NetworkInterfaceConfig,
     VlanConfig,
 )
@@ -45,6 +46,8 @@ async def test_network_info(
     assert result.interfaces[0].ipv6.gateway is None
     assert result.interfaces[0].wifi is None
     assert result.interfaces[0].vlan is None
+    assert result.interfaces[0].mdns is MulticastDnsMode.DEFAULT
+    assert result.interfaces[0].llmnr is MulticastDnsMode.DEFAULT
 
     assert result.docker.interface == "hassio"
     assert result.docker.address.compressed == "172.30.32.0/23"
@@ -89,6 +92,8 @@ async def test_network_interface_info(
     assert result.ipv6.gateway is None
     assert result.wifi is None
     assert result.vlan is None
+    assert result.mdns is MulticastDnsMode.ANNOUNCE
+    assert result.llmnr is MulticastDnsMode.ANNOUNCE
 
 
 async def test_network_update_interface(
@@ -102,13 +107,25 @@ async def test_network_update_interface(
             address=[IPv4Interface("192.168.1.2/24")],
             gateway=IPv4Address("192.168.1.1"),
             nameservers=[IPv4Address("192.168.1.1")],
-        )
+        ),
+        mdns=MulticastDnsMode.OFF,
     )
     assert (
         await supervisor_client.network.update_interface("end0", config=config) is None
     )
-    assert responses.requests.keys() == {
-        ("POST", URL(f"{SUPERVISOR_URL}/network/interface/end0/update"))
+
+    request_key = ("POST", URL(f"{SUPERVISOR_URL}/network/interface/end0/update"))
+    assert responses.requests.keys() == {request_key}
+
+    assert len(responses.requests[request_key]) == 1
+    assert responses.requests[request_key][0].kwargs["json"] == {
+        "ipv4": {
+            "address": ["192.168.1.2/24"],
+            "gateway": "192.168.1.1",
+            "method": "static",
+            "nameservers": ["192.168.1.1"],
+        },
+        "mdns": "off",
     }
 
 
@@ -132,7 +149,11 @@ async def test_network_access_points(
 
 @pytest.mark.parametrize(
     "config",
-    [None, NetworkInterfaceConfig(ipv4=IPv4Config(method=InterfaceMethod.AUTO))],
+    [
+        None,
+        NetworkInterfaceConfig(ipv4=IPv4Config(method=InterfaceMethod.AUTO)),
+        NetworkInterfaceConfig(mdns=MulticastDnsMode.OFF),
+    ],
 )
 async def test_network_save_vlan(
     responses: aioresponses,

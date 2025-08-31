@@ -22,6 +22,8 @@
       "ready": true
     },
     "wifi": null,
-    "vlan": null
+    "vlan": null,
+    "mdns": "announce",
+    "llmnr": "announce"
   }
 }

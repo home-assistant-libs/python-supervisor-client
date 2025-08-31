@@ -24,7 +24,9 @@
           "ready": true
         },
         "wifi": null,
-        "vlan": null
+        "vlan": null,
+        "mdns": "default",
+        "llmnr": "default"
       }
     ],
     "docker": {
