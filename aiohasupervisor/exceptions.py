@@ -1,17 +1,47 @@
 """Exceptions from supervisor client."""
 
+from abc import ABC
+from collections.abc import Callable
+from typing import Any
+
 
 class SupervisorError(Exception):
     """Generic exception."""
 
-    def __init__(self, message: str | None = None, job_id: str | None = None) -> None:
+    error_key: str | None = None
+
+    def __init__(
+        self,
+        message: str | None = None,
+        message_template: str | None = None,
+        extra_fields: dict[str, Any] | None = None,
+        job_id: str | None = None,
+    ) -> None:
         """Initialize exception."""
         if message is not None:
             super().__init__(message)
         else:
             super().__init__()
 
-        self.job_id: str | None = job_id
+        self.job_id = job_id
+        self.message_template = message_template
+        self.extra_fields = extra_fields
+
+
+ERROR_KEYS: dict[str, type[SupervisorError]] = {}
+
+
+def error_key(
+    key: str,
+) -> Callable[[type[SupervisorError]], type[SupervisorError]]:
+    """Store exception in keyed error map."""
+
+    def wrap(cls: type[SupervisorError]) -> type[SupervisorError]:
+        ERROR_KEYS[key] = cls
+        cls.error_key = key
+        return cls
+
+    return wrap
 
 
 class SupervisorConnectionError(SupervisorError, ConnectionError):
@@ -46,45 +76,20 @@ class SupervisorResponseError(SupervisorError):
     """Unusable response received from Supervisor with the wrong type or encoding."""
 
 
-class AddonNotSupportedError(SupervisorError):
+class AddonNotSupportedError(SupervisorError, ABC):
     """Addon is not supported on this system."""
 
 
+@error_key("addon_not_supported_architecture_error")
 class AddonNotSupportedArchitectureError(AddonNotSupportedError):
     """Addon is not supported on this system due to its architecture."""
 
-    def __init__(
-        self, addon: str, architectures: str, job_id: str | None = None
-    ) -> None:
-        """Initialize exception."""
-        super().__init__(
-            f"Add-on {addon} not supported on this platform, "
-            f"supported architectures: {architectures}",
-            job_id,
-        )
 
-
+@error_key("addon_not_supported_machine_type_error")
 class AddonNotSupportedMachineTypeError(AddonNotSupportedError):
     """Addon is not supported on this system due to its machine type."""
 
-    def __init__(
-        self, addon: str, machine_types: str, job_id: str | None = None
-    ) -> None:
-        """Initialize exception."""
-        super().__init__(
-            f"Add-on {addon} not supported on this machine, "
-            f"supported machine types: {machine_types}",
-            job_id,
-        )
 
-
+@error_key("addon_not_supported_home_assistant_version_error")
 class AddonNotSupportedHomeAssistantVersionError(AddonNotSupportedError):
     """Addon is not supported on this system due to its version of Home Assistant."""
-
-    def __init__(self, addon: str, version: str, job_id: str | None = None) -> None:
-        """Initialize exception."""
-        super().__init__(
-            f"Add-on {addon} not supported on this system, "
-            f"requires Home Assistant version {version} or greater",
-            job_id,
-        )

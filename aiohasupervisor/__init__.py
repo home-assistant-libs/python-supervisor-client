@@ -1,6 +1,10 @@
 """Init file for aiohasupervisor."""
 
 from aiohasupervisor.exceptions import (
+    AddonNotSupportedArchitectureError,
+    AddonNotSupportedError,
+    AddonNotSupportedHomeAssistantVersionError,
+    AddonNotSupportedMachineTypeError,
     SupervisorAuthenticationError,
     SupervisorBadRequestError,
     SupervisorConnectionError,
@@ -14,14 +18,18 @@ from aiohasupervisor.exceptions import (
 from aiohasupervisor.root import SupervisorClient
 
 __all__ = [
-    "SupervisorError",
-    "SupervisorConnectionError",
+    "AddonNotSupportedArchitectureError",
+    "AddonNotSupportedError",
+    "AddonNotSupportedHomeAssistantVersionError",
+    "AddonNotSupportedMachineTypeError",
     "SupervisorAuthenticationError",
     "SupervisorBadRequestError",
+    "SupervisorClient",
+    "SupervisorConnectionError",
+    "SupervisorError",
     "SupervisorForbiddenError",
     "SupervisorNotFoundError",
     "SupervisorResponseError",
     "SupervisorServiceUnavailableError",
     "SupervisorTimeoutError",
-    "SupervisorClient",
 ]
