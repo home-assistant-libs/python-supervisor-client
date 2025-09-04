@@ -49,6 +49,15 @@ class AuthMethod(StrEnum):
     WPA_PSK = "wpa-psk"
 
 
+class MulticastDnsMode(StrEnum):
+    """Multicast DNS working mode."""
+
+    DEFAULT = "default"
+    OFF = "off"
+    RESOLVE = "resolve"
+    ANNOUNCE = "announce"
+
+
 # --- OBJECTS ----
 
 
@@ -110,6 +119,8 @@ class NetworkInterface(ResponseData):
     ipv6: IPv6
     wifi: Wifi | None
     vlan: Vlan | None
+    mdns: MulticastDnsMode
+    llmnr: MulticastDnsMode
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,6 +180,8 @@ class NetworkInterfaceConfig(Options):
     ipv4: IPv4Config | None = None
     ipv6: IPv6Config | None = None
     wifi: WifiConfig | None = None
+    mdns: MulticastDnsMode | None = None
+    llmnr: MulticastDnsMode | None = None
     enabled: bool | None = None
 
 
@@ -196,3 +209,5 @@ class VlanConfig(Options):
 
     ipv4: IPv4Config | None = None
     ipv6: IPv6Config | None = None
+    mdns: MulticastDnsMode | None = None
+    llmnr: MulticastDnsMode | None = None
