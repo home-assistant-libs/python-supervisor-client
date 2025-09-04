@@ -1,7 +1,5 @@
 """Store client for supervisor."""
 
-import re
-
 from .client import _SupervisorComponentClient
 from .const import ResponseType
 from .models.addons import (
@@ -12,19 +10,6 @@ from .models.addons import (
     StoreAddonUpdate,
     StoreAddRepository,
     StoreInfo,
-)
-
-RE_ADDON_UNAVAILABLE_ARCHITECTURE = re.compile(
-    r"^Add\-on (?P<addon>\w+) not supported on this platform, "
-    r"supported architectures: (?P<architectures>.*)$"
-)
-RE_ADDON_UNAVAILABLE_MACHINE_TYPE = re.compile(
-    r"^Add\-on (?P<addon>\w+) not supported on this machine, "
-    r"supported machine types: (?P<machine_types>.*)$"
-)
-RE_ADDON_UNAVAILABLE_HOME_ASSISTANT = re.compile(
-    r"^Add\-on (?P<addon>\w+) not supported on this system, "
-    r"requires Home Assistant version (?P<version>\S+) or greater$"
 )
 
 
