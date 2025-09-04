@@ -4,13 +4,6 @@ import re
 
 from .client import _SupervisorComponentClient
 from .const import ResponseType
-from .exceptions import (
-    AddonNotSupportedArchitectureError,
-    AddonNotSupportedError,
-    AddonNotSupportedHomeAssistantVersionError,
-    AddonNotSupportedMachineTypeError,
-    SupervisorBadRequestError,
-)
 from .models.addons import (
     Repository,
     StoreAddon,
@@ -77,35 +70,30 @@ class StoreClient(_SupervisorComponentClient):
 
         If Supervisor adds a new reason an add-on can be restricted from being
         installed on some systems in the future, older versions of this client
-        will raise the generic AddonNotSupportedError for that reason.
+        will raise the generic SupervisorBadRequestError for that reason.
         """
-        try:
-            await self._client.get(
-                f"store/addons/{addon}/availability", response_type=ResponseType.NONE
-            )
-        except SupervisorBadRequestError as err:
-            if match := RE_ADDON_UNAVAILABLE_ARCHITECTURE.match(str(err)):
-                raise AddonNotSupportedArchitectureError(
-                    match.group("addon"), match.group("architectures"), err.job_id
-                ) from None
-            if match := RE_ADDON_UNAVAILABLE_HOME_ASSISTANT.match(str(err)):
-                raise AddonNotSupportedHomeAssistantVersionError(
-                    match.group("addon"), match.group("version"), err.job_id
-                ) from None
-            if match := RE_ADDON_UNAVAILABLE_MACHINE_TYPE.match(str(err)):
-                raise AddonNotSupportedMachineTypeError(
-                    match.group("addon"), match.group("machine_types"), err.job_id
-                ) from None
-            raise AddonNotSupportedError(str(err), err.job_id) from None
+        await self._client.get(
+            f"store/addons/{addon}/availability", response_type=ResponseType.NONE
+        )
 
     async def install_addon(self, addon: str) -> None:
-        """Install an addon."""
+        """Install an addon.
+
+        Supervisor does an availability check before install. If the addon
+        cannot be installed on this system it will raise one of those errors
+        shown in the `addon_availability` method.
+        """
         await self._client.post(f"store/addons/{addon}/install", timeout=None)
 
     async def update_addon(
         self, addon: str, options: StoreAddonUpdate | None = None
     ) -> None:
-        """Update an addon to latest version."""
+        """Update an addon to latest version.
+
+        Supervisor does an availability check before update. If the new version
+        cannot be installed on this system it will raise one of those errors
+        shown in the `addon_availability` method.
+        """
         await self._client.post(
             f"store/addons/{addon}/update",
             json=options.to_dict() if options else None,

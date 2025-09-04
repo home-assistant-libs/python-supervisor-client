@@ -17,6 +17,7 @@ from yarl import URL
 
 from .const import DEFAULT_TIMEOUT, ResponseType
 from .exceptions import (
+    ERROR_KEYS,
     SupervisorAuthenticationError,
     SupervisorBadRequestError,
     SupervisorConnectionError,
@@ -73,7 +74,14 @@ class _SupervisorClient:
 
             if is_json(response):
                 result = Response.from_json(await response.text())
-                raise exc_type(result.message, result.job_id)
+                if result.error_key in ERROR_KEYS:
+                    exc_type = ERROR_KEYS[result.error_key]
+                raise exc_type(
+                    result.message,
+                    result.message_template,
+                    result.extra_fields,
+                    result.job_id,
+                )
             raise exc_type()
 
     async def _request(
