@@ -97,6 +97,28 @@ async def test_jobs_get_job(
     assert info.child_jobs[0].child_jobs[0].child_jobs == []
 
 
+async def test_jobs_get_job_extra(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test jobs get job API with extra metadata."""
+    responses.get(
+        f"{SUPERVISOR_URL}/jobs/2febe59311f94d6ba36f6f9f73357ca8",
+        status=200,
+        body=load_fixture("jobs_get_job_extra.json"),
+    )
+    info = await supervisor_client.jobs.get_job(
+        UUID("2febe59311f94d6ba36f6f9f73357ca8")
+    )
+
+    assert info.name == "docker_interface_install"
+    assert info.reference == "homeassistant"
+    assert info.child_jobs[0].name == "Pulling container image layer"
+    assert info.child_jobs[0].reference == "1e214cd6d7d0"
+    assert info.child_jobs[0].progress == 26.1
+    assert info.child_jobs[0].stage == "Downloading"
+    assert info.child_jobs[0].extra == {"current": 227726144, "total": 436480882}
+
+
 async def test_jobs_delete_job(
     responses: aioresponses, supervisor_client: SupervisorClient
 ) -> None:

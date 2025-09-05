@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime  # noqa: TCH003
 from enum import StrEnum
+from typing import Any
 from uuid import UUID  # noqa: TCH003
 
 from .base import Request, ResponseData
@@ -61,6 +62,7 @@ class Job(ResponseData):
     errors: list[JobError]
     created: datetime
     child_jobs: list[Job]
+    extra: dict[str, Any] | None
 
 
 @dataclass(slots=True, frozen=True)
