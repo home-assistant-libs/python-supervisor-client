@@ -357,6 +357,14 @@ class StoreAddonUpdate(Request):
     """StoreAddonUpdate model."""
 
     backup: bool | None = None
+    background: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class StoreAddonInstall(Request):
+    """StoreAddonInstall model."""
+
+    background: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)

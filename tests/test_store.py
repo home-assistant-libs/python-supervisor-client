@@ -1,10 +1,12 @@
 """Tests for store supervisor client."""
 
 from aioresponses import aioresponses
+import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import StoreAddonUpdate, StoreAddRepository
+from aiohasupervisor.models.addons import StoreAddonInstall
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -104,32 +106,67 @@ async def test_store_addon_documentation(
     assert documentation.startswith("# Home Assistant Add-on: Mosquitto broker")
 
 
+@pytest.mark.parametrize(
+    ("options", "has_timeout"),
+    [
+        (None, False),
+        (StoreAddonInstall(), False),
+        (StoreAddonInstall(background=False), False),
+        (StoreAddonInstall(background=True), True),
+    ],
+)
 async def test_store_addon_install(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: StoreAddonInstall | None,
+    has_timeout: bool,  # noqa: FBT001
 ) -> None:
     """Test store addon install API."""
     responses.post(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/install", status=200)
 
-    assert (await supervisor_client.store.install_addon("core_mosquitto")) is None
-    assert responses.requests.keys() == {
-        ("POST", URL(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/install"))
-    }
+    assert (
+        await supervisor_client.store.install_addon("core_mosquitto", options)
+    ) is None
+    assert (
+        bool(
+            responses.requests[
+                ("POST", URL(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/install"))
+            ][0].kwargs["timeout"]
+        )
+        is has_timeout
+    )
 
 
+@pytest.mark.parametrize(
+    ("options", "has_timeout"),
+    [
+        (None, False),
+        (StoreAddonUpdate(), False),
+        (StoreAddonUpdate(backup=True), False),
+        (StoreAddonUpdate(background=False), False),
+        (StoreAddonUpdate(background=True), True),
+    ],
+)
 async def test_store_addon_update(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    options: StoreAddonUpdate | None,
+    has_timeout: bool,  # noqa: FBT001
 ) -> None:
     """Test store addon update API."""
     responses.post(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/update", status=200)
 
     assert (
-        await supervisor_client.store.update_addon(
-            "core_mosquitto", StoreAddonUpdate(backup=True)
-        )
+        await supervisor_client.store.update_addon("core_mosquitto", options)
     ) is None
-    assert responses.requests.keys() == {
-        ("POST", URL(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/update"))
-    }
+    assert (
+        bool(
+            responses.requests[
+                ("POST", URL(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/update"))
+            ][0].kwargs["timeout"]
+        )
+        is has_timeout
+    )
 
 
 async def test_store_reload(

@@ -1,6 +1,7 @@
 """Backups client for supervisor."""
 
 from collections.abc import AsyncIterator
+from typing import Any
 
 from aiohttp import MultipartWriter
 from multidict import MultiDict
@@ -60,21 +61,31 @@ class BackupsClient(_SupervisorComponentClient):
 
     async def full_backup(self, options: FullBackupOptions | None = None) -> NewBackup:
         """Create a new full backup."""
+        # Must disable timeout if API call waits for backup to complete
+        kwargs: dict[str, Any] = {}
+        if not options or not options.background:
+            kwargs["timeout"] = None
+
         result = await self._client.post(
             "backups/new/full",
             json=options.to_dict() if options else None,
             response_type=ResponseType.JSON,
-            timeout=None,
+            **kwargs,
         )
         return NewBackup.from_dict(result.data)
 
     async def partial_backup(self, options: PartialBackupOptions) -> NewBackup:
         """Create a new partial backup."""
+        # Must disable timeout if API call waits for backup to complete
+        kwargs: dict[str, Any] = {}
+        if not options.background:
+            kwargs["timeout"] = None
+
         result = await self._client.post(
             "backups/new/partial",
             json=options.to_dict(),
             response_type=ResponseType.JSON,
-            timeout=None,
+            **kwargs,
         )
         return NewBackup.from_dict(result.data)
 
@@ -95,11 +106,16 @@ class BackupsClient(_SupervisorComponentClient):
         self, backup: str, options: FullRestoreOptions | None = None
     ) -> BackupJob:
         """Start full restore from backup."""
+        # Must disable timeout if API call waits for restore to complete
+        kwargs: dict[str, Any] = {}
+        if not options or not options.background:
+            kwargs["timeout"] = None
+
         result = await self._client.post(
             f"backups/{backup}/restore/full",
             json=options.to_dict() if options else None,
             response_type=ResponseType.JSON,
-            timeout=None,
+            **kwargs,
         )
         return BackupJob.from_dict(result.data)
 
@@ -107,11 +123,16 @@ class BackupsClient(_SupervisorComponentClient):
         self, backup: str, options: PartialRestoreOptions
     ) -> BackupJob:
         """Start partial restore from backup."""
+        # Must disable timeout if API call waits for restore to complete
+        kwargs: dict[str, Any] = {}
+        if not options.background:
+            kwargs["timeout"] = None
+
         result = await self._client.post(
             f"backups/{backup}/restore/partial",
             json=options.to_dict(),
             response_type=ResponseType.JSON,
-            timeout=None,
+            **kwargs,
         )
         return BackupJob.from_dict(result.data)
 

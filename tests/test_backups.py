@@ -168,31 +168,42 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
 
 
 @pytest.mark.parametrize(
-    ("options", "slug"),
+    ("options", "slug", "has_timeout"),
     [
-        (FullBackupOptions(name="Test", background=True), None),
-        (FullBackupOptions(name="Test", background=False), "9ecf0028"),
-        (FullBackupOptions(name="Test", background=False, location="test"), "9ecf0028"),
+        (FullBackupOptions(name="Test", background=True), None, True),
+        (FullBackupOptions(name="Test", background=False), "9ecf0028", False),
+        (
+            FullBackupOptions(name="Test", background=False, location="test"),
+            "9ecf0028",
+            False,
+        ),
         (
             FullBackupOptions(
                 name="Test", background=False, location={".local", "test"}
             ),
             "9ecf0028",
+            False,
         ),
         (
             FullBackupOptions(
                 name="Test", background=False, extra={"user": "test", "scheduled": True}
             ),
             "9ecf0028",
+            False,
         ),
-        (FullBackupOptions(name="Test", background=False, extra=None), "9ecf0028"),
+        (
+            FullBackupOptions(name="Test", background=False, extra=None),
+            "9ecf0028",
+            False,
+        ),
         (
             FullBackupOptions(
                 name="test", background=False, filename=PurePath("backup.tar")
             ),
             "9ecf0028",
+            False,
         ),
-        (None, "9ecf0028"),
+        (None, "9ecf0028", False),
     ],
 )
 async def test_backups_full_backup(
@@ -200,6 +211,7 @@ async def test_backups_full_backup(
     supervisor_client: SupervisorClient,
     options: FullBackupOptions | None,
     slug: str | None,
+    has_timeout: bool,  # noqa: FBT001
 ) -> None:
     """Test backups full backup API."""
     responses.post(
@@ -209,21 +221,35 @@ async def test_backups_full_backup(
     result = await supervisor_client.backups.full_backup(options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
+    assert (
+        bool(
+            responses.requests[("POST", URL(f"{SUPERVISOR_URL}/backups/new/full"))][
+                0
+            ].kwargs["timeout"]
+        )
+        is has_timeout
+    )
 
 
 @pytest.mark.parametrize(
-    ("options", "slug"),
+    ("options", "slug", "has_timeout"),
     [
-        (PartialBackupOptions(name="Test", background=True, addons={"core_ssh"}), None),
+        (
+            PartialBackupOptions(name="Test", background=True, addons={"core_ssh"}),
+            None,
+            True,
+        ),
         (
             PartialBackupOptions(name="Test", background=False, addons={"core_ssh"}),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(
                 name="Test", background=False, location="test", addons={"core_ssh"}
             ),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(
@@ -233,6 +259,7 @@ async def test_backups_full_backup(
                 addons={"core_ssh"},
             ),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(
@@ -242,12 +269,14 @@ async def test_backups_full_backup(
                 extra={"user": "test", "scheduled": True},
             ),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(
                 name="Test", background=False, addons={"core_ssh"}, extra=None
             ),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(
@@ -257,14 +286,17 @@ async def test_backups_full_backup(
                 filename=PurePath("backup.tar"),
             ),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(name="Test", background=None, addons={"core_ssh"}),
             "9ecf0028",
+            False,
         ),
         (
             PartialBackupOptions(name="Test", background=None, addons=AddonSet.ALL),
             "9ecf0028",
+            False,
         ),
     ],
 )
@@ -273,6 +305,7 @@ async def test_backups_partial_backup(
     supervisor_client: SupervisorClient,
     options: PartialBackupOptions,
     slug: str | None,
+    has_timeout: bool,  # noqa: FBT001
 ) -> None:
     """Test backups full backup API."""
     responses.post(
@@ -282,6 +315,14 @@ async def test_backups_partial_backup(
     result = await supervisor_client.backups.partial_backup(options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
+    assert (
+        bool(
+            responses.requests[("POST", URL(f"{SUPERVISOR_URL}/backups/new/partial"))][
+                0
+            ].kwargs["timeout"]
+        )
+        is has_timeout
+    )
 
 
 async def test_backup_info(
@@ -381,18 +422,19 @@ async def test_remove_backup(
 
 
 @pytest.mark.parametrize(
-    "options",
+    ("options", "has_timeout"),
     [
-        None,
-        FullRestoreOptions(password="abc123"),  # noqa: S106
-        FullRestoreOptions(background=True),
-        FullRestoreOptions(location="test"),
+        (None, False),
+        (FullRestoreOptions(password="abc123"), False),  # noqa: S106
+        (FullRestoreOptions(background=True), True),
+        (FullRestoreOptions(location="test"), False),
     ],
 )
 async def test_full_restore(
     responses: aioresponses,
     supervisor_client: SupervisorClient,
     options: FullRestoreOptions | None,
+    has_timeout: bool,  # noqa: FBT001
 ) -> None:
     """Test full restore API."""
     responses.post(
@@ -402,22 +444,34 @@ async def test_full_restore(
     )
     result = await supervisor_client.backups.full_restore("abc123", options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+    assert (
+        bool(
+            responses.requests[
+                ("POST", URL(f"{SUPERVISOR_URL}/backups/abc123/restore/full"))
+            ][0].kwargs["timeout"]
+        )
+        is has_timeout
+    )
 
 
 @pytest.mark.parametrize(
-    "options",
+    ("options", "has_timeout"),
     [
-        PartialRestoreOptions(addons={"core_ssh"}),
-        PartialRestoreOptions(homeassistant=True, location=".local"),
-        PartialRestoreOptions(folders={Folder.SHARE, Folder.SSL}, location="test"),
-        PartialRestoreOptions(addons={"core_ssh"}, background=True),
-        PartialRestoreOptions(addons={"core_ssh"}, password="abc123"),  # noqa: S106
+        (PartialRestoreOptions(addons={"core_ssh"}), False),
+        (PartialRestoreOptions(homeassistant=True, location=".local"), False),
+        (
+            PartialRestoreOptions(folders={Folder.SHARE, Folder.SSL}, location="test"),
+            False,
+        ),
+        (PartialRestoreOptions(addons={"core_ssh"}, background=True), True),
+        (PartialRestoreOptions(addons={"core_ssh"}, password="abc123"), False),  # noqa: S106
     ],
 )
 async def test_partial_restore(
     responses: aioresponses,
     supervisor_client: SupervisorClient,
     options: PartialRestoreOptions,
+    has_timeout: bool,  # noqa: FBT001
 ) -> None:
     """Test partial restore API."""
     responses.post(
@@ -427,6 +481,14 @@ async def test_partial_restore(
     )
     result = await supervisor_client.backups.partial_restore("abc123", options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
+    assert (
+        bool(
+            responses.requests[
+                ("POST", URL(f"{SUPERVISOR_URL}/backups/abc123/restore/partial"))
+            ][0].kwargs["timeout"]
+        )
+        is has_timeout
+    )
 
 
 @pytest.mark.parametrize(
