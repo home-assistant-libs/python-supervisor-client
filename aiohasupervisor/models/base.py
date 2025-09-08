@@ -84,6 +84,9 @@ class Response(DataClassORJSONMixin):
     data: Any | None = None
     message: str | None = None
     job_id: str | None = None
+    error_key: str | None = None
+    message_template: str | None = None
+    extra_fields: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,0 +1,10 @@
+{
+  "result": "error",
+  "message": "Add-on core_mosquitto not supported on this platform, supported architectures: i386",
+  "error_key": "addon_not_supported_architecture_error",
+  "message_template": "Add-on {slug} not supported on this platform, supported architectures: {architectures}",
+  "extra_fields": {
+    "slug": "core_mosquitto",
+    "architectures": "i386"
+  }
+}
