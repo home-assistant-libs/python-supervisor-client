@@ -1,11 +1,14 @@
 """Store client for supervisor."""
 
+from typing import Any
+
 from .client import _SupervisorComponentClient
 from .const import ResponseType
 from .models.addons import (
     Repository,
     StoreAddon,
     StoreAddonComplete,
+    StoreAddonInstall,
     StoreAddonsList,
     StoreAddonUpdate,
     StoreAddRepository,
@@ -45,18 +48,34 @@ class StoreClient(_SupervisorComponentClient):
         )
         return result.data
 
-    async def install_addon(self, addon: str) -> None:
+    async def install_addon(
+        self, addon: str, options: StoreAddonInstall | None = None
+    ) -> None:
         """Install an addon."""
-        await self._client.post(f"store/addons/{addon}/install", timeout=None)
+        # Must disable timeout if API call waits for install to complete
+        kwargs: dict[str, Any] = {}
+        if not options or not options.background:
+            kwargs["timeout"] = None
+
+        await self._client.post(
+            f"store/addons/{addon}/install",
+            json=options.to_dict() if options else None,
+            **kwargs,
+        )
 
     async def update_addon(
         self, addon: str, options: StoreAddonUpdate | None = None
     ) -> None:
         """Update an addon to latest version."""
+        # Must disable timeout if API call waits for update to complete
+        kwargs: dict[str, Any] = {}
+        if not options or not options.background:
+            kwargs["timeout"] = None
+
         await self._client.post(
             f"store/addons/{addon}/update",
             json=options.to_dict() if options else None,
-            timeout=None,
+            **kwargs,
         )
 
     async def reload(self) -> None:
