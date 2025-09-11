@@ -57,6 +57,7 @@ class Capability(StrEnum):
     """
 
     BPF = "BPF"
+    CHECKPOINT_RESTORE = "CHECKPOINT_RESTORE"
     DAC_READ_SEARCH = "DAC_READ_SEARCH"
     IPC_LOCK = "IPC_LOCK"
     NET_ADMIN = "NET_ADMIN"
