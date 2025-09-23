@@ -2,7 +2,6 @@
   "result": "error",
   "message": "Add-on core_mosquitto not supported on this system, requires Home Assistant version 2023.1.1 or greater",
   "error_key": "addon_not_supported_home_assistant_version_error",
-  "message_template": "Add-on {slug} not supported on this system, requires Home Assistant version {version} or greater",
   "extra_fields": {
     "slug": "core_mosquitto",
     "version": "2023.1.1"

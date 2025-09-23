@@ -78,7 +78,6 @@ class _SupervisorClient:
                     exc_type = ERROR_KEYS[result.error_key]
                 raise exc_type(
                     result.message,
-                    result.message_template,
                     result.extra_fields,
                     result.job_id,
                 )

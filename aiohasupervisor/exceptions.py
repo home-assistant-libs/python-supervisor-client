@@ -13,7 +13,6 @@ class SupervisorError(Exception):
     def __init__(
         self,
         message: str | None = None,
-        message_template: str | None = None,
         extra_fields: dict[str, Any] | None = None,
         job_id: str | None = None,
     ) -> None:
@@ -24,7 +23,6 @@ class SupervisorError(Exception):
             super().__init__()
 
         self.job_id = job_id
-        self.message_template = message_template
         self.extra_fields = extra_fields
 
 

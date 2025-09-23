@@ -227,7 +227,6 @@ async def test_store_addon_availability_error(
 
     def check_availability_error(err: SupervisorError) -> bool:
         assert err.error_key == error_key
-        assert err.message_template == error_data["message_template"]
         assert err.extra_fields == error_data["extra_fields"]
         return True
 
