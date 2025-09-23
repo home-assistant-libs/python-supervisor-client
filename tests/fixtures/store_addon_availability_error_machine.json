@@ -1,0 +1,9 @@
+{
+  "result": "error",
+  "message": "Add-on core_mosquitto not supported on this machine, supported machine types: odroid-n2",
+  "error_key": "addon_not_supported_machine_type_error",
+  "extra_fields": {
+    "slug": "core_mosquitto",
+    "machine_types": "odroid-n2"
+  }
+}

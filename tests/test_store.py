@@ -1,10 +1,19 @@
 """Tests for store supervisor client."""
 
+from json import loads
+
 from aioresponses import aioresponses
 import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
+from aiohasupervisor.exceptions import (
+    AddonNotSupportedArchitectureError,
+    AddonNotSupportedHomeAssistantVersionError,
+    AddonNotSupportedMachineTypeError,
+    SupervisorBadRequestError,
+    SupervisorError,
+)
 from aiohasupervisor.models import StoreAddonUpdate, StoreAddRepository
 from aiohasupervisor.models.addons import StoreAddonInstall
 
@@ -167,6 +176,92 @@ async def test_store_addon_update(
         )
         is has_timeout
     )
+
+
+async def test_store_addon_availability(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test store addon availability API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/availability", status=200
+    )
+
+    assert (await supervisor_client.store.addon_availability("core_mosquitto")) is None
+
+
+@pytest.mark.parametrize(
+    ("error_fixture", "error_key", "exc_type"),
+    [
+        (
+            "store_addon_availability_error_architecture.json",
+            "addon_not_supported_architecture_error",
+            AddonNotSupportedArchitectureError,
+        ),
+        (
+            "store_addon_availability_error_machine.json",
+            "addon_not_supported_machine_type_error",
+            AddonNotSupportedMachineTypeError,
+        ),
+        (
+            "store_addon_availability_error_home_assistant.json",
+            "addon_not_supported_home_assistant_version_error",
+            AddonNotSupportedHomeAssistantVersionError,
+        ),
+        (
+            "store_addon_availability_error_other.json",
+            None,
+            SupervisorBadRequestError,
+        ),
+    ],
+)
+async def test_store_addon_availability_error(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    error_fixture: str,
+    error_key: str | None,
+    exc_type: type[SupervisorError],
+) -> None:
+    """Test store addon availability errors."""
+    error_body = load_fixture(error_fixture)
+    error_data = loads(error_body)
+
+    def check_availability_error(err: SupervisorError) -> bool:
+        assert err.error_key == error_key
+        assert err.extra_fields == error_data["extra_fields"]
+        return True
+
+    # Availability API
+    responses.get(
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/availability",
+        status=400,
+        body=error_body,
+    )
+    with pytest.raises(
+        exc_type, match=error_data["message"], check=check_availability_error
+    ):
+        await supervisor_client.store.addon_availability("core_mosquitto")
+
+    # Install API
+    responses.post(
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/install",
+        status=400,
+        body=error_body,
+    )
+    with pytest.raises(
+        exc_type, match=error_data["message"], check=check_availability_error
+    ):
+        await supervisor_client.store.install_addon("core_mosquitto")
+
+    # Update API
+    responses.post(
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/update",
+        status=400,
+        body=error_body,
+    )
+    with pytest.raises(
+        exc_type, match=error_data["message"], check=check_availability_error
+    ):
+        await supervisor_client.store.update_addon("core_mosquitto")
 
 
 async def test_store_reload(

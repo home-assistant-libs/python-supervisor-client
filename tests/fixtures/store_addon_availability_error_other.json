@@ -1,0 +1,9 @@
+{
+  "result": "error",
+  "message": "Add-on core_mosquitto not supported on this system, requires <something new> to be <something else>",
+  "error_key": "addon_not_supported_other_error",
+  "extra_fields": {
+    "slug": "core_mosquitto",
+    "requirement": "<something else>"
+  }
+}
