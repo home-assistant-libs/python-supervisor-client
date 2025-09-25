@@ -38,7 +38,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: venv
           key: >
@@ -53,7 +53,7 @@ jobs:
           pip install -e ".[dev]"
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           lookup-only: true
@@ -85,7 +85,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: venv
           key: >
@@ -98,7 +98,7 @@ jobs:
           exit 1
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: >
@@ -134,7 +134,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: venv
           key: >
@@ -147,7 +147,7 @@ jobs:
           exit 1
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: >
@@ -183,7 +183,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: venv
           key: >
@@ -196,7 +196,7 @@ jobs:
           exit 1
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: >
@@ -275,7 +275,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: venv
           key: >
@@ -326,7 +326,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v4.2.4
+        uses: actions/cache@v4.3.0
         with:
           path: venv
           key: >
