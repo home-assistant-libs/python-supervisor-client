@@ -23,7 +23,7 @@ version = "0.0.0"
 [project.optional-dependencies]
 dev = [
     # Production requirements
-    "aiohttp==3.12.15",
+    "aiohttp==3.13.0",
     "mashumaro==3.17",
     "orjson==3.11.3",
 
