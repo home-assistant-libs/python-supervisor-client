@@ -30,7 +30,7 @@ jobs:
     name: Prepare Python ${{ matrix.python-version }} dependencies
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up Python
         id: python
         uses: actions/setup-python@v6.0.0
@@ -77,7 +77,7 @@ jobs:
         python-version: ["3.12", "3.13"]
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6.0.0
         id: python
@@ -126,7 +126,7 @@ jobs:
         python-version: ["3.12", "3.13"]
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6.0.0
         id: python
@@ -175,7 +175,7 @@ jobs:
         python-version: ["3.12", "3.13"]
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6.0.0
         id: python
@@ -267,7 +267,7 @@ jobs:
     name: Run tests Python ${{ matrix.python-version }}
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6.0.0
         id: python
@@ -319,7 +319,7 @@ jobs:
     needs: ["pytest", "prepare"]
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
         uses: actions/setup-python@v6.0.0
         id: python
