@@ -14,6 +14,7 @@
     "watchdog": true,
     "audio_input": null,
     "audio_output": null,
-    "backups_exclude_database": false
+    "backups_exclude_database": false,
+    "duplicate_log_file": false
   }
 }
