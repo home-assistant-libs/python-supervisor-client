@@ -26,6 +26,7 @@ class HomeAssistantInfo(ResponseData):
     audio_input: str | None
     audio_output: str | None
     backups_exclude_database: bool
+    duplicate_log_file: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +47,7 @@ class HomeAssistantOptions(Options):
     audio_input: str | None = DEFAULT  # type: ignore[assignment]
     audio_output: str | None = DEFAULT  # type: ignore[assignment]
     backups_exclude_database: bool | None = None
+    duplicate_log_file: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)
