@@ -129,4 +129,8 @@ class StoreClient(_SupervisorComponentClient):
         """Remove a repository from the store."""
         await self._client.delete(f"store/repositories/{repository}")
 
+    async def repair_repository(self, repository: str) -> None:
+        """Repair/reset an addon repository in the store."""
+        await self._client.post(f"store/repositories/{repository}/repair")
+
     # Omitted for now - Icon/Logo endpoints
