@@ -310,10 +310,22 @@ async def test_store_add_repository(
 async def test_store_remove_repository(
     responses: aioresponses, supervisor_client: SupervisorClient
 ) -> None:
-    """Test store addon info API."""
+    """Test store remove repository API."""
     responses.delete(f"{SUPERVISOR_URL}/store/repositories/test", status=200)
 
     assert (await supervisor_client.store.remove_repository("test")) is None
     assert responses.requests.keys() == {
         ("DELETE", URL(f"{SUPERVISOR_URL}/store/repositories/test"))
+    }
+
+
+async def test_store_repair_repository(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test store repository repair API."""
+    responses.post(f"{SUPERVISOR_URL}/store/repositories/test/repair", status=200)
+
+    assert (await supervisor_client.store.repair_repository("test")) is None
+    assert responses.requests.keys() == {
+        ("POST", URL(f"{SUPERVISOR_URL}/store/repositories/test/repair"))
     }
