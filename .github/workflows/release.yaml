@@ -18,7 +18,7 @@ jobs:
     name: Builds and publishes releases to PyPI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@v6.0.2
       - name: Store version from inputs
         if: github.event_name == 'workflow_dispatch'
         run: echo "tag=${{ inputs.version }}" >> $GITHUB_ENV
