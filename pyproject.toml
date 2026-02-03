@@ -25,7 +25,7 @@ dev = [
     # Production requirements
     "aiohttp==3.13.3",
     "mashumaro==3.18",
-    "orjson==3.11.6",
+    "orjson==3.11.7",
 
     # Test requirements
     "aioresponses==0.7.8",
