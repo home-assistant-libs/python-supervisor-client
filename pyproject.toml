@@ -24,7 +24,7 @@ version = "0.0.0"
 dev = [
     # Production requirements
     "aiohttp==3.13.3",
-    "mashumaro==3.18",
+    "mashumaro==3.19",
     "orjson==3.11.7",
 
     # Test requirements
