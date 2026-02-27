@@ -339,7 +339,7 @@ jobs:
           echo "Failed to restore Python virtual environment from cache"
           exit 1
       - name: Download all coverage artifacts
-        uses: actions/download-artifact@v7.0.0
+        uses: actions/download-artifact@v8.0.0
       - name: Combine coverage results
         run: |
           . venv/bin/activate
