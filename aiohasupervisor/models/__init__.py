@@ -50,6 +50,7 @@ from aiohasupervisor.models.backups import (
     RemoveBackupOptions,
     UploadBackupOptions,
 )
+from aiohasupervisor.models.base import ResponseData
 from aiohasupervisor.models.discovery import (
     Discovery,
     DiscoveryConfig,
@@ -253,6 +254,7 @@ __all__ = [
     "RemoveBackupOptions",
     "Repository",
     "ResolutionInfo",
+    "ResponseData",
     "RootInfo",
     "Service",
     "ServiceState",
