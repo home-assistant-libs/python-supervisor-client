@@ -8,8 +8,11 @@ from yarl import URL
 
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import (
+    InterfaceAddrGenMode,
+    InterfaceIp6Privacy,
     InterfaceMethod,
     IPv4Config,
+    IPv6Config,
     MulticastDnsMode,
     NetworkInterfaceConfig,
     VlanConfig,
@@ -44,6 +47,8 @@ async def test_network_info(
         == "fe80::819d:c479:d712:7a77/64"
     )
     assert result.interfaces[0].ipv6.gateway is None
+    assert result.interfaces[0].ipv6.addr_gen_mode is InterfaceAddrGenMode.DEFAULT
+    assert result.interfaces[0].ipv6.ip6_privacy is InterfaceIp6Privacy.DEFAULT
     assert result.interfaces[0].wifi is None
     assert result.interfaces[0].vlan is None
     assert result.interfaces[0].mdns is MulticastDnsMode.DEFAULT
@@ -90,6 +95,8 @@ async def test_network_interface_info(
     assert result.ipv6.method == "disabled"
     assert result.ipv6.address[0].with_prefixlen == "fe80::819d:c479:d712:7a77/64"
     assert result.ipv6.gateway is None
+    assert result.ipv6.addr_gen_mode is InterfaceAddrGenMode.DEFAULT
+    assert result.ipv6.ip6_privacy is InterfaceIp6Privacy.DEFAULT
     assert result.wifi is None
     assert result.vlan is None
     assert result.mdns is MulticastDnsMode.ANNOUNCE
@@ -108,6 +115,11 @@ async def test_network_update_interface(
             gateway=IPv4Address("192.168.1.1"),
             nameservers=[IPv4Address("192.168.1.1")],
         ),
+        ipv6=IPv6Config(
+            method=InterfaceMethod.AUTO,
+            addr_gen_mode=InterfaceAddrGenMode.STABLE_PRIVACY,
+            ip6_privacy=InterfaceIp6Privacy.ENABLED,
+        ),
         mdns=MulticastDnsMode.OFF,
     )
     assert (
@@ -124,6 +136,11 @@ async def test_network_update_interface(
             "gateway": "192.168.1.1",
             "method": "static",
             "nameservers": ["192.168.1.1"],
+        },
+        "ipv6": {
+            "method": "auto",
+            "addr_gen_mode": "stable-privacy",
+            "ip6_privacy": "enabled",
         },
         "mdns": "off",
     }

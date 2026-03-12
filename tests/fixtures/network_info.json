@@ -21,7 +21,9 @@
           "address": ["fe80::819d:c479:d712:7a77/64"],
           "nameservers": [],
           "gateway": null,
-          "ready": true
+          "ready": true,
+          "addr_gen_mode": "default",
+          "ip6_privacy": "default"
         },
         "wifi": null,
         "vlan": null,
