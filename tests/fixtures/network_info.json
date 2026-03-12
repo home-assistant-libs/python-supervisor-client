@@ -14,14 +14,16 @@
           "address": ["192.168.1.2/24"],
           "nameservers": ["192.168.1.1"],
           "gateway": "192.168.1.1",
-          "ready": true
+          "ready": true,
+          "route_metric": 100
         },
         "ipv6": {
           "method": "disabled",
           "address": ["fe80::819d:c479:d712:7a77/64"],
           "nameservers": [],
           "gateway": null,
-          "ready": true
+          "ready": true,
+          "route_metric": null
         },
         "wifi": null,
         "vlan": null,

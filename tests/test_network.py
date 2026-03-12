@@ -38,12 +38,14 @@ async def test_network_info(
     assert result.interfaces[0].ipv4.nameservers[0].compressed == "192.168.1.1"
     assert result.interfaces[0].ipv4.gateway.compressed == "192.168.1.1"
     assert result.interfaces[0].ipv4.ready is True
+    assert result.interfaces[0].ipv4.route_metric == 100
     assert result.interfaces[0].ipv6.method == "disabled"
     assert (
         result.interfaces[0].ipv6.address[0].with_prefixlen
         == "fe80::819d:c479:d712:7a77/64"
     )
     assert result.interfaces[0].ipv6.gateway is None
+    assert result.interfaces[0].ipv6.route_metric is None
     assert result.interfaces[0].wifi is None
     assert result.interfaces[0].vlan is None
     assert result.interfaces[0].mdns is MulticastDnsMode.DEFAULT
@@ -87,9 +89,11 @@ async def test_network_interface_info(
     assert result.ipv4.nameservers[0].compressed == "192.168.1.1"
     assert result.ipv4.gateway.compressed == "192.168.1.1"
     assert result.ipv4.ready is True
+    assert result.ipv4.route_metric == 100
     assert result.ipv6.method == "disabled"
     assert result.ipv6.address[0].with_prefixlen == "fe80::819d:c479:d712:7a77/64"
     assert result.ipv6.gateway is None
+    assert result.ipv6.route_metric is None
     assert result.wifi is None
     assert result.vlan is None
     assert result.mdns is MulticastDnsMode.ANNOUNCE
@@ -107,6 +111,7 @@ async def test_network_update_interface(
             address=[IPv4Interface("192.168.1.2/24")],
             gateway=IPv4Address("192.168.1.1"),
             nameservers=[IPv4Address("192.168.1.1")],
+            route_metric=100,
         ),
         mdns=MulticastDnsMode.OFF,
     )
@@ -124,6 +129,7 @@ async def test_network_update_interface(
             "gateway": "192.168.1.1",
             "method": "static",
             "nameservers": ["192.168.1.1"],
+            "route_metric": 100,
         },
         "mdns": "off",
     }
