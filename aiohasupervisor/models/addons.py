@@ -117,7 +117,7 @@ class AddonStartup(StrEnum):
 class AddonInfoBaseFields(ABC):
     """AddonInfoBaseFields ABC type."""
 
-    advanced: bool  # Deprecated as Supervisor 2026.03 . Will always be value True
+     advanced: bool  # Deprecated since Supervisor 2026.03; always False.
     available: bool
     build: bool
     description: str
