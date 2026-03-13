@@ -94,7 +94,7 @@ class IPv4(IpBase, ResponseData):
     address: list[IPv4Interface]
     nameservers: list[IPv4Address]
     gateway: IPv4Address | None
-    route_metric: int | None = None
+    route_metric: int | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,7 +104,7 @@ class IPv6(IpBase, ResponseData):
     address: list[IPv6Interface]
     nameservers: list[IPv6Address]
     gateway: IPv6Address | None
-    route_metric: int | None = None
+    route_metric: int | None
     addr_gen_mode: InterfaceAddrGenMode
     ip6_privacy: InterfaceIp6Privacy
 
