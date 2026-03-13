@@ -12,7 +12,8 @@
       "address": ["192.168.1.2/24"],
       "nameservers": ["192.168.1.1"],
       "gateway": "192.168.1.1",
-      "ready": true
+      "ready": true,
+      "route_metric": 100
     },
     "ipv6": {
       "method": "disabled",
@@ -20,6 +21,7 @@
       "nameservers": [],
       "gateway": null,
       "ready": true,
+      "route_metric": null,
       "addr_gen_mode": "default",
       "ip6_privacy": "default"
     },
