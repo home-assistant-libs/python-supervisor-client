@@ -150,7 +150,6 @@ class CheckType(StrEnum):
 
     ADDON_PWNED = "addon_pwned"
     BACKUPS = "backups"
-    CORE_SECURITY = "core_security"
     DEPRECATED_ADDON = "deprecated_addon"
     DEPRECATED_ARCH_ADDON = "deprecated_arch_addon"
     DETACHED_ADDON_MISSING = "detached_addon_missing"

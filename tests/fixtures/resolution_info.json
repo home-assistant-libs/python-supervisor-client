@@ -32,8 +32,7 @@
       { "enabled": true, "slug": "free_space" },
       { "enabled": true, "slug": "detached_addon_removed" },
       { "enabled": true, "slug": "docker_config" },
-      { "enabled": true, "slug": "addon_pwned" },
-      { "enabled": true, "slug": "core_security" }
+      { "enabled": true, "slug": "addon_pwned" }
     ]
   }
 }
