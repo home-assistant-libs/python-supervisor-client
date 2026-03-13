@@ -21,7 +21,9 @@
       "nameservers": [],
       "gateway": null,
       "ready": true,
-      "route_metric": null
+      "route_metric": null,
+      "addr_gen_mode": "default",
+      "ip6_privacy": "default"
     },
     "wifi": null,
     "vlan": null,
