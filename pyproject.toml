@@ -70,6 +70,7 @@ filterwarnings = [
     "error",
     "ignore:pkg_resources is deprecated as an API:DeprecationWarning:dirhash",
     "ignore::pytest.PytestUnraisableExceptionWarning",
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:aioresponses",
 ]
 
 [tool.ruff]
