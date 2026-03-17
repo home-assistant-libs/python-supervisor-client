@@ -137,8 +137,8 @@ class NetworkInterface(ResponseData):
     connected: bool
     primary: bool
     mac: str
-    ipv4: IPv4
-    ipv6: IPv6
+    ipv4: IPv4 | None
+    ipv6: IPv6 | None
     wifi: Wifi | None
     vlan: Vlan | None
     mdns: MulticastDnsMode | None

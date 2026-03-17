@@ -39,24 +39,8 @@
         "connected": false,
         "primary": false,
         "mac": "00:11:22:33:44:55",
-        "ipv4": {
-          "method": "disabled",
-          "address": [],
-          "nameservers": [],
-          "gateway": null,
-          "ready": false,
-          "route_metric": null
-        },
-        "ipv6": {
-          "method": "disabled",
-          "address": [],
-          "nameservers": [],
-          "gateway": null,
-          "ready": false,
-          "route_metric": null,
-          "addr_gen_mode": "default",
-          "ip6_privacy": "default"
-        },
+        "ipv4": null,
+        "ipv6": null,
         "wifi": null,
         "vlan": null,
         "mdns": null,
