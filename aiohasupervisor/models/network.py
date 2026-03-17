@@ -141,8 +141,8 @@ class NetworkInterface(ResponseData):
     ipv6: IPv6
     wifi: Wifi | None
     vlan: Vlan | None
-    mdns: MulticastDnsMode
-    llmnr: MulticastDnsMode
+    mdns: MulticastDnsMode | None
+    llmnr: MulticastDnsMode | None
 
 
 @dataclass(frozen=True, slots=True)
