@@ -56,6 +56,12 @@ async def test_network_info(
     assert result.interfaces[0].mdns is MulticastDnsMode.DEFAULT
     assert result.interfaces[0].llmnr is MulticastDnsMode.DEFAULT
 
+    assert result.interfaces[1].interface == "end0.10"
+    assert result.interfaces[1].type == "vlan"
+    assert result.interfaces[1].enabled is False
+    assert result.interfaces[1].mdns is None
+    assert result.interfaces[1].llmnr is None
+
     assert result.docker.interface == "hassio"
     assert result.docker.address.compressed == "172.30.32.0/23"
     assert result.docker.gateway.compressed == "172.30.32.1"
