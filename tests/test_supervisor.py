@@ -47,18 +47,11 @@ async def test_supervisor_info(
     assert info.detect_blocking_io is False
 
 
-@pytest.mark.parametrize(
-    ("field", "expected"),
-    [
-        ("version_latest", None),
-        ("arch", None),
-    ],
-)
+@pytest.mark.parametrize("field", ["version_latest", "arch"])
 async def test_supervisor_info_optional_fields_none(
     responses: aioresponses,
     supervisor_client: SupervisorClient,
     field: str,
-    expected: None,
 ) -> None:
     """Test supervisor info API when optional fields are None."""
     import json
