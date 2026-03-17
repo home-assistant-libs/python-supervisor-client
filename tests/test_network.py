@@ -59,6 +59,8 @@ async def test_network_info(
     assert result.interfaces[1].interface == "end0.10"
     assert result.interfaces[1].type == "vlan"
     assert result.interfaces[1].enabled is False
+    assert result.interfaces[1].ipv4 is None
+    assert result.interfaces[1].ipv6 is None
     assert result.interfaces[1].mdns is None
     assert result.interfaces[1].llmnr is None
 
