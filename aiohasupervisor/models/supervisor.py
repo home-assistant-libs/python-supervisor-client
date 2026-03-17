@@ -26,10 +26,10 @@ class SupervisorInfo(ResponseData):
     """SupervisorInfo model."""
 
     version: str
-    version_latest: str
+    version_latest: str | None
     update_available: bool
     channel: UpdateChannel
-    arch: str
+    arch: str | None
     supported: bool
     healthy: bool
     ip_address: IPv4Address

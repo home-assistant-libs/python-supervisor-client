@@ -47,6 +47,23 @@ async def test_supervisor_info(
     assert info.detect_blocking_io is False
 
 
+async def test_supervisor_info_version_latest_none(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test supervisor info API when version_latest is None (version fetch failed)."""
+    import json
+
+    fixture = json.loads(load_fixture("supervisor_info.json"))
+    fixture["data"]["version_latest"] = None
+    responses.get(
+        f"{SUPERVISOR_URL}/supervisor/info",
+        status=200,
+        payload=fixture,
+    )
+    info = await supervisor_client.supervisor.info()
+    assert info.version_latest is None
+
+
 async def test_supervisor_stats(
     responses: aioresponses, supervisor_client: SupervisorClient
 ) -> None:
