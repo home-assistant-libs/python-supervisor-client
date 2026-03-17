@@ -47,21 +47,31 @@ async def test_supervisor_info(
     assert info.detect_blocking_io is False
 
 
-async def test_supervisor_info_version_latest_none(
-    responses: aioresponses, supervisor_client: SupervisorClient
+@pytest.mark.parametrize(
+    ("field", "expected"),
+    [
+        ("version_latest", None),
+        ("arch", None),
+    ],
+)
+async def test_supervisor_info_optional_fields_none(
+    responses: aioresponses,
+    supervisor_client: SupervisorClient,
+    field: str,
+    expected: None,
 ) -> None:
-    """Test supervisor info API when version_latest is None (version fetch failed)."""
+    """Test supervisor info API when optional fields are None."""
     import json
 
     fixture = json.loads(load_fixture("supervisor_info.json"))
-    fixture["data"]["version_latest"] = None
+    fixture["data"][field] = None
     responses.get(
         f"{SUPERVISOR_URL}/supervisor/info",
         status=200,
         payload=fixture,
     )
     info = await supervisor_client.supervisor.info()
-    assert info.version_latest is None
+    assert getattr(info, field) is None
 
 
 async def test_supervisor_stats(
