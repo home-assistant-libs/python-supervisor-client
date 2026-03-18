@@ -10,6 +10,7 @@ from .client import _SupervisorClient
 from .discovery import DiscoveryClient
 from .homeassistant import HomeAssistantClient
 from .host import HostClient
+from .ingress import IngressClient
 from .jobs import JobsClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .mounts import MountsClient
@@ -43,6 +44,7 @@ class SupervisorClient:
         self._store = StoreClient(self._client)
         self._supervisor = SupervisorManagementClient(self._client)
         self._homeassistant = HomeAssistantClient(self._client)
+        self._ingress = IngressClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
@@ -103,6 +105,11 @@ class SupervisorClient:
     def supervisor(self) -> SupervisorManagementClient:
         """Get supervisor component client."""
         return self._supervisor
+
+    @property
+    def ingress(self) -> IngressClient:
+        """Get ingress component client."""
+        return self._ingress
 
     async def info(self) -> RootInfo:
         """Get root info."""

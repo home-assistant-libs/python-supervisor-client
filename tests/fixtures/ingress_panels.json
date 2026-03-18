@@ -1,0 +1,19 @@
+{
+  "result": "ok",
+  "data": {
+    "panels": {
+      "core_ssh": {
+        "title": "Terminal",
+        "icon": "mdi:console",
+        "admin": true,
+        "enable": false
+      },
+      "a0d7b954_vscode": {
+        "title": "Studio Code Server",
+        "icon": "mdi:microsoft-visual-studio-code",
+        "admin": true,
+        "enable": true
+      }
+    }
+  }
+}
