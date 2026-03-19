@@ -72,6 +72,7 @@ from aiohasupervisor.models.host import (
     ServiceState,
     ShutdownOptions,
 )
+from aiohasupervisor.models.ingress import CreateSessionOptions, IngressPanel
 from aiohasupervisor.models.jobs import (
     Job,
     JobCondition,
@@ -195,6 +196,7 @@ __all__ = [
     "CheckType",
     "ContextType",
     "CpuArch",
+    "CreateSessionOptions",
     "DataDisk",
     "DetectBlockingIO",
     "Discovery",
@@ -221,11 +223,12 @@ __all__ = [
     "IPv4Config",
     "IPv6",
     "IPv6Config",
+    "IngressPanel",
     "InstalledAddon",
     "InstalledAddonComplete",
-    "InterfaceMethod",
     "InterfaceAddrGenMode",
     "InterfaceIp6Privacy",
+    "InterfaceMethod",
     "InterfaceType",
     "Issue",
     "IssueType",
