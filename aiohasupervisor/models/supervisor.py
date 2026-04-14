@@ -18,6 +18,18 @@ class DetectBlockingIO(StrEnum):
     ON_AT_STARTUP = "on_at_startup"
 
 
+class FeatureFlag(StrEnum):
+    """FeatureFlag type.
+
+    This is an incomplete list. Supervisor regularly adds new feature flags as
+    new development features are introduced. Therefore when returning feature flags,
+    some keys may not be in this list and will be parsed as strings on older versions
+    of the client.
+    """
+
+    SUPERVISOR_V2_API = "supervisor_v2_api"
+
+
 # --- OBJECTS ----
 
 
@@ -41,6 +53,7 @@ class SupervisorInfo(ResponseData):
     auto_update: bool
     country: str | None
     detect_blocking_io: bool
+    feature_flags: dict[FeatureFlag | str, bool]
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,3 +83,4 @@ class SupervisorOptions(Options):
     auto_update: bool | None = None
     country: str | None = None
     detect_blocking_io: DetectBlockingIO | None = None
+    feature_flags: dict[FeatureFlag, bool] | None = None

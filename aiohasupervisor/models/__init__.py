@@ -152,6 +152,7 @@ from aiohasupervisor.models.root import (
 )
 from aiohasupervisor.models.supervisor import (
     DetectBlockingIO,
+    FeatureFlag,
     SupervisorInfo,
     SupervisorOptions,
     SupervisorStats,
@@ -203,6 +204,7 @@ __all__ = [
     "DiscoveryConfig",
     "DockerNetwork",
     "DownloadBackupOptions",
+    "FeatureFlag",
     "Folder",
     "FreezeOptions",
     "FullBackupOptions",
