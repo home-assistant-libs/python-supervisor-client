@@ -18,6 +18,9 @@
     "country": null,
     "wait_boot": 5,
     "detect_blocking_io": false,
+    "feature_flags": {
+      "supervisor_v2_api": false
+    },
     "addons": [
       {
         "name": "Terminal & SSH",

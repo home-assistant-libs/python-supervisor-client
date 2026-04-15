@@ -1,6 +1,7 @@
 """Test for supervisor management client."""
 
 from ipaddress import IPv4Address
+import json
 
 from aioresponses import aioresponses
 import pytest
@@ -8,7 +9,7 @@ from yarl import URL
 
 from aiohasupervisor import SupervisorClient
 from aiohasupervisor.models import SupervisorOptions, SupervisorUpdateOptions
-from aiohasupervisor.models.supervisor import DetectBlockingIO
+from aiohasupervisor.models.supervisor import DetectBlockingIO, FeatureFlag
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -45,6 +46,7 @@ async def test_supervisor_info(
     assert info.ip_address == IPv4Address("172.30.32.2")
     assert info.country is None
     assert info.detect_blocking_io is False
+    assert info.feature_flags == {FeatureFlag.SUPERVISOR_V2_API: False}
 
 
 @pytest.mark.parametrize("field", ["version_latest", "arch"])
@@ -54,8 +56,6 @@ async def test_supervisor_info_optional_fields_none(
     field: str,
 ) -> None:
     """Test supervisor info API when optional fields are None."""
-    import json
-
     fixture = json.loads(load_fixture("supervisor_info.json"))
     fixture["data"][field] = None
     responses.get(
@@ -151,6 +151,45 @@ async def test_supervisor_options(
         "debug_block": True,
         "country": "NL",
         "detect_blocking_io": "on_at_startup",
+    }
+
+
+async def test_supervisor_info_unknown_feature_flag(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test supervisor info with an unknown feature flag returns it as a string key."""
+    fixture = json.loads(load_fixture("supervisor_info.json"))
+    fixture["data"]["feature_flags"]["future_feature"] = True
+    responses.get(
+        f"{SUPERVISOR_URL}/supervisor/info",
+        status=200,
+        payload=fixture,
+    )
+    info = await supervisor_client.supervisor.info()
+    assert info.feature_flags[FeatureFlag.SUPERVISOR_V2_API] is False
+    assert info.feature_flags["future_feature"] is True
+
+
+async def test_supervisor_options_feature_flags(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test supervisor options API with feature_flags."""
+    responses.post(f"{SUPERVISOR_URL}/supervisor/options", status=200)
+    assert (
+        await supervisor_client.supervisor.set_options(
+            SupervisorOptions(
+                feature_flags={FeatureFlag.SUPERVISOR_V2_API: True},
+            )
+        )
+        is None
+    )
+    assert (
+        request := responses.requests[
+            ("POST", URL(f"{SUPERVISOR_URL}/supervisor/options"))
+        ]
+    )
+    assert request[0].kwargs["json"] == {
+        "feature_flags": {"supervisor_v2_api": True},
     }
 
 
