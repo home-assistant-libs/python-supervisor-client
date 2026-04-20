@@ -42,7 +42,7 @@ jobs:
         with:
           path: venv
           key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
+            ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('pyproject.toml') }}
       - name: Create Python virtual environment
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -58,7 +58,7 @@ jobs:
           path: ${{ env.PRE_COMMIT_CACHE }}
           lookup-only: true
           key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
+            ${{ runner.os }}-pre-commit-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pre-commit-
@@ -89,7 +89,7 @@ jobs:
         with:
           path: venv
           key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
+            ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('pyproject.toml') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -102,7 +102,7 @@ jobs:
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
+            ${{ runner.os }}-pre-commit-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -138,7 +138,7 @@ jobs:
         with:
           path: venv
           key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
+            ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('pyproject.toml') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -151,7 +151,7 @@ jobs:
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
+            ${{ runner.os }}-pre-commit-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -187,7 +187,7 @@ jobs:
         with:
           path: venv
           key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
+            ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('pyproject.toml') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -200,7 +200,7 @@ jobs:
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
+            ${{ runner.os }}-pre-commit-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -279,7 +279,7 @@ jobs:
         with:
           path: venv
           key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
+            ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('pyproject.toml') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
@@ -331,7 +331,7 @@ jobs:
         with:
           path: venv
           key: >
-            ${{ runner.os }}-venv-${{ env.DEFAULT_PYTHON }}-
+            ${{ runner.os }}-venv-${{ steps.python.outputs.python-version }}-
             ${{ hashFiles('pyproject.toml') }}
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
