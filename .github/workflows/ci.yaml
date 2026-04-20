@@ -41,9 +41,10 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
-            ${{ hashFiles('pyproject.toml') }}
+          key: &venv-key >-
+            ${{ runner.os }}-venv-${{
+            steps.python.outputs.python-version }}-${{
+            hashFiles('pyproject.toml') }}
       - name: Create Python virtual environment
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -57,9 +58,10 @@ jobs:
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           lookup-only: true
-          key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
-            ${{ hashFiles('.pre-commit-config.yaml') }}
+          key: &pre-commit-key >-
+            ${{ runner.os }}-pre-commit-${{
+            steps.python.outputs.python-version }}-${{
+            hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pre-commit-
       - name: Install pre-commit dependencies
@@ -88,9 +90,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
-            ${{ hashFiles('pyproject.toml') }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -101,9 +101,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
-          key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
-            ${{ hashFiles('.pre-commit-config.yaml') }}
+          key: *pre-commit-key
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -137,9 +135,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
-            ${{ hashFiles('pyproject.toml') }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -150,9 +146,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
-          key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
-            ${{ hashFiles('.pre-commit-config.yaml') }}
+          key: *pre-commit-key
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -186,9 +180,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
-            ${{ hashFiles('pyproject.toml') }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -199,9 +191,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
-          key: >
-            ${{ runner.os }}-pre-commit-${{ matrix.python-version }}-
-            ${{ hashFiles('.pre-commit-config.yaml') }}
+          key: *pre-commit-key
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -278,9 +268,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: >
-            ${{ runner.os }}-venv-${{ matrix.python-version }}-
-            ${{ hashFiles('pyproject.toml') }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -330,9 +318,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: >
-            ${{ runner.os }}-venv-${{ env.DEFAULT_PYTHON }}-
-            ${{ hashFiles('pyproject.toml') }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
