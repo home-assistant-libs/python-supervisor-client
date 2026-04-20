@@ -36,23 +36,15 @@ jobs:
         uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
-      - &cache-keys-step
-        name: Generate cache keys
-        id: cache-keys
-        run: |
-          V=${{ steps.python.outputs.python-version }}
-          PYH=${{ hashFiles('pyproject.toml') }}
-          PCH=${{ hashFiles('.pre-commit-config.yaml') }}
-          {
-            echo "venv=${{ runner.os }}-venv-$V-$PYH"
-            echo "precommit=${{ runner.os }}-pre-commit-$V-$PCH"
-          } >> "$GITHUB_OUTPUT"
       - name: Restore Python virtual environment
         id: cache-venv
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: ${{ steps.cache-keys.outputs.venv }}
+          key: &venv-key >-
+            ${{ runner.os }}-venv-${{
+            steps.python.outputs.python-version }}-${{
+            hashFiles('pyproject.toml') }}
       - name: Create Python virtual environment
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -66,7 +58,10 @@ jobs:
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           lookup-only: true
-          key: ${{ steps.cache-keys.outputs.precommit }}
+          key: &pre-commit-key >-
+            ${{ runner.os }}-pre-commit-${{
+            steps.python.outputs.python-version }}-${{
+            hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pre-commit-
       - name: Install pre-commit dependencies
@@ -90,13 +85,12 @@ jobs:
         id: python
         with:
           python-version: ${{ matrix.python-version }}
-      - *cache-keys-step
       - name: Restore Python virtual environment
         id: cache-venv
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: ${{ steps.cache-keys.outputs.venv }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -107,7 +101,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ steps.cache-keys.outputs.precommit }}
+          key: *pre-commit-key
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -136,13 +130,12 @@ jobs:
         id: python
         with:
           python-version: ${{ matrix.python-version }}
-      - *cache-keys-step
       - name: Restore Python virtual environment
         id: cache-venv
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: ${{ steps.cache-keys.outputs.venv }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -153,7 +146,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ steps.cache-keys.outputs.precommit }}
+          key: *pre-commit-key
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -182,13 +175,12 @@ jobs:
         id: python
         with:
           python-version: ${{ matrix.python-version }}
-      - *cache-keys-step
       - name: Restore Python virtual environment
         id: cache-venv
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: ${{ steps.cache-keys.outputs.venv }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -199,7 +191,7 @@ jobs:
         uses: actions/cache@v5.0.5
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ steps.cache-keys.outputs.precommit }}
+          key: *pre-commit-key
       - name: Fail job if cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -271,13 +263,12 @@ jobs:
         id: python
         with:
           python-version: ${{ matrix.python-version }}
-      - *cache-keys-step
       - name: Restore Python virtual environment
         id: cache-venv
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: ${{ steps.cache-keys.outputs.venv }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -322,13 +313,12 @@ jobs:
         id: python
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
-      - *cache-keys-step
       - name: Restore Python virtual environment
         id: cache-venv
         uses: actions/cache@v5.0.5
         with:
           path: venv
-          key: ${{ steps.cache-keys.outputs.venv }}
+          key: *venv-key
       - name: Fail job if Python cache restore failed
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
