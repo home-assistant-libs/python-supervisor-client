@@ -210,15 +210,13 @@ class InstalledAddon(
 
 @dataclass(frozen=True, slots=True)
 class InstalledAddonComplete(
-    AddonInfoBaseFields,
-    AddonInfoStoreExtInstalledBaseFields,
+    InstalledAddon,
     AddonInfoStoreBaseFields,
     AddonInfoStoreExtFields,
     ResponseData,
 ):
     """InstalledAddonComplete model."""
 
-    state: AddonState
     hostname: str
     dns: list[str]
     protected: bool
