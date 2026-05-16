@@ -28,6 +28,7 @@ class FeatureFlag(StrEnum):
     """
 
     SUPERVISOR_V2_API = "supervisor_v2_api"
+    UNIX_SOCKET_CORE_API = "unix_socket_core_api"
 
 
 # --- OBJECTS ----
