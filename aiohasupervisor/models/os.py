@@ -127,6 +127,18 @@ class YellowOptions(Options):
 
 
 @dataclass(frozen=True, slots=True)
+class RaspberryPiFirmwareInfo(ResponseData):
+    """RaspberryPiFirmwareInfo model — Raspberry Pi firmware state."""
+
+    current_version: str | None
+    latest_version: str | None
+    update_available: bool
+    update_blocked: bool
+    update_pending: bool
+    blocked_reason: str | None
+
+
+@dataclass(frozen=True, slots=True)
 class SwapInfo(ResponseData):
     """SwapInfo model."""
 
