@@ -209,3 +209,34 @@ async def test_os_yellow_options(
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/os/boards/yellow"))
     }
+
+
+async def test_os_raspberry_pi_firmware_info(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test Raspberry Pi firmware info API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/os/boards/raspberrypi/firmware",
+        status=200,
+        body=load_fixture("os_raspberrypi_info.json"),
+    )
+    info = await supervisor_client.os.raspberry_pi_firmware_info()
+    assert info.current_version == "1765222194"
+    assert info.latest_version == "1778498402"
+    assert info.update_available is True
+    assert info.update_blocked is False
+    assert info.update_pending is False
+    assert info.blocked_reason is None
+
+
+async def test_os_update_raspberry_pi_firmware(
+    responses: aioresponses, supervisor_client: SupervisorClient
+) -> None:
+    """Test Raspberry Pi firmware update API."""
+    responses.post(
+        f"{SUPERVISOR_URL}/os/boards/raspberrypi/firmware/update", status=200
+    )
+    assert await supervisor_client.os.update_raspberry_pi_firmware() is None
+    assert responses.requests.keys() == {
+        ("POST", URL(f"{SUPERVISOR_URL}/os/boards/raspberrypi/firmware/update"))
+    }

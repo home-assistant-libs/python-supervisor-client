@@ -9,6 +9,7 @@ from .models.os import (
     MigrateDataOptions,
     OSInfo,
     OSUpdate,
+    RaspberryPiFirmwareInfo,
     SetBootSlotOptions,
     SwapInfo,
     SwapOptions,
@@ -78,3 +79,12 @@ class OSClient(_SupervisorComponentClient):
     async def set_yellow_options(self, options: YellowOptions) -> None:
         """Set options for yellow board (if in use)."""
         await self._client.post("os/boards/yellow", json=options.to_dict())
+
+    async def raspberry_pi_firmware_info(self) -> RaspberryPiFirmwareInfo:
+        """Get Raspberry Pi firmware state (if board supports it)."""
+        result = await self._client.get("os/boards/raspberrypi/firmware")
+        return RaspberryPiFirmwareInfo.from_dict(result.data)
+
+    async def update_raspberry_pi_firmware(self) -> None:
+        """Trigger Raspberry Pi firmware update."""
+        await self._client.post("os/boards/raspberrypi/firmware/update", timeout=None)

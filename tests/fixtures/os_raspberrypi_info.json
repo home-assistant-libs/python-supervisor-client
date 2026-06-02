@@ -1,0 +1,11 @@
+{
+  "result": "ok",
+  "data": {
+    "current_version": "1765222194",
+    "latest_version": "1778498402",
+    "update_available": true,
+    "update_blocked": false,
+    "update_pending": false,
+    "blocked_reason": null
+  }
+}
