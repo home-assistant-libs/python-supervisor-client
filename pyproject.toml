@@ -23,12 +23,12 @@ version = "0.0.0"
 [project.optional-dependencies]
 dev = [
     # Production requirements
-    "aiohttp==3.13.5",
+    "aiohttp==3.14.1",
     "mashumaro==3.22",
     "orjson==3.11.9",
 
     # Test requirements
-    "aioresponses==0.7.8",
+    "aiointercept==0.1.5",
     "codespell==2.4.2",
     "coverage==7.14.1",
     "mypy==2.1.0",
@@ -70,7 +70,6 @@ filterwarnings = [
     "error",
     "ignore:pkg_resources is deprecated as an API:DeprecationWarning:dirhash",
     "ignore::pytest.PytestUnraisableExceptionWarning",
-    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:aioresponses",
 ]
 
 [tool.ruff]

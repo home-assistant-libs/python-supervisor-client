@@ -3,7 +3,7 @@
 from ipaddress import IPv4Address
 import json
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -16,7 +16,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_supervisor_ping(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor ping API."""
     responses.get(f"{SUPERVISOR_URL}/supervisor/ping", status=200)
@@ -27,7 +27,7 @@ async def test_supervisor_ping(
 
 
 async def test_supervisor_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor info API."""
     responses.get(
@@ -51,7 +51,7 @@ async def test_supervisor_info(
 
 @pytest.mark.parametrize("field", ["version_latest", "arch"])
 async def test_supervisor_info_optional_fields_none(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     field: str,
 ) -> None:
@@ -68,7 +68,7 @@ async def test_supervisor_info_optional_fields_none(
 
 
 async def test_supervisor_stats(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor stats API."""
     responses.get(
@@ -88,7 +88,7 @@ async def test_supervisor_stats(
     "options", [None, SupervisorUpdateOptions(version="2024.01.0")]
 )
 async def test_supervisor_update(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: SupervisorUpdateOptions | None,
 ) -> None:
@@ -101,7 +101,7 @@ async def test_supervisor_update(
 
 
 async def test_supervisor_reload(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor reload API."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/reload", status=200)
@@ -112,7 +112,7 @@ async def test_supervisor_reload(
 
 
 async def test_supervisor_restart(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor restart API."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/restart", status=200)
@@ -123,7 +123,7 @@ async def test_supervisor_restart(
 
 
 async def test_supervisor_options(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor options API."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/options", status=200)
@@ -155,7 +155,7 @@ async def test_supervisor_options(
 
 
 async def test_supervisor_info_unknown_feature_flag(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor info with an unknown feature flag returns it as a string key."""
     fixture = json.loads(load_fixture("supervisor_info.json"))
@@ -171,7 +171,7 @@ async def test_supervisor_info_unknown_feature_flag(
 
 
 async def test_supervisor_options_feature_flags(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor options API with feature_flags."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/options", status=200)
@@ -194,7 +194,7 @@ async def test_supervisor_options_feature_flags(
 
 
 async def test_supervisor_repair(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test supervisor repair API."""
     responses.post(f"{SUPERVISOR_URL}/supervisor/repair", status=200)

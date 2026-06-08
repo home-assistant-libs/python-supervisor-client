@@ -3,7 +3,7 @@
 from json import dumps
 
 from aiohttp import ClientSession
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -22,7 +22,7 @@ from . import load_fixture
 from .const import SUPERVISOR_URL
 
 
-async def test_using_own_session(responses: aioresponses) -> None:
+async def test_using_own_session(responses: aiointercept) -> None:
     """Test passing in an existing session."""
     responses.get(
         f"{SUPERVISOR_URL}/info", status=200, body=load_fixture("root_info.json")
@@ -37,7 +37,7 @@ async def test_using_own_session(responses: aioresponses) -> None:
         assert not session.closed
 
 
-async def test_using_new_session(responses: aioresponses) -> None:
+async def test_using_new_session(responses: aiointercept) -> None:
     """Test letting client create new session."""
     responses.get(
         f"{SUPERVISOR_URL}/info", status=200, body=load_fixture("root_info.json")
@@ -52,7 +52,7 @@ async def test_using_new_session(responses: aioresponses) -> None:
 
 
 async def test_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test info API."""
     responses.get(
@@ -71,7 +71,7 @@ async def test_info(
 
 
 async def test_available_updates(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test available updates API."""
     responses.get(
@@ -89,7 +89,7 @@ async def test_available_updates(
 
 
 async def test_reload_updates(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test reload updates API."""
     responses.post(f"{SUPERVISOR_URL}/reload_updates", status=200)
@@ -100,7 +100,7 @@ async def test_reload_updates(
 
 
 async def test_refresh_updates(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test refresh updates API."""
     responses.post(f"{SUPERVISOR_URL}/refresh_updates", status=200)
@@ -122,7 +122,7 @@ async def test_refresh_updates(
     ],
 )
 async def test_error_handling(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     status: int,
     message: str | None,

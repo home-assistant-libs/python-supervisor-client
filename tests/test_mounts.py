@@ -2,7 +2,7 @@
 
 from pathlib import PurePath
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -20,7 +20,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_mounts_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test mounts info API."""
     responses.get(
@@ -53,7 +53,7 @@ async def test_mounts_info(
 
 @pytest.mark.parametrize("mount_name", ["test", None])
 async def test_mounts_options(
-    responses: aioresponses, supervisor_client: SupervisorClient, mount_name: str | None
+    responses: aiointercept, supervisor_client: SupervisorClient, mount_name: str | None
 ) -> None:
     """Test mounts options API."""
     responses.post(f"{SUPERVISOR_URL}/mounts/options", status=200)
@@ -101,7 +101,7 @@ async def test_mounts_options(
     ],
 )
 async def test_create_mount(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     mount_config: CIFSMountRequest | NFSMountRequest,
 ) -> None:
@@ -144,7 +144,7 @@ async def test_create_mount(
     ],
 )
 async def test_update_mount(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     mount_config: CIFSMountRequest | NFSMountRequest,
 ) -> None:
@@ -155,7 +155,7 @@ async def test_update_mount(
 
 
 async def test_delete_mount(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test delete mount API."""
     responses.delete(f"{SUPERVISOR_URL}/mounts/test", status=200)
@@ -166,7 +166,7 @@ async def test_delete_mount(
 
 
 async def test_reload_mount(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test reload mount API."""
     responses.post(f"{SUPERVISOR_URL}/mounts/test/reload", status=200)

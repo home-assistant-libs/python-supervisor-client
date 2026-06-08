@@ -1,6 +1,6 @@
 """Test ingress component client."""
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -12,7 +12,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_panels(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test panels API."""
     responses.get(
@@ -38,7 +38,7 @@ async def test_panels(
     [(None, None), (CreateSessionOptions(user_id="test"), {"user_id": "test"})],
 )
 async def test_create_session(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: CreateSessionOptions | None,
     expected_body: dict[str, str] | None,
@@ -56,7 +56,7 @@ async def test_create_session(
 
 
 async def test_validate_session(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test validate session API."""
     validate_url = f"{SUPERVISOR_URL}/ingress/validate_session"

@@ -2,6 +2,22 @@
 
 from pathlib import Path
 
+from aiohttp import ClientTimeout
+from yarl import URL
+
+type RequestTimeouts = dict[tuple[str, URL], list[ClientTimeout | None]]
+
+
+def assert_request_timeout(
+    request_timeouts: RequestTimeouts,
+    method: str,
+    url: str,
+    *,
+    has_timeout: bool,
+) -> None:
+    """Assert whether a client side timeout was set for the given request."""
+    assert bool(request_timeouts[(method, URL(url))][0]) is has_timeout
+
 
 def get_fixture_path(filename: str) -> Path:
     """Get fixture path."""

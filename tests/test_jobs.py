@@ -3,7 +3,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
@@ -14,7 +14,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_jobs_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs info API."""
     responses.get(
@@ -46,7 +46,7 @@ async def test_jobs_info(
 
 
 async def test_jobs_set_options(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs set options API."""
     responses.post(f"{SUPERVISOR_URL}/jobs/options", status=200)
@@ -62,7 +62,7 @@ async def test_jobs_set_options(
 
 
 async def test_jobs_reset(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs reset API."""
     responses.post(f"{SUPERVISOR_URL}/jobs/reset", status=200)
@@ -71,7 +71,7 @@ async def test_jobs_reset(
 
 
 async def test_jobs_get_job(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs get job API."""
     responses.get(
@@ -98,7 +98,7 @@ async def test_jobs_get_job(
 
 
 async def test_jobs_get_job_extra(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs get job API with extra metadata."""
     responses.get(
@@ -120,7 +120,7 @@ async def test_jobs_get_job_extra(
 
 
 async def test_jobs_delete_job(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs delete job API."""
     responses.delete(
@@ -138,7 +138,7 @@ async def test_jobs_delete_job(
 
 
 async def test_jobs_info_backward_compatibility_no_stage(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test jobs info API with error lacking stage field for backward compatibility."""
     responses.get(

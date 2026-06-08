@@ -2,7 +2,7 @@
 
 from json import loads
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -17,12 +17,12 @@ from aiohasupervisor.exceptions import (
 from aiohasupervisor.models import StoreAddonUpdate, StoreAddRepository
 from aiohasupervisor.models.addons import StoreAddonInstall
 
-from . import load_fixture
+from . import RequestTimeouts, assert_request_timeout, load_fixture
 from .const import SUPERVISOR_URL
 
 
 async def test_store_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store info API."""
     responses.get(
@@ -40,7 +40,7 @@ async def test_store_info(
 
 
 async def test_store_addons_list(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store addons list API."""
     responses.get(
@@ -56,7 +56,7 @@ async def test_store_addons_list(
 
 
 async def test_store_repositories_list(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store repositories list API."""
     responses.get(
@@ -72,7 +72,7 @@ async def test_store_repositories_list(
 
 
 async def test_store_addon_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store addon info API."""
     responses.get(
@@ -90,7 +90,7 @@ async def test_store_addon_info(
 
 
 async def test_store_addon_changelog(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store addon info changelog API."""
     responses.get(
@@ -103,7 +103,7 @@ async def test_store_addon_changelog(
 
 
 async def test_store_addon_documentation(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store addon documentation API."""
     responses.get(
@@ -125,7 +125,8 @@ async def test_store_addon_documentation(
     ],
 )
 async def test_store_addon_install(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: StoreAddonInstall | None,
     has_timeout: bool,  # noqa: FBT001
@@ -136,13 +137,11 @@ async def test_store_addon_install(
     assert (
         await supervisor_client.store.install_addon("core_mosquitto", options)
     ) is None
-    assert (
-        bool(
-            responses.requests[
-                ("POST", URL(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/install"))
-            ][0].kwargs["timeout"]
-        )
-        is has_timeout
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/install",
+        has_timeout=has_timeout,
     )
 
 
@@ -157,7 +156,8 @@ async def test_store_addon_install(
     ],
 )
 async def test_store_addon_update(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: StoreAddonUpdate | None,
     has_timeout: bool,  # noqa: FBT001
@@ -168,18 +168,16 @@ async def test_store_addon_update(
     assert (
         await supervisor_client.store.update_addon("core_mosquitto", options)
     ) is None
-    assert (
-        bool(
-            responses.requests[
-                ("POST", URL(f"{SUPERVISOR_URL}/store/addons/core_mosquitto/update"))
-            ][0].kwargs["timeout"]
-        )
-        is has_timeout
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/store/addons/core_mosquitto/update",
+        has_timeout=has_timeout,
     )
 
 
 async def test_store_addon_availability(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store addon availability API."""
     responses.get(
@@ -215,7 +213,7 @@ async def test_store_addon_availability(
     ],
 )
 async def test_store_addon_availability_error(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     error_fixture: str,
     error_key: str | None,
@@ -265,7 +263,7 @@ async def test_store_addon_availability_error(
 
 
 async def test_store_reload(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store reload API."""
     responses.post(f"{SUPERVISOR_URL}/store/reload", status=200)
@@ -277,7 +275,7 @@ async def test_store_reload(
 
 
 async def test_store_repository_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store repository info API."""
     responses.get(
@@ -292,7 +290,7 @@ async def test_store_repository_info(
 
 
 async def test_store_add_repository(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store add repository API."""
     responses.post(f"{SUPERVISOR_URL}/store/repositories", status=200)
@@ -308,7 +306,7 @@ async def test_store_add_repository(
 
 
 async def test_store_remove_repository(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store remove repository API."""
     responses.delete(f"{SUPERVISOR_URL}/store/repositories/test", status=200)
@@ -320,7 +318,7 @@ async def test_store_remove_repository(
 
 
 async def test_store_repair_repository(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test store repository repair API."""
     responses.post(f"{SUPERVISOR_URL}/store/repositories/test/repair", status=200)
