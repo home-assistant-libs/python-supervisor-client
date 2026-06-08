@@ -27,8 +27,6 @@ async def client() -> AsyncGenerator[SupervisorClient, None]:
 @pytest.fixture(name="responses")
 async def aiointercept_fixture() -> AsyncGenerator[aiointercept, None]:
     """Return aiointercept fixture."""
-    # mock_external_urls keeps the aioresponses behavior of intercepting the
-    # SUPERVISOR_URL host so the existing call sites need no changes.
     async with aiointercept(mock_external_urls=True) as mocked_responses:
         yield mocked_responses
 
