@@ -16,7 +16,9 @@ def assert_request_timeout(
     has_timeout: bool,
 ) -> None:
     """Assert whether a client side timeout was set for the given request."""
-    assert bool(request_timeouts[(method, URL(url))][0]) is has_timeout
+    key = (method, URL(url))
+    assert key in request_timeouts, f"no request captured for {key}"
+    assert bool(request_timeouts[key][0]) is has_timeout
 
 
 def get_fixture_path(filename: str) -> Path:
