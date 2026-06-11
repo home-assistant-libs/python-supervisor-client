@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
@@ -13,7 +13,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_discovery_list(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Discovery list API."""
     responses.get(
@@ -29,7 +29,7 @@ async def test_discovery_list(
 
 
 async def test_get_discovery(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Discovery get API."""
     uuid = UUID("889ca604cff84004894e53d181655b3a")
@@ -48,7 +48,7 @@ async def test_get_discovery(
 
 
 async def test_delete_discovery(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Discovery delete API."""
     uuid = UUID("889ca604cff84004894e53d181655b3a")
@@ -60,7 +60,7 @@ async def test_delete_discovery(
 
 
 async def test_set_discovery(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Discovery set API."""
     responses.post(

@@ -2,7 +2,7 @@
 
 from ipaddress import IPv4Address
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -20,7 +20,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_homeassistant_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Home Assistant info API."""
     responses.get(
@@ -41,7 +41,7 @@ async def test_homeassistant_info(
 
 
 async def test_homeassistant_stats(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Home Assistant stats API."""
     responses.get(
@@ -57,7 +57,7 @@ async def test_homeassistant_stats(
 
 
 async def test_homeassistant_options(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Home Assistant options API."""
     responses.post(f"{SUPERVISOR_URL}/core/options", status=200)
@@ -74,7 +74,7 @@ async def test_homeassistant_options(
 
 @pytest.mark.parametrize("options", [None, HomeAssistantUpdateOptions(backup=False)])
 async def test_homeassistant_update(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: HomeAssistantUpdateOptions | None,
 ) -> None:
@@ -86,7 +86,7 @@ async def test_homeassistant_update(
 
 @pytest.mark.parametrize("options", [None, HomeAssistantRestartOptions(safe_mode=True)])
 async def test_homeassistant_restart(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: HomeAssistantRestartOptions | None,
 ) -> None:
@@ -100,7 +100,7 @@ async def test_homeassistant_restart(
 
 @pytest.mark.parametrize("options", [None, HomeAssistantStopOptions(force=True)])
 async def test_homeassistant_stop(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: HomeAssistantStopOptions | None,
 ) -> None:
@@ -111,7 +111,7 @@ async def test_homeassistant_stop(
 
 
 async def test_homeassistant_start(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Home Assistant start API."""
     responses.post(f"{SUPERVISOR_URL}/core/start", status=200)
@@ -120,7 +120,7 @@ async def test_homeassistant_start(
 
 
 async def test_homeassistant_check_config(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test Home Assistant check config API."""
     responses.post(f"{SUPERVISOR_URL}/core/check", status=200)
@@ -130,7 +130,7 @@ async def test_homeassistant_check_config(
 
 @pytest.mark.parametrize("options", [None, HomeAssistantRebuildOptions(safe_mode=True)])
 async def test_homeassistant_rebuild(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: HomeAssistantRebuildOptions | None,
 ) -> None:

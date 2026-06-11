@@ -2,7 +2,7 @@
 
 from ipaddress import IPv4Address
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
@@ -27,7 +27,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_addons_list(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test addons list API."""
     responses.get(
@@ -44,7 +44,7 @@ async def test_addons_list(
 
 
 async def test_addons_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test addons info API."""
     responses.get(
@@ -70,7 +70,7 @@ async def test_addons_info(
 
 
 async def test_addons_uninstall(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test uninstall addon API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/uninstall", status=200)
@@ -86,7 +86,7 @@ async def test_addons_uninstall(
 
 
 async def test_addons_start(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test start addon API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/start", status=200)
@@ -97,7 +97,7 @@ async def test_addons_start(
 
 
 async def test_addons_stop(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test stop addon API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/stop", status=200)
@@ -108,7 +108,7 @@ async def test_addons_stop(
 
 
 async def test_addons_restart(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test restart addon API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/restart", status=200)
@@ -119,7 +119,7 @@ async def test_addons_restart(
 
 
 async def test_addons_options(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test addon options API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/options", status=200)
@@ -150,7 +150,7 @@ async def test_addons_options(
 
 
 async def test_addons_config_validate(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test config validate API."""
     responses.post(
@@ -170,7 +170,7 @@ async def test_addons_config_validate(
 
 
 async def test_addons_config(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test get addon config API."""
     responses.get(
@@ -184,7 +184,7 @@ async def test_addons_config(
 
 
 async def test_addons_rebuild(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test rebuild addon API."""
     responses.post(f"{SUPERVISOR_URL}/addons/local_example/rebuild", status=200)
@@ -195,7 +195,7 @@ async def test_addons_rebuild(
 
 
 async def test_addons_rebuild_with_force(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test rebuild addon API with force option."""
     responses.post(f"{SUPERVISOR_URL}/addons/local_example/rebuild", status=200)
@@ -214,7 +214,7 @@ async def test_addons_rebuild_with_force(
 
 
 async def test_addons_stdin(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test addon stdin API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/stdin", status=200)
@@ -228,11 +228,11 @@ async def test_addons_stdin(
             ("POST", URL(f"{SUPERVISOR_URL}/addons/core_ssh/stdin"))
         ]
     )
-    assert request[0].kwargs["data"] == b"hello world"
+    assert request[0].captured_body == b"hello world"
 
 
 async def test_addons_security(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test addon security API."""
     responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/security", status=200)
@@ -252,7 +252,7 @@ async def test_addons_security(
 
 
 async def test_addons_stats(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test addon stats API."""
     responses.get(

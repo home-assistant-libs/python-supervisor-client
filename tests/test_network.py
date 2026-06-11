@@ -2,7 +2,7 @@
 
 from ipaddress import IPv4Address, IPv4Interface
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -23,7 +23,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_network_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test network info API."""
     responses.get(
@@ -73,7 +73,7 @@ async def test_network_info(
 
 
 async def test_network_reload(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test network reload API."""
     responses.post(f"{SUPERVISOR_URL}/network/reload", status=200)
@@ -84,7 +84,7 @@ async def test_network_reload(
 
 
 async def test_network_interface_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test network interface info API."""
     responses.get(
@@ -116,7 +116,7 @@ async def test_network_interface_info(
 
 
 async def test_network_update_interface(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test network interface update API."""
     responses.post(f"{SUPERVISOR_URL}/network/interface/end0/update", status=200)
@@ -161,7 +161,7 @@ async def test_network_update_interface(
 
 
 async def test_network_access_points(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test network access points API."""
     responses.get(
@@ -187,7 +187,7 @@ async def test_network_access_points(
     ],
 )
 async def test_network_save_vlan(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     config: NetworkInterfaceConfig | None,
 ) -> None:

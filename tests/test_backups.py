@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from pathlib import PurePath
 from typing import Any
 
-from aioresponses import CallbackResult, aioresponses
+from aiointercept import CallbackResult, aiointercept
 import pytest
 from yarl import URL
 
@@ -26,12 +26,12 @@ from aiohasupervisor.models import (
     UploadBackupOptions,
 )
 
-from . import load_fixture
+from . import RequestTimeouts, assert_request_timeout, load_fixture
 from .const import SUPERVISOR_URL
 
 
 async def test_backups_list(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backups list API."""
     responses.get(
@@ -49,7 +49,7 @@ async def test_backups_list(
 
 
 async def test_backups_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backups info API."""
     responses.get(
@@ -64,7 +64,7 @@ async def test_backups_info(
 
 
 async def test_backups_options(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backups options API."""
     responses.post(f"{SUPERVISOR_URL}/backups/options", status=200)
@@ -78,7 +78,7 @@ async def test_backups_options(
 
 
 async def test_backups_reload(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backups reload API."""
     responses.post(f"{SUPERVISOR_URL}/backups/reload", status=200)
@@ -90,7 +90,7 @@ async def test_backups_reload(
 
 @pytest.mark.parametrize("options", [None, FreezeOptions(timeout=1000)])
 async def test_backups_freeze(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: FreezeOptions | None,
 ) -> None:
@@ -103,7 +103,7 @@ async def test_backups_freeze(
 
 
 async def test_backups_thaw(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backups thaw API."""
     responses.post(f"{SUPERVISOR_URL}/backups/thaw", status=200)
@@ -179,7 +179,7 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
         ),
         (
             FullBackupOptions(
-                name="Test", background=False, location={".local", "test"}
+                name="Test", background=False, location=[".local", "test"]
             ),
             "9ecf0028",
             False,
@@ -207,7 +207,8 @@ def backup_callback(url: str, **kwargs: dict[str, Any]) -> CallbackResult:  # no
     ],
 )
 async def test_backups_full_backup(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: FullBackupOptions | None,
     slug: str | None,
@@ -221,13 +222,11 @@ async def test_backups_full_backup(
     result = await supervisor_client.backups.full_backup(options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
-    assert (
-        bool(
-            responses.requests[("POST", URL(f"{SUPERVISOR_URL}/backups/new/full"))][
-                0
-            ].kwargs["timeout"]
-        )
-        is has_timeout
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/backups/new/full",
+        has_timeout=has_timeout,
     )
 
 
@@ -255,7 +254,7 @@ async def test_backups_full_backup(
             PartialBackupOptions(
                 name="Test",
                 background=False,
-                location={".local", "test"},
+                location=[".local", "test"],
                 addons={"core_ssh"},
             ),
             "9ecf0028",
@@ -301,7 +300,8 @@ async def test_backups_full_backup(
     ],
 )
 async def test_backups_partial_backup(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: PartialBackupOptions,
     slug: str | None,
@@ -315,18 +315,16 @@ async def test_backups_partial_backup(
     result = await supervisor_client.backups.partial_backup(options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
     assert result.slug == slug
-    assert (
-        bool(
-            responses.requests[("POST", URL(f"{SUPERVISOR_URL}/backups/new/partial"))][
-                0
-            ].kwargs["timeout"]
-        )
-        is has_timeout
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/backups/new/partial",
+        has_timeout=has_timeout,
     )
 
 
 async def test_backup_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backup info API."""
     responses.get(
@@ -358,7 +356,7 @@ async def test_backup_info(
 
 
 async def test_backup_info_no_homeassistant(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backup info API with no home assistant."""
     responses.get(
@@ -373,7 +371,7 @@ async def test_backup_info_no_homeassistant(
 
 
 async def test_backup_info_with_extra(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backup info API with extras set by client."""
     responses.get(
@@ -388,7 +386,7 @@ async def test_backup_info_with_extra(
 
 
 async def test_backup_info_with_multiple_locations(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test backup info API with multiple locations."""
     responses.get(
@@ -409,7 +407,7 @@ async def test_backup_info_with_multiple_locations(
     "options", [None, RemoveBackupOptions(location={"test", None})]
 )
 async def test_remove_backup(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: RemoveBackupOptions | None,
 ) -> None:
@@ -431,7 +429,8 @@ async def test_remove_backup(
     ],
 )
 async def test_full_restore(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: FullRestoreOptions | None,
     has_timeout: bool,  # noqa: FBT001
@@ -444,13 +443,11 @@ async def test_full_restore(
     )
     result = await supervisor_client.backups.full_restore("abc123", options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
-    assert (
-        bool(
-            responses.requests[
-                ("POST", URL(f"{SUPERVISOR_URL}/backups/abc123/restore/full"))
-            ][0].kwargs["timeout"]
-        )
-        is has_timeout
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/backups/abc123/restore/full",
+        has_timeout=has_timeout,
     )
 
 
@@ -468,7 +465,8 @@ async def test_full_restore(
     ],
 )
 async def test_partial_restore(
-    responses: aioresponses,
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: PartialRestoreOptions,
     has_timeout: bool,  # noqa: FBT001
@@ -481,13 +479,11 @@ async def test_partial_restore(
     )
     result = await supervisor_client.backups.partial_restore("abc123", options)
     assert result.job_id.hex == "dc9dbc16f6ad4de592ffa72c807ca2bf"
-    assert (
-        bool(
-            responses.requests[
-                ("POST", URL(f"{SUPERVISOR_URL}/backups/abc123/restore/partial"))
-            ][0].kwargs["timeout"]
-        )
-        is has_timeout
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/backups/abc123/restore/partial",
+        has_timeout=has_timeout,
     )
 
 
@@ -503,7 +499,7 @@ async def test_partial_restore(
     ],
 )
 async def test_upload_backup(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: UploadBackupOptions | None,
     query: str,
@@ -527,11 +523,12 @@ async def test_upload_backup(
     [
         (None, ""),
         (DownloadBackupOptions(location="test"), "?location=test"),
-        (DownloadBackupOptions(location=None), "?location="),
+        # location=None is omitted from the query, so no parameter is sent.
+        (DownloadBackupOptions(location=None), ""),
     ],
 )
 async def test_download_backup(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: DownloadBackupOptions | None,
     query: str,
@@ -624,7 +621,7 @@ async def test_full_backup_model(
 
 
 async def test_backups_list_location_attributes(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
 ) -> None:
     """Test location attributes field in backups list."""
@@ -648,7 +645,7 @@ async def test_backups_list_location_attributes(
 
 
 async def test_backup_info_location_attributes(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
 ) -> None:
     """Test location attributes field in backup info."""

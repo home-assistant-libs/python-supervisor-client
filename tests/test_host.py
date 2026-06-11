@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
@@ -14,7 +14,7 @@ from .const import SUPERVISOR_URL
 
 
 async def test_host_info(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test host info API."""
     responses.get(
@@ -49,7 +49,7 @@ async def test_host_info(
 
 @pytest.mark.parametrize("options", [None, RebootOptions(force=True)])
 async def test_host_reboot(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: RebootOptions | None,
 ) -> None:
@@ -61,7 +61,7 @@ async def test_host_reboot(
 
 @pytest.mark.parametrize("options", [None, ShutdownOptions(force=True)])
 async def test_host_shutdown(
-    responses: aioresponses,
+    responses: aiointercept,
     supervisor_client: SupervisorClient,
     options: ShutdownOptions | None,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_host_shutdown(
 
 
 async def test_host_reload(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test host reload API."""
     responses.post(f"{SUPERVISOR_URL}/host/reload", status=200)
@@ -83,7 +83,7 @@ async def test_host_reload(
 
 
 async def test_host_options(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test host options API."""
     responses.post(f"{SUPERVISOR_URL}/host/options", status=200)
@@ -96,7 +96,7 @@ async def test_host_options(
 
 
 async def test_host_services(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test host services API."""
     responses.get(
@@ -114,7 +114,7 @@ async def test_host_services(
 
 
 async def test_host_disk_usage(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test host disk usage API."""
     responses.get(
@@ -189,7 +189,7 @@ async def test_host_disk_usage(
 
 
 async def test_host_disk_usage_with_custom_depth(
-    responses: aioresponses, supervisor_client: SupervisorClient
+    responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:
     """Test host disk usage API with custom max_depth."""
     responses.get(
