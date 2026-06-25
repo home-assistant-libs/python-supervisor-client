@@ -19,6 +19,7 @@ class SuggestionType(StrEnum):
 
     ADOPT_DATA_DISK = "adopt_data_disk"
     CLEAR_FULL_BACKUP = "clear_full_backup"
+    CLEAR_PORT_CONFIG = "clear_port_config"
     CREATE_FULL_BACKUP = "create_full_backup"
     DISABLE_BOOT = "disable_boot"
     ENABLE_NTP = "enable_ntp"
@@ -44,6 +45,7 @@ class IssueType(StrEnum):
     in this list parsed as strings on older versions of the client.
     """
 
+    APP_PORT_CONFLICT = "app_port_conflict"
     BOOT_FAIL = "boot_fail"
     CORRUPT_DOCKER = "corrupt_docker"
     CORRUPT_REPOSITORY = "corrupt_repository"
@@ -176,6 +178,7 @@ class Suggestion(ResponseData):
     reference: str | None
     uuid: UUID
     auto: bool
+    reference_extra: dict | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -186,6 +189,7 @@ class Issue(ResponseData):
     context: ContextType
     reference: str | None
     uuid: UUID
+    reference_extra: dict | None
 
 
 @dataclass(frozen=True, slots=True)

@@ -9,7 +9,8 @@
         "context": "system",
         "reference": null,
         "uuid": "f87d3556f02c4004a47111c072c76fac",
-        "auto": false
+        "auto": false,
+        "reference_extra": null
       }
     ],
     "issues": [
@@ -17,7 +18,8 @@
         "type": "no_current_backup",
         "context": "system",
         "reference": null,
-        "uuid": "7f0eac2b61c9456dab6970507a276c36"
+        "uuid": "7f0eac2b61c9456dab6970507a276c36",
+        "reference_extra": null
       }
     ],
     "checks": [
