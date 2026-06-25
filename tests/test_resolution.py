@@ -27,11 +27,13 @@ async def test_resolution_info(
     assert info.issues[0].context == "system"
     assert info.issues[0].type == "no_current_backup"
     assert info.issues[0].reference is None
+    assert info.issues[0].reference_extra is None
     assert info.issues[0].uuid.hex == "7f0eac2b61c9456dab6970507a276c36"
     assert info.suggestions[0].auto is False
     assert info.suggestions[0].context == "system"
     assert info.suggestions[0].type == "create_full_backup"
     assert info.suggestions[0].reference is None
+    assert info.suggestions[0].reference_extra is None
     assert info.suggestions[0].uuid.hex == "f87d3556f02c4004a47111c072c76fac"
     assert info.unhealthy == ["supervisor"]
     assert info.unsupported == []
