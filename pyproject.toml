@@ -28,7 +28,7 @@ dev = [
     "orjson==3.11.9",
 
     # Test requirements
-    "aiointercept==0.1.7",
+    "aiointercept==0.1.8",
     "codespell==2.4.2",
     "coverage==7.14.3",
     "mypy==2.1.0",
