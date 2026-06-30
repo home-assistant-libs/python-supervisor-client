@@ -73,6 +73,7 @@ class IssueType(StrEnum):
     PWNED = "pwned"
     REBOOT_REQUIRED = "reboot_required"
     SECURITY = "security"
+    SYSTEMD_UNIT_FAILED = "systemd_unit_failed"
     UPDATE_FAILED = "update_failed"
     UPDATE_ROLLBACK = "update_rollback"
 
@@ -119,10 +120,12 @@ class UnhealthyReason(StrEnum):
     client.
     """
 
+    DATA_FILESYSTEM_CHECK_ERROR = "data_filesystem_check_error"
     DOCKER = "docker"
     DOCKER_GATEWAY_UNPROTECTED = "docker_gateway_unprotected"
     DUPLICATE_OS_INSTALLATION = "duplicate_os_installation"
     OSERROR_BAD_MESSAGE = "oserror_bad_message"
+    OS_FILESYSTEM_CHECK_ERROR = "os_filesystem_check_error"
     PRIVILEGED = "privileged"
     SETUP = "setup"
     SUPERVISOR = "supervisor"
@@ -164,6 +167,7 @@ class CheckType(StrEnum):
     FREE_SPACE = "free_space"
     MULTIPLE_DATA_DISKS = "multiple_data_disks"
     NETWORK_INTERFACE_IPV4 = "network_interface_ipv4"
+    SYSTEMD_UNIT_FAILURE = "systemd_unit_failure"
 
 
 # --- OBJECTS ----
