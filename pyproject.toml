@@ -30,7 +30,7 @@ dev = [
     # Test requirements
     "aiointercept==0.1.8",
     "codespell==2.4.2",
-    "coverage==7.14.3",
+    "coverage==7.15.0",
     "mypy==2.1.0",
     "pre-commit==4.6.0",
     "pytest-asyncio==1.4.0",
