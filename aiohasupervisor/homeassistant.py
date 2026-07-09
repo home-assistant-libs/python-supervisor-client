@@ -38,18 +38,20 @@ class HomeAssistantClient(_SupervisorComponentClient):
     async def restart(self, options: HomeAssistantRestartOptions | None = None) -> None:
         """Restart Home Assistant."""
         await self._client.post(
-            "core/restart", json=options.to_dict() if options else None
+            "core/restart",
+            json=options.to_dict() if options else None,
+            timeout=None,
         )
 
     async def stop(self, options: HomeAssistantStopOptions | None = None) -> None:
         """Stop Home Assistant."""
         await self._client.post(
-            "core/stop", json=options.to_dict() if options else None
+            "core/stop", json=options.to_dict() if options else None, timeout=None
         )
 
     async def start(self) -> None:
         """Start Home Assistant."""
-        await self._client.post("core/start")
+        await self._client.post("core/start", timeout=None)
 
     async def check_config(self) -> None:
         """Check Home Assistant config."""
@@ -58,5 +60,7 @@ class HomeAssistantClient(_SupervisorComponentClient):
     async def rebuild(self, options: HomeAssistantRebuildOptions | None = None) -> None:
         """Rebuild Home Assistant."""
         await self._client.post(
-            "core/rebuild", json=options.to_dict() if options else None
+            "core/rebuild",
+            json=options.to_dict() if options else None,
+            timeout=None,
         )
