@@ -15,7 +15,7 @@ from aiohasupervisor.models import (
     HomeAssistantUpdateOptions,
 )
 
-from . import load_fixture
+from . import RequestTimeouts, assert_request_timeout, load_fixture
 from .const import SUPERVISOR_URL
 
 
@@ -75,6 +75,7 @@ async def test_homeassistant_options(
 @pytest.mark.parametrize("options", [None, HomeAssistantUpdateOptions(backup=False)])
 async def test_homeassistant_update(
     responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: HomeAssistantUpdateOptions | None,
 ) -> None:
@@ -82,11 +83,18 @@ async def test_homeassistant_update(
     responses.post(f"{SUPERVISOR_URL}/core/update", status=200)
     assert await supervisor_client.homeassistant.update(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/update"))}
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/core/update",
+        has_timeout=False,
+    )
 
 
 @pytest.mark.parametrize("options", [None, HomeAssistantRestartOptions(safe_mode=True)])
 async def test_homeassistant_restart(
     responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: HomeAssistantRestartOptions | None,
 ) -> None:
@@ -96,11 +104,18 @@ async def test_homeassistant_restart(
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/core/restart"))
     }
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/core/restart",
+        has_timeout=False,
+    )
 
 
 @pytest.mark.parametrize("options", [None, HomeAssistantStopOptions(force=True)])
 async def test_homeassistant_stop(
     responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: HomeAssistantStopOptions | None,
 ) -> None:
@@ -108,29 +123,52 @@ async def test_homeassistant_stop(
     responses.post(f"{SUPERVISOR_URL}/core/stop", status=200)
     assert await supervisor_client.homeassistant.stop(options) is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/stop"))}
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/core/stop",
+        has_timeout=False,
+    )
 
 
 async def test_homeassistant_start(
-    responses: aiointercept, supervisor_client: SupervisorClient
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
+    supervisor_client: SupervisorClient,
 ) -> None:
     """Test Home Assistant start API."""
     responses.post(f"{SUPERVISOR_URL}/core/start", status=200)
     assert await supervisor_client.homeassistant.start() is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/start"))}
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/core/start",
+        has_timeout=False,
+    )
 
 
 async def test_homeassistant_check_config(
-    responses: aiointercept, supervisor_client: SupervisorClient
+    responses: aiointercept,
+    request_timeouts: RequestTimeouts,
+    supervisor_client: SupervisorClient,
 ) -> None:
     """Test Home Assistant check config API."""
     responses.post(f"{SUPERVISOR_URL}/core/check", status=200)
     assert await supervisor_client.homeassistant.check_config() is None
     assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/core/check"))}
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/core/check",
+        has_timeout=True,
+    )
 
 
 @pytest.mark.parametrize("options", [None, HomeAssistantRebuildOptions(safe_mode=True)])
 async def test_homeassistant_rebuild(
     responses: aiointercept,
+    request_timeouts: RequestTimeouts,
     supervisor_client: SupervisorClient,
     options: HomeAssistantRebuildOptions | None,
 ) -> None:
@@ -140,3 +178,9 @@ async def test_homeassistant_rebuild(
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/core/rebuild"))
     }
+    assert_request_timeout(
+        request_timeouts,
+        "POST",
+        f"{SUPERVISOR_URL}/core/rebuild",
+        has_timeout=False,
+    )
