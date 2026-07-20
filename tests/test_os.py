@@ -33,6 +33,7 @@ async def test_os_info(
     info = await supervisor_client.os.info()
     assert info.version == "13.0"
     assert info.version_latest == "13.1"
+    assert info.version_pending is None
     assert info.update_available is True
     assert info.boot_slots["A"].state == "inactive"
     assert info.boot_slots["B"].state == "booted"

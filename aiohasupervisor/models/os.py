@@ -42,6 +42,7 @@ class OSInfo(ResponseData):
 
     version: str | None
     version_latest: str | None
+    version_pending: str | None
     update_available: bool
     board: str | None
     boot: str | None
