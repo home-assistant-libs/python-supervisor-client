@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v7.0.0
       - name: Set up Python
         id: python
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
@@ -81,7 +81,7 @@ jobs:
       - name: Check out code from GitHub
         uses: actions/checkout@v7.0.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7.0.0
         id: python
         with:
           python-version: ${{ matrix.python-version }}
@@ -126,7 +126,7 @@ jobs:
       - name: Check out code from GitHub
         uses: actions/checkout@v7.0.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7.0.0
         id: python
         with:
           python-version: ${{ matrix.python-version }}
@@ -171,7 +171,7 @@ jobs:
       - name: Check out code from GitHub
         uses: actions/checkout@v7.0.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7.0.0
         id: python
         with:
           python-version: ${{ matrix.python-version }}
@@ -259,7 +259,7 @@ jobs:
       - name: Check out code from GitHub
         uses: actions/checkout@v7.0.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7.0.0
         id: python
         with:
           python-version: ${{ matrix.python-version }}
@@ -309,7 +309,7 @@ jobs:
       - name: Check out code from GitHub
         uses: actions/checkout@v7.0.0
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7.0.0
         id: python
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
