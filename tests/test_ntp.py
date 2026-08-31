@@ -36,7 +36,14 @@ async def test_ntp_set_options(
         )
         is None
     )
-    assert responses.requests.keys() == {("POST", URL(f"{SUPERVISOR_URL}/ntp/options"))}
+    assert len(responses.requests) == 1
+    assert (
+        request := responses.requests[("POST", URL(f"{SUPERVISOR_URL}/ntp/options"))]
+    )
+    assert request[0].kwargs["json"] == {
+        "servers": ["pool.ntp.org"],
+        "fallback_servers": [],
+    }
 
 
 async def test_ntp_options_requires_a_field() -> None:
