@@ -15,6 +15,7 @@ from .jobs import JobsClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .mounts import MountsClient
 from .network import NetworkClient
+from .ntp import NTPClient
 from .os import OSClient
 from .resolution import ResolutionClient
 from .store import StoreClient
@@ -39,6 +40,7 @@ class SupervisorClient:
         self._jobs = JobsClient(self._client)
         self._mounts = MountsClient(self._client)
         self._network = NetworkClient(self._client)
+        self._ntp = NTPClient(self._client)
         self._host = HostClient(self._client)
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
@@ -85,6 +87,11 @@ class SupervisorClient:
     def network(self) -> NetworkClient:
         """Get network component client."""
         return self._network
+
+    @property
+    def ntp(self) -> NTPClient:
+        """Get NTP component client."""
+        return self._ntp
 
     @property
     def host(self) -> HostClient:

@@ -114,6 +114,7 @@ from aiohasupervisor.models.network import (
     WifiConfig,
     WifiMode,
 )
+from aiohasupervisor.models.ntp import NTPInfo, NTPOptions
 from aiohasupervisor.models.os import (
     BootSlot,
     BootSlotName,
@@ -251,6 +252,8 @@ __all__ = [
     "MulticastDnsMode",
     "NFSMountRequest",
     "NFSMountResponse",
+    "NTPInfo",
+    "NTPOptions",
     "NetworkInfo",
     "NetworkInterface",
     "NetworkInterfaceConfig",
