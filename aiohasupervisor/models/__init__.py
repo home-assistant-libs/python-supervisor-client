@@ -114,7 +114,6 @@ from aiohasupervisor.models.network import (
     WifiConfig,
     WifiMode,
 )
-from aiohasupervisor.models.ntp import NTPInfo, NTPOptions
 from aiohasupervisor.models.os import (
     BootSlot,
     BootSlotName,
@@ -160,6 +159,7 @@ from aiohasupervisor.models.supervisor import (
     SupervisorStats,
     SupervisorUpdateOptions,
 )
+from aiohasupervisor.models.time import TimeConfig, TimeInfo, TimeOptions
 
 __all__ = [
     "LOCATION_CLOUD_BACKUP",
@@ -252,8 +252,6 @@ __all__ = [
     "MulticastDnsMode",
     "NFSMountRequest",
     "NFSMountResponse",
-    "NTPInfo",
-    "NTPOptions",
     "NetworkInfo",
     "NetworkInterface",
     "NetworkInterfaceConfig",
@@ -288,6 +286,9 @@ __all__ = [
     "SupervisorState",
     "SupervisorStats",
     "SupervisorUpdateOptions",
+    "TimeConfig",
+    "TimeInfo",
+    "TimeOptions",
     "UnhealthyReason",
     "UnsupportedReason",
     "UpdateChannel",

@@ -15,11 +15,11 @@ from .jobs import JobsClient
 from .models.root import AvailableUpdate, AvailableUpdates, RootInfo
 from .mounts import MountsClient
 from .network import NetworkClient
-from .ntp import NTPClient
 from .os import OSClient
 from .resolution import ResolutionClient
 from .store import StoreClient
 from .supervisor import SupervisorManagementClient
+from .time import TimeClient
 
 
 class SupervisorClient:
@@ -40,13 +40,13 @@ class SupervisorClient:
         self._jobs = JobsClient(self._client)
         self._mounts = MountsClient(self._client)
         self._network = NetworkClient(self._client)
-        self._ntp = NTPClient(self._client)
         self._host = HostClient(self._client)
         self._resolution = ResolutionClient(self._client)
         self._store = StoreClient(self._client)
         self._supervisor = SupervisorManagementClient(self._client)
         self._homeassistant = HomeAssistantClient(self._client)
         self._ingress = IngressClient(self._client)
+        self._time = TimeClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
@@ -89,9 +89,9 @@ class SupervisorClient:
         return self._network
 
     @property
-    def ntp(self) -> NTPClient:
-        """Get NTP component client."""
-        return self._ntp
+    def time(self) -> TimeClient:
+        """Get time component client."""
+        return self._time
 
     @property
     def host(self) -> HostClient:

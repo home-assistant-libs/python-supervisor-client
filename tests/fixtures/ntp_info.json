@@ -1,7 +1,0 @@
-{
-  "result": "ok",
-  "data": {
-    "servers": ["time.cloudflare.com"],
-    "fallback_servers": ["time.google.com"]
-  }
-}
