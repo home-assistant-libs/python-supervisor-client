@@ -1,0 +1,9 @@
+{
+  "result": "ok",
+  "data": {
+    "config": {
+      "servers": ["time.cloudflare.com"],
+      "fallback_servers": ["time.google.com"]
+    }
+  }
+}

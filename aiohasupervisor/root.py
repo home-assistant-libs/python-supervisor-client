@@ -19,6 +19,7 @@ from .os import OSClient
 from .resolution import ResolutionClient
 from .store import StoreClient
 from .supervisor import SupervisorManagementClient
+from .time import TimeClient
 
 
 class SupervisorClient:
@@ -45,6 +46,7 @@ class SupervisorClient:
         self._supervisor = SupervisorManagementClient(self._client)
         self._homeassistant = HomeAssistantClient(self._client)
         self._ingress = IngressClient(self._client)
+        self._time = TimeClient(self._client)
 
     @property
     def addons(self) -> AddonsClient:
@@ -85,6 +87,11 @@ class SupervisorClient:
     def network(self) -> NetworkClient:
         """Get network component client."""
         return self._network
+
+    @property
+    def time(self) -> TimeClient:
+        """Get time component client."""
+        return self._time
 
     @property
     def host(self) -> HostClient:

@@ -23,6 +23,7 @@ class HostFeature(StrEnum):
     JOURNAL = "journal"
     MOUNT = "mount"
     NETWORK = "network"
+    NTP = "ntp"
     OS_AGENT = "os_agent"
     REBOOT = "reboot"
     RESOLVED = "resolved"
