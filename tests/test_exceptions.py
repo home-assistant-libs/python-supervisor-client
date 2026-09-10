@@ -92,7 +92,10 @@ from aiohasupervisor.exceptions import (
     StoreRepositoryAlreadyAddedError,
     StoreRepositoryLocalCannotResetError,
     StoreRepositoryUnknownError,
+    SupervisorAuthenticationError,
+    SupervisorBadRequestError,
     SupervisorError,
+    SupervisorNotFoundError,
     SupervisorStatsTimeoutError,
     SupervisorUnknownError,
 )
@@ -255,3 +258,98 @@ def test_error_key_class_attribute_matches_expectation(
     """Test each exception class's error_key attribute matches expectation."""
     assert exc_type.error_key == error_key
     assert issubclass(exc_type, SupervisorError)
+
+
+# Hard-coded mapping of every error_key whose Supervisor-side exception
+# inherits from an HTTP status class that this library also models
+# (SupervisorBadRequestError/400, SupervisorAuthenticationError/401,
+# SupervisorNotFoundError/404). Keys whose Supervisor-side status is 409, 429
+# or 500 are omitted since this library has no dedicated class for those
+# statuses yet. Like EXPECTED_ERROR_KEY_CLASSES above, this is intentionally
+# hard-coded rather than derived from the classes themselves: the client
+# picks the exception type by HTTP status first and then overrides it with
+# the keyed class (see `_SupervisorClient._raise_on_status`), so once a key
+# is registered its class must still inherit from the matching status class
+# or that status class silently disappears from the exception's MRO.
+EXPECTED_STATUS_BASE_CLASSES: dict[str, type[SupervisorError]] = {
+    "addon_not_supported_architecture_error": SupervisorBadRequestError,
+    "addon_not_supported_home_assistant_version_error": SupervisorBadRequestError,
+    "addon_not_supported_machine_type_error": SupervisorBadRequestError,
+    "app_already_installed_error": SupervisorBadRequestError,
+    "app_backup_metadata_invalid_error": SupervisorBadRequestError,
+    "app_boot_config_cannot_change_error": SupervisorBadRequestError,
+    "app_build_architecture_not_supported_error": SupervisorBadRequestError,
+    "app_build_dockerfile_missing_error": SupervisorBadRequestError,
+    "app_configuration_invalid_error": SupervisorBadRequestError,
+    "app_file_read_error": SupervisorBadRequestError,
+    "app_no_update_available_error": SupervisorBadRequestError,
+    "app_not_found_error": SupervisorBadRequestError,
+    "app_not_in_store_error": SupervisorBadRequestError,
+    "app_not_installed_error": SupervisorBadRequestError,
+    "app_not_running_error": SupervisorBadRequestError,
+    "app_not_supported_architecture_error": SupervisorBadRequestError,
+    "app_not_supported_home_assistant_version_error": SupervisorBadRequestError,
+    "app_not_supported_machine_type_error": SupervisorBadRequestError,
+    "app_not_supported_write_stdin_error": SupervisorBadRequestError,
+    "app_port_conflict": SupervisorBadRequestError,
+    "app_pre_post_backup_command_returned_error": SupervisorBadRequestError,
+    "app_rebuild_image_based_error": SupervisorBadRequestError,
+    "app_rebuild_version_changed_error": SupervisorBadRequestError,
+    "auth_invalid_non_string_value_error": SupervisorAuthenticationError,
+    "auth_password_reset_error": SupervisorBadRequestError,
+    "backup_mount_down": SupervisorBadRequestError,
+    "cli_not_running_error": SupervisorBadRequestError,
+    "docker_container_not_found_error": SupervisorNotFoundError,
+    "docker_container_not_running_error": SupervisorBadRequestError,
+    "docker_container_port_conflict": SupervisorBadRequestError,
+    "docker_no_space_on_device": SupervisorBadRequestError,
+    "docker_registry_auth_error": SupervisorBadRequestError,
+    "host_invalid_hostname": SupervisorBadRequestError,
+    "homeassistant_not_running_error": SupervisorBadRequestError,
+    "homeassistant_update_already_installed_error": SupervisorBadRequestError,
+    "homeassistant_update_error": SupervisorBadRequestError,
+    "homeassistant_update_image_error": SupervisorBadRequestError,
+    "mount_activation_error": SupervisorBadRequestError,
+    "mount_not_found_error": SupervisorNotFoundError,
+    "mount_reload_error": SupervisorBadRequestError,
+    "mount_setup_error": SupervisorBadRequestError,
+    "mount_target_not_directory_error": SupervisorBadRequestError,
+    "mount_target_not_empty_error": SupervisorBadRequestError,
+    "mount_unmount_error": SupervisorBadRequestError,
+    "mount_usage_not_mounted_error": SupervisorBadRequestError,
+    "mount_usage_read_error": SupervisorBadRequestError,
+    "mount_usage_timeout_error": SupervisorBadRequestError,
+    "multicast_not_running_error": SupervisorBadRequestError,
+    "observer_not_running_error": SupervisorBadRequestError,
+    "observer_port_conflict": SupervisorBadRequestError,
+    "coredns_not_running_error": SupervisorBadRequestError,
+    "audio_not_running_error": SupervisorBadRequestError,
+    "resolution_check_not_found_error": SupervisorNotFoundError,
+    "resolution_issue_not_found_error": SupervisorNotFoundError,
+    "resolution_suggestion_not_found_error": SupervisorNotFoundError,
+    "service_not_provided_error": SupervisorNotFoundError,
+    "store_app_not_found_error": SupervisorNotFoundError,
+    "store_repository_local_cannot_reset": SupervisorBadRequestError,
+}
+
+_SORTED_STATUS_BASE_KEYS = sorted(EXPECTED_STATUS_BASE_CLASSES.items())
+
+
+@pytest.mark.parametrize(
+    ("error_key", "status_base"),
+    _SORTED_STATUS_BASE_KEYS,
+    ids=[key for key, _ in _SORTED_STATUS_BASE_KEYS],
+)
+def test_error_key_class_inherits_expected_status_base(
+    error_key: str, status_base: type[SupervisorError]
+) -> None:
+    """Test each error_key class also inherits its expected HTTP status class.
+
+    The client picks the exception type by HTTP status first and then
+    overrides it with the keyed class whenever the key is registered. If a
+    keyed class doesn't also inherit from the status class matching its
+    Supervisor-side status, that status class disappears from the raised
+    exception's MRO once the key is registered.
+    """
+    exc_type = EXPECTED_ERROR_KEY_CLASSES[error_key]
+    assert issubclass(exc_type, status_base)

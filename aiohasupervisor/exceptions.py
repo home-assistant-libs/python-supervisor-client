@@ -79,17 +79,23 @@ class AddonNotSupportedError(SupervisorError, ABC):
 
 
 @error_key("addon_not_supported_architecture_error")
-class AddonNotSupportedArchitectureError(AddonNotSupportedError):
+class AddonNotSupportedArchitectureError(
+    AddonNotSupportedError, SupervisorBadRequestError
+):
     """Addon is not supported on this system due to its architecture."""
 
 
 @error_key("addon_not_supported_machine_type_error")
-class AddonNotSupportedMachineTypeError(AddonNotSupportedError):
+class AddonNotSupportedMachineTypeError(
+    AddonNotSupportedError, SupervisorBadRequestError
+):
     """Addon is not supported on this system due to its machine type."""
 
 
 @error_key("addon_not_supported_home_assistant_version_error")
-class AddonNotSupportedHomeAssistantVersionError(AddonNotSupportedError):
+class AddonNotSupportedHomeAssistantVersionError(
+    AddonNotSupportedError, SupervisorBadRequestError
+):
     """Addon is not supported on this system due to its version of Home Assistant."""
 
 
@@ -119,7 +125,7 @@ class HomeAssistantError(SupervisorError, ABC):
 
 
 @error_key("homeassistant_update_error")
-class HomeAssistantUpdateError(HomeAssistantError):
+class HomeAssistantUpdateError(HomeAssistantError, SupervisorBadRequestError):
     """Raised when updating Home Assistant failed."""
 
 
@@ -134,7 +140,7 @@ class HomeAssistantUpdateAlreadyInstalledError(HomeAssistantUpdateError):
 
 
 @error_key("homeassistant_not_running_error")
-class HomeAssistantNotRunningError(HomeAssistantError):
+class HomeAssistantNotRunningError(HomeAssistantError, SupervisorBadRequestError):
     """Raised when Home Assistant is not running."""
 
 
@@ -163,7 +169,7 @@ class CliError(SupervisorError, ABC):
 
 
 @error_key("cli_not_running_error")
-class CliNotRunningError(CliError):
+class CliNotRunningError(CliError, SupervisorBadRequestError):
     """Raised when the HA cli plugin is not running."""
 
 
@@ -182,12 +188,12 @@ class ObserverError(SupervisorError, ABC):
 
 
 @error_key("observer_port_conflict")
-class ObserverPortConflictError(ObserverError):
+class ObserverPortConflictError(ObserverError, SupervisorBadRequestError):
     """Raised if Observer cannot start due to a port conflict."""
 
 
 @error_key("observer_not_running_error")
-class ObserverNotRunningError(ObserverError):
+class ObserverNotRunningError(ObserverError, SupervisorBadRequestError):
     """Raised when Observer is not running."""
 
 
@@ -206,7 +212,7 @@ class MulticastError(SupervisorError, ABC):
 
 
 @error_key("multicast_not_running_error")
-class MulticastNotRunningError(MulticastError):
+class MulticastNotRunningError(MulticastError, SupervisorBadRequestError):
     """Raised when Multicast is not running."""
 
 
@@ -225,7 +231,7 @@ class CoreDNSError(SupervisorError, ABC):
 
 
 @error_key("coredns_not_running_error")
-class CoreDNSNotRunningError(CoreDNSError):
+class CoreDNSNotRunningError(CoreDNSError, SupervisorBadRequestError):
     """Raised when CoreDNS is not running."""
 
 
@@ -244,7 +250,7 @@ class AudioError(SupervisorError, ABC):
 
 
 @error_key("audio_not_running_error")
-class AudioNotRunningError(AudioError):
+class AudioNotRunningError(AudioError, SupervisorBadRequestError):
     """Raised when Audio is not running."""
 
 
@@ -263,47 +269,47 @@ class AppError(SupervisorError, ABC):
 
 
 @error_key("app_already_installed_error")
-class AppAlreadyInstalledError(AppError):
+class AppAlreadyInstalledError(AppError, SupervisorBadRequestError):
     """Raised when attempting to install an app that is already installed."""
 
 
 @error_key("app_not_found_error")
-class AppNotFoundError(AppError):
+class AppNotFoundError(AppError, SupervisorBadRequestError):
     """Raised when an app cannot be found in any store."""
 
 
 @error_key("app_not_installed_error")
-class AppNotInstalledError(AppError):
+class AppNotInstalledError(AppError, SupervisorBadRequestError):
     """Raised when an action is taken on an app that is not installed."""
 
 
 @error_key("app_not_in_store_error")
-class AppNotInStoreError(AppError):
+class AppNotInStoreError(AppError, SupervisorBadRequestError):
     """Raised when an installed app is no longer available in its store."""
 
 
 @error_key("app_no_update_available_error")
-class AppNoUpdateAvailableError(AppError):
+class AppNoUpdateAvailableError(AppError, SupervisorBadRequestError):
     """Raised when an update is requested but local matches store version."""
 
 
 @error_key("app_rebuild_version_changed_error")
-class AppRebuildVersionChangedError(AppError):
+class AppRebuildVersionChangedError(AppError, SupervisorBadRequestError):
     """Raised when rebuild is requested but local and store versions differ."""
 
 
 @error_key("app_configuration_invalid_error")
-class AppConfigurationInvalidError(AppError):
+class AppConfigurationInvalidError(AppError, SupervisorBadRequestError):
     """Raised if invalid configuration provided for app."""
 
 
 @error_key("app_boot_config_cannot_change_error")
-class AppBootConfigCannotChangeError(AppError):
+class AppBootConfigCannotChangeError(AppError, SupervisorBadRequestError):
     """Raised if user attempts to change app boot config when it can't be changed."""
 
 
 @error_key("app_not_running_error")
-class AppNotRunningError(AppError):
+class AppNotRunningError(AppError, SupervisorBadRequestError):
     """Raised when an app is not running."""
 
 
@@ -313,27 +319,27 @@ class AppStatsTimeoutError(AppError):
 
 
 @error_key("app_port_conflict")
-class AppPortConflictError(AppError):
+class AppPortConflictError(AppError, SupervisorBadRequestError):
     """Raised if app cannot start due to a port conflict."""
 
 
 @error_key("app_rebuild_image_based_error")
-class AppRebuildImageBasedError(AppError):
+class AppRebuildImageBasedError(AppError, SupervisorBadRequestError):
     """Raised when rebuild is requested for an image-based app."""
 
 
 @error_key("app_not_supported_write_stdin_error")
-class AppNotSupportedWriteStdinError(AppError):
+class AppNotSupportedWriteStdinError(AppError, SupervisorBadRequestError):
     """Raised when an app does not support writing to stdin."""
 
 
 @error_key("app_build_dockerfile_missing_error")
-class AppBuildDockerfileMissingError(AppError):
+class AppBuildDockerfileMissingError(AppError, SupervisorBadRequestError):
     """Raised when app build is invalid because dockerfile is missing."""
 
 
 @error_key("app_build_architecture_not_supported_error")
-class AppBuildArchitectureNotSupportedError(AppError):
+class AppBuildArchitectureNotSupportedError(AppError, SupervisorBadRequestError):
     """Raised when app cannot be built on system due to unsupported architecture."""
 
 
@@ -348,7 +354,7 @@ class AppBuildFailedUnknownError(AppError):
 
 
 @error_key("app_file_read_error")
-class AppFileReadError(AppError):
+class AppFileReadError(AppError, SupervisorBadRequestError):
     """Raised when an app metadata file cannot be read due to a filesystem error."""
 
 
@@ -357,7 +363,7 @@ class AuthError(SupervisorError, ABC):
 
 
 @error_key("auth_password_reset_error")
-class AuthPasswordResetError(AuthError):
+class AuthPasswordResetError(AuthError, SupervisorBadRequestError):
     """Raised if password reset failed."""
 
 
@@ -367,7 +373,7 @@ class AuthListUsersError(AuthError):
 
 
 @error_key("auth_invalid_non_string_value_error")
-class AuthInvalidNonStringValueError(AuthError):
+class AuthInvalidNonStringValueError(AuthError, SupervisorAuthenticationError):
     """Raised if something besides a string provided as username or password."""
 
 
@@ -386,7 +392,7 @@ class HostContainerLogEpochError(HostError):
 
 
 @error_key("host_invalid_hostname")
-class HostInvalidHostnameError(HostError):
+class HostInvalidHostnameError(HostError, SupervisorBadRequestError):
     """Raised when a hostname is rejected by the host as semantically invalid."""
 
 
@@ -400,7 +406,7 @@ class ServiceAlreadyProvidedError(ServiceError):
 
 
 @error_key("service_not_provided_error")
-class ServiceNotProvidedError(ServiceError):
+class ServiceNotProvidedError(ServiceError, SupervisorNotFoundError):
     """Raised when a service is not currently provided by any app."""
 
 
@@ -409,12 +415,12 @@ class DockerError(SupervisorError, ABC):
 
 
 @error_key("docker_container_not_found_error")
-class DockerContainerNotFoundError(DockerError):
+class DockerContainerNotFoundError(DockerError, SupervisorNotFoundError):
     """Raised when a referenced container could not be found."""
 
 
 @error_key("docker_container_not_running_error")
-class DockerContainerNotRunningError(DockerError):
+class DockerContainerNotRunningError(DockerError, SupervisorBadRequestError):
     """Raised when an action requires a container to be running but it isn't."""
 
 
@@ -429,17 +435,17 @@ class DockerStatsUnknownError(DockerError):
 
 
 @error_key("docker_no_space_on_device")
-class DockerNoSpaceOnDeviceError(DockerError):
+class DockerNoSpaceOnDeviceError(DockerError, SupervisorBadRequestError):
     """Raised if a docker pull fails due to available space."""
 
 
 @error_key("docker_container_port_conflict")
-class DockerContainerPortConflictError(DockerError):
+class DockerContainerPortConflictError(DockerError, SupervisorBadRequestError):
     """Raised if docker cannot start a container due to a port conflict."""
 
 
 @error_key("docker_registry_auth_error")
-class DockerRegistryAuthError(DockerError):
+class DockerRegistryAuthError(DockerError, SupervisorBadRequestError):
     """Raised when Docker registry authentication fails."""
 
 
@@ -465,17 +471,17 @@ class ResolutionError(SupervisorError, ABC):
 
 
 @error_key("resolution_check_not_found_error")
-class ResolutionCheckNotFoundError(ResolutionError):
+class ResolutionCheckNotFoundError(ResolutionError, SupervisorNotFoundError):
     """Raised if check does not exist."""
 
 
 @error_key("resolution_issue_not_found_error")
-class ResolutionIssueNotFoundError(ResolutionError):
+class ResolutionIssueNotFoundError(ResolutionError, SupervisorNotFoundError):
     """Raised if issue does not exist."""
 
 
 @error_key("resolution_suggestion_not_found_error")
-class ResolutionSuggestionNotFoundError(ResolutionError):
+class ResolutionSuggestionNotFoundError(ResolutionError, SupervisorNotFoundError):
     """Raised if suggestion does not exist."""
 
 
@@ -484,7 +490,7 @@ class StoreError(SupervisorError, ABC):
 
 
 @error_key("store_app_not_found_error")
-class StoreAppNotFoundError(StoreError):
+class StoreAppNotFoundError(StoreError, SupervisorNotFoundError):
     """Raised if a requested app is not in the store."""
 
 
@@ -494,7 +500,7 @@ class StoreRepositoryAlreadyAddedError(StoreError):
 
 
 @error_key("store_repository_local_cannot_reset")
-class StoreRepositoryLocalCannotResetError(StoreError):
+class StoreRepositoryLocalCannotResetError(StoreError, SupervisorBadRequestError):
     """Raised if user requests a reset on the local app repository."""
 
 
@@ -508,17 +514,17 @@ class BackupError(SupervisorError, ABC):
 
 
 @error_key("backup_mount_down")
-class BackupMountDownError(BackupError):
+class BackupMountDownError(BackupError, SupervisorBadRequestError):
     """Raised if mount specified for backup is down."""
 
 
 @error_key("app_backup_metadata_invalid_error")
-class AppBackupMetadataInvalidError(BackupError):
+class AppBackupMetadataInvalidError(BackupError, SupervisorBadRequestError):
     """Raised if invalid metadata file provided for app in backup."""
 
 
 @error_key("app_pre_post_backup_command_returned_error")
-class AppPrePostBackupCommandReturnedError(BackupError):
+class AppPrePostBackupCommandReturnedError(BackupError, SupervisorBadRequestError):
     """Raised when an app's pre/post backup command returns an error."""
 
 
@@ -532,22 +538,22 @@ class MountError(SupervisorError, ABC):
 
 
 @error_key("mount_activation_error")
-class MountActivationError(MountError):
+class MountActivationError(MountError, SupervisorBadRequestError):
     """Raised on mount not reaching active state after mount/reload."""
 
 
 @error_key("mount_setup_error")
-class MountSetupError(MountError):
+class MountSetupError(MountError, SupervisorBadRequestError):
     """Raised when the systemd units of a mount could not be set up."""
 
 
 @error_key("mount_unmount_error")
-class MountUnmountError(MountError):
+class MountUnmountError(MountError, SupervisorBadRequestError):
     """Raised when a mount could not be removed from the system."""
 
 
 @error_key("mount_reload_error")
-class MountReloadError(MountError):
+class MountReloadError(MountError, SupervisorBadRequestError):
     """Raised when a mount could not be reloaded."""
 
 
@@ -556,30 +562,30 @@ class MountInvalidError(MountError, ABC):
 
 
 @error_key("mount_target_not_directory_error")
-class MountTargetNotDirectoryError(MountInvalidError):
+class MountTargetNotDirectoryError(MountInvalidError, SupervisorBadRequestError):
     """Raised when a mount target exists but is not a directory."""
 
 
 @error_key("mount_target_not_empty_error")
-class MountTargetNotEmptyError(MountInvalidError):
+class MountTargetNotEmptyError(MountInvalidError, SupervisorBadRequestError):
     """Raised when a mount target directory contains existing data."""
 
 
 @error_key("mount_not_found_error")
-class MountNotFoundError(MountError):
+class MountNotFoundError(MountError, SupervisorNotFoundError):
     """Raised when a mount does not exist."""
 
 
 @error_key("mount_usage_not_mounted_error")
-class MountUsageNotMountedError(MountError):
+class MountUsageNotMountedError(MountError, SupervisorBadRequestError):
     """Raised when a mount's path is no longer a mount point."""
 
 
 @error_key("mount_usage_read_error")
-class MountUsageReadError(MountError):
+class MountUsageReadError(MountError, SupervisorBadRequestError):
     """Raised when reading a mount's storage usage fails."""
 
 
 @error_key("mount_usage_timeout_error")
-class MountUsageTimeoutError(MountError):
+class MountUsageTimeoutError(MountError, SupervisorBadRequestError):
     """Raised when a caller gives up waiting on a mount's storage usage probe."""
