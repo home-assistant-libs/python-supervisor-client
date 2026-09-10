@@ -7,7 +7,8 @@ import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models import HostOptions, RebootOptions, ShutdownOptions
+from aiohasupervisor.models import HostInfo, HostOptions, RebootOptions, ShutdownOptions
+from aiohasupervisor.models.root import HostFeature
 
 from . import load_fixture
 from .const import SUPERVISOR_URL
@@ -45,6 +46,65 @@ async def test_host_info(
     assert result.dt_utc == datetime(2024, 10, 3, 0, 0, 0, 0, UTC)
     assert result.dt_synchronized is True
     assert result.startup_time == 1.966311
+
+
+async def test_host_info_all_features(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test host info API prefers all_features field over features if present."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/info",
+        status=200,
+        body=load_fixture("host_info_all_features.json"),
+    )
+    result = await supervisor_client.host.info()
+    assert HostFeature.NTP in result.features
+    assert result.features == [
+        "reboot",
+        "shutdown",
+        "services",
+        "network",
+        "hostname",
+        "timedate",
+        "os_agent",
+        "haos",
+        "resolved",
+        "journal",
+        "disk",
+        "mount",
+        "ntp",
+    ]
+
+
+async def test_host_info_all_features_unknown_feature(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test host info API includes unknown features from all_features as strings."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/info",
+        status=200,
+        body=load_fixture("host_info_unknown_feature.json"),
+    )
+    result = await supervisor_client.host.info()
+    assert result.features == [
+        HostFeature.REBOOT,
+        HostFeature.SHUTDOWN,
+        "future_feature",
+    ]
+
+
+async def test_host_info_round_trip(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test HostInfo to_dict/from_dict round trip works after merging all_features."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/info",
+        status=200,
+        body=load_fixture("host_info_all_features.json"),
+    )
+    result = await supervisor_client.host.info()
+    round_tripped = HostInfo.from_dict(result.to_dict())
+    assert round_tripped == result
 
 
 @pytest.mark.parametrize("options", [None, RebootOptions(force=True)])
