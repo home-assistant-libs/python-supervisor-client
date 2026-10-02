@@ -37,7 +37,8 @@
       "resolved",
       "journal",
       "disk",
-      "mount"
+      "mount",
+      "ntp"
     ],
     "hostname": "homeassistant",
     "llmnr_hostname": "homeassistant3",

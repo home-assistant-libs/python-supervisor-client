@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from .base import Request, ResponseData
 from .root import HostFeature
@@ -46,7 +47,7 @@ class HostInfo(ResponseData):
     disk_total: float
     disk_used: float
     disk_life_time: float | None
-    features: list[HostFeature]
+    features: list[HostFeature | str]
     hostname: str | None
     llmnr_hostname: str | None
     kernel: str | None
@@ -59,6 +60,20 @@ class HostInfo(ResponseData):
     boot_timestamp: int | None
     broadcast_llmnr: bool | None
     broadcast_mdns: bool | None
+
+    @classmethod
+    def __pre_deserialize__(cls, d: dict[str, Any]) -> dict[str, Any]:
+        """Prefer all_features over features field if present.
+
+        Supervisor sends the full, unfiltered list of features as all_features
+        while features may omit some for backwards compatibility with older
+        clients. Only merge it into features here (rather than aliasing the
+        field to all_features) so that a to_dict/from_dict round trip of this
+        model continues to work.
+        """
+        if "all_features" in d:
+            d = {**d, "features": d["all_features"]}
+        return d
 
 
 @dataclass(frozen=True, slots=True)
