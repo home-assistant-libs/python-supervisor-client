@@ -83,6 +83,8 @@ from aiohasupervisor.models.jobs import (
 from aiohasupervisor.models.mounts import (
     CIFSMountRequest,
     CIFSMountResponse,
+    DiskMountRequest,
+    DiskMountResponse,
     MountCifsVersion,
     MountsInfo,
     MountsOptions,
@@ -204,6 +206,8 @@ __all__ = [
     "DetectBlockingIO",
     "Discovery",
     "DiscoveryConfig",
+    "DiskMountRequest",
+    "DiskMountResponse",
     "DockerNetwork",
     "DownloadBackupOptions",
     "FeatureFlag",
