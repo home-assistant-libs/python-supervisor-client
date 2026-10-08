@@ -2,6 +2,7 @@
 
 from json import loads
 
+from aiohttp import ClientTimeout
 from aiointercept import aiointercept
 import pytest
 from yarl import URL
@@ -263,7 +264,9 @@ async def test_store_addon_availability_error(
 
 
 async def test_store_reload(
-    responses: aiointercept, supervisor_client: SupervisorClient
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    request_timeouts: RequestTimeouts,
 ) -> None:
     """Test store reload API."""
     responses.post(f"{SUPERVISOR_URL}/store/reload", status=200)
@@ -272,6 +275,9 @@ async def test_store_reload(
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/store/reload"))
     }
+    assert request_timeouts[("POST", URL(f"{SUPERVISOR_URL}/store/reload"))] == [
+        ClientTimeout(total=300)
+    ]
 
 
 async def test_store_repository_info(
