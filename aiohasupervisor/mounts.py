@@ -1,7 +1,13 @@
 """Mounts client for Supervisor."""
 
 from .client import _SupervisorComponentClient
-from .models.mounts import CIFSMountRequest, MountsInfo, MountsOptions, NFSMountRequest
+from .models.mounts import (
+    CIFSMountRequest,
+    DiskMountRequest,
+    MountsInfo,
+    MountsOptions,
+    NFSMountRequest,
+)
 
 
 class MountsClient(_SupervisorComponentClient):
@@ -17,13 +23,13 @@ class MountsClient(_SupervisorComponentClient):
         await self._client.post("mounts/options", json=options.to_dict())
 
     async def create_mount(
-        self, name: str, config: CIFSMountRequest | NFSMountRequest
+        self, name: str, config: CIFSMountRequest | NFSMountRequest | DiskMountRequest
     ) -> None:
         """Create a new mount."""
         await self._client.post("mounts", json={"name": name, **config.to_dict()})
 
     async def update_mount(
-        self, name: str, config: CIFSMountRequest | NFSMountRequest
+        self, name: str, config: CIFSMountRequest | NFSMountRequest | DiskMountRequest
     ) -> None:
         """Update an existing mount."""
         await self._client.put(f"mounts/{name}", json=config.to_dict())

@@ -35,6 +35,25 @@
         "path": "media",
         "state": "active",
         "user_path": "/media/Test3"
+      },
+      {
+        "name": "Test4",
+        "type": "disk",
+        "usage": "media",
+        "read_only": true,
+        "uuid": "C45A-110F",
+        "filesystem": "vfat",
+        "state": "active",
+        "user_path": "/media/Test4"
+      },
+      {
+        "name": "Test5",
+        "type": "disk",
+        "usage": "backup",
+        "read_only": false,
+        "uuid": "0f3b2c1d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+        "state": null,
+        "user_path": null
       }
     ]
   }

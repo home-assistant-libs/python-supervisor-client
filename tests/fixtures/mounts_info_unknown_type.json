@@ -1,0 +1,26 @@
+{
+  "result": "ok",
+  "data": {
+    "default_backup_mount": null,
+    "mounts": [
+      {
+        "name": "Test",
+        "type": "nfs",
+        "server": "test.local",
+        "usage": "media",
+        "read_only": false,
+        "path": "media",
+        "state": "active",
+        "user_path": "/media/Test"
+      },
+      {
+        "name": "Future",
+        "type": "future",
+        "usage": "media",
+        "read_only": false,
+        "state": "active",
+        "user_path": "/media/Future"
+      }
+    ]
+  }
+}
