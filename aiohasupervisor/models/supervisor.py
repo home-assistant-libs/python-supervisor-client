@@ -27,7 +27,10 @@ class FeatureFlag(StrEnum):
     of the client.
     """
 
+    APP_DROP_NET_RAW = "app_drop_net_raw"
+    APP_REDUCED_CAPABILITIES = "app_reduced_capabilities"
     SUPERVISOR_V2_API = "supervisor_v2_api"
+    SUPERVISOR_WEBSOCKET_V2_API = "supervisor_websocket_v2_api"
 
 
 # --- OBJECTS ----
