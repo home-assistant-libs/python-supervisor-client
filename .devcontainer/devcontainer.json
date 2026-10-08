@@ -3,7 +3,8 @@
   "context": "..",
   "dockerFile": "../Dockerfile.dev",
   "containerEnv": {
-    "WORKSPACE_DIRECTORY": "${containerWorkspaceFolder}"
+    "WORKSPACE_DIRECTORY": "${containerWorkspaceFolder}",
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
   },
   "remoteEnv": {
     "PATH": "${containerEnv:VIRTUAL_ENV}/bin:${containerEnv:PATH}"
@@ -20,7 +21,8 @@
         "redhat.vscode-yaml",
         "esbenp.prettier-vscode",
         "GitHub.vscode-pull-request-github",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "anthropic.claude-code"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/home/vscode/.local/ha-venv/bin/python",
@@ -42,5 +44,11 @@
         }
       }
     }
-  }
+  },
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:latest": {}
+  },
+  "mounts": [
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+  ]
 }
