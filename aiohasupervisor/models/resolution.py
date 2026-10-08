@@ -33,6 +33,7 @@ class SuggestionType(StrEnum):
     EXECUTE_START = "execute_start"
     EXECUTE_STOP = "execute_stop"
     EXECUTE_UPDATE = "execute_update"
+    MOVE_LOCAL_DATA = "move_local_data"
     REGISTRY_LOGIN = "registry_login"
     RENAME_DATA_DISK = "rename_data_disk"
 
