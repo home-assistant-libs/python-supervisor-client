@@ -4,6 +4,7 @@ Supervisor CI runs this from a checkout of this repo at the client version under
 test, with that version installed:
 
     python tests/compat/check_responses.py <records-dir> [--coverage SCOPE]
+        [--format FORMAT]
 
 Records are read from every ``*.jsonl`` file in ``<records-dir>``, one JSON object
 per line, as written by Supervisor's API test recorder:
@@ -26,8 +27,8 @@ Each unique response is checked as follows:
   ``--coverage supervisor`` client endpoints no recording covers are,
   ``--coverage all`` reports both.
 
-Exits non-zero on any failure. Emits GitHub annotations when run in GitHub
-Actions.
+Exits non-zero on any failure. Issues are written as GitHub annotations when run
+in GitHub Actions and as plain text otherwise, ``--format`` forces either.
 """
 
 from __future__ import annotations
@@ -89,6 +90,15 @@ class Coverage(StrEnum):
     # Client endpoints Supervisor's tests do not cover
     SUPERVISOR = "supervisor"
     ALL = "all"
+
+
+class OutputFormat(StrEnum):
+    """How to write issues."""
+
+    # GitHub annotations in GitHub Actions, text otherwise
+    AUTO = "auto"
+    GITHUB = "github"
+    TEXT = "text"
 
 
 @dataclass(frozen=True)
@@ -309,9 +319,18 @@ def _escape(value: str) -> str:
     return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
 
-def _emit(level: str, issue: Issue) -> None:
-    """Write an issue, as a GitHub annotation in GitHub Actions."""
+def _resolve_format(output_format: OutputFormat) -> OutputFormat:
+    """Resolve auto output format from the environment."""
+    if output_format != OutputFormat.AUTO:
+        return output_format
     if os.environ.get("GITHUB_ACTIONS") == "true":
+        return OutputFormat.GITHUB
+    return OutputFormat.TEXT
+
+
+def _emit(level: str, issue: Issue, output_format: OutputFormat) -> None:
+    """Write an issue in the output format."""
+    if output_format == OutputFormat.GITHUB:
         props = ""
         if issue.file:
             file = _escape(issue.file).replace(":", "%3A").replace(",", "%2C")
@@ -338,6 +357,16 @@ def main(argv: list[str] | None = None) -> int:
             "(supervisor) or both (all). Default: none"
         ),
     )
+    parser.add_argument(
+        "--format",
+        type=OutputFormat,
+        choices=list(OutputFormat),
+        default=OutputFormat.AUTO,
+        help=(
+            "Write issues as GitHub annotations (github) or plain text (text). "
+            "Default: auto, github when run in GitHub Actions"
+        ),
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -346,11 +375,12 @@ def main(argv: list[str] | None = None) -> int:
         sys.stderr.write(f"{err}\n")
         return 2
 
+    output_format = _resolve_format(args.format)
     report = asyncio.run(check(records, coverage=args.coverage))
     for issue in report.failures:
-        _emit("error", issue)
+        _emit("error", issue, output_format)
     for issue in report.warnings:
-        _emit("warning", issue)
+        _emit("warning", issue, output_format)
     sys.stdout.write(
         f"Checked {report.checked} responses, {report.replayed} replayed through "
         f"the client: {len(report.failures)} failures, "

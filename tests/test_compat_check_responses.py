@@ -220,7 +220,7 @@ def test_main_pass(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """Test main exits zero when all responses parse."""
     write_records(tmp_path, make_record())
 
-    assert main([str(tmp_path)]) == 0
+    assert main([str(tmp_path), "--format", "text"]) == 0
     out = capsys.readouterr().out
     assert "ERROR" not in out
     assert out.splitlines()[-1].startswith(
@@ -228,20 +228,41 @@ def test_main_pass(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     )
 
 
+GITHUB_FAILURE = (
+    "::error file=tests/api/test_mounts.py::GET /mounts: client cannot parse"
+)
+TEXT_FAILURE = "ERROR: GET /mounts: client cannot parse"
+
+
+@pytest.mark.parametrize(
+    ("args", "github_actions", "expected"),
+    [
+        (["--format", "github"], None, GITHUB_FAILURE),
+        (["--format", "text"], "true", TEXT_FAILURE),
+        ([], "true", GITHUB_FAILURE),
+        (["--format", "auto"], "true", GITHUB_FAILURE),
+        ([], None, TEXT_FAILURE),
+        ([], "false", TEXT_FAILURE),
+    ],
+)
 def test_main_fail(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
+    args: list[str],
+    github_actions: str | None,
+    expected: str,
 ) -> None:
-    """Test main exits non-zero with GitHub annotations on failure."""
-    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    """Test main exits non-zero on failure, in the chosen or detected format."""
+    if github_actions is None:
+        monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    else:
+        monkeypatch.setenv("GITHUB_ACTIONS", github_actions)
     write_records(tmp_path, make_record(body=BAD_MOUNTS))
 
-    assert main([str(tmp_path)]) == 1
+    assert main([str(tmp_path), *args]) == 1
     lines = capsys.readouterr().out.splitlines()
-    assert lines[0].startswith(
-        "::error file=tests/api/test_mounts.py::GET /mounts: client cannot parse"
-    )
+    assert lines[0].startswith(expected)
     assert lines[-1].endswith("the client: 1 failures, 0 warnings")
 
 
@@ -273,7 +294,7 @@ def test_main_coverage(
     )
     write_records(tmp_path, make_record(), make_record("/new/thing"))
 
-    assert main([str(tmp_path), "--coverage", coverage]) == 0
+    assert main([str(tmp_path), "--coverage", coverage, "--format", "text"]) == 0
     lines = capsys.readouterr().out.splitlines()
     assert lines[:-1] == expected
     assert lines[-1].endswith(f"0 failures, {len(expected)} warnings")
