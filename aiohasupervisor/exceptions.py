@@ -74,6 +74,11 @@ class SupervisorResponseError(SupervisorError):
     """Unusable response received from Supervisor with the wrong type or encoding."""
 
 
+@error_key("system_not_ready_error")
+class SystemNotReadyError(SupervisorServiceUnavailableError):
+    """Raised when Supervisor is not ready to perform the requested operation."""
+
+
 class AddonNotSupportedError(SupervisorError, ABC):
     """Addon is not supported on this system."""
 
@@ -154,6 +159,25 @@ class HomeAssistantUnknownError(HomeAssistantError):
     """Raised when an unknown error occurs with Home Assistant."""
 
 
+@error_key("home_assistant_auth_error")
+class HomeAssistantAuthError(HomeAssistantError):
+    """Raised when Supervisor could not authenticate with Home Assistant."""
+
+
+class HassOSError(SupervisorError, ABC):
+    """Error related to Home Assistant Operating System."""
+
+
+@error_key("hassos_update_already_installed_error")
+class HassOSUpdateAlreadyInstalledError(HassOSError, SupervisorBadRequestError):
+    """Raised when the requested OS version is already installed."""
+
+
+@error_key("hassos_update_pending_reboot_error")
+class HassOSUpdatePendingRebootError(HassOSError, SupervisorBadRequestError):
+    """Raised when the requested OS version is installed and awaits a reboot."""
+
+
 @error_key("supervisor_unknown_error")
 class SupervisorUnknownError(SupervisorError):
     """Raised when an unknown error occurs with Supervisor or its container."""
@@ -162,6 +186,15 @@ class SupervisorUnknownError(SupervisorError):
 @error_key("supervisor_stats_timeout_error")
 class SupervisorStatsTimeoutError(SupervisorError):
     """Raised when fetching stats for Supervisor times out."""
+
+
+class PluginError(SupervisorError, ABC):
+    """Error related to a plugin."""
+
+
+@error_key("plugin_disabled_error")
+class PluginDisabledError(PluginError, SupervisorBadRequestError):
+    """Raised when an action requires a plugin that is disabled."""
 
 
 class CliError(SupervisorError, ABC):
@@ -224,6 +257,11 @@ class MulticastStatsTimeoutError(MulticastError):
 @error_key("multicast_unknown_error")
 class MulticastUnknownError(MulticastError):
     """Raised when an unknown error occurs getting stats for Multicast."""
+
+
+@error_key("multicast_disabled_error")
+class MulticastDisabledError(MulticastError, PluginDisabledError):
+    """Raised when an action requires the Multicast plugin but it is disabled."""
 
 
 class CoreDNSError(SupervisorError, ABC):
@@ -396,6 +434,62 @@ class HostInvalidHostnameError(HostError, SupervisorBadRequestError):
     """Raised when a hostname is rejected by the host as semantically invalid."""
 
 
+@error_key("host_apparmor_load_profile_error")
+class HostAppArmorLoadProfileError(HostError, SupervisorBadRequestError):
+    """Raised when the OS Agent rejects an AppArmor profile."""
+
+
+class HostNetworkError(HostError, ABC):
+    """Error related to host networking."""
+
+
+@error_key("host_network_activation_failed_error")
+class HostNetworkActivationFailedError(HostNetworkError, SupervisorBadRequestError):
+    """Raised when a connection deactivates instead of becoming activated."""
+
+
+@error_key("host_network_activation_timeout_error")
+class HostNetworkActivationTimeoutError(HostNetworkError, SupervisorBadRequestError):
+    """Raised when a connection does not finish activating before the timeout."""
+
+
+@error_key("host_network_wifi_psk_required_error")
+class HostNetworkWifiPskRequiredError(HostNetworkError, SupervisorBadRequestError):
+    """Raised when a wpa-psk connection profile is created without a psk."""
+
+
+@error_key("host_network_interface_update_not_found_error")
+class HostNetworkInterfaceUpdateNotFoundError(
+    HostNetworkError, SupervisorNotFoundError
+):
+    """Raised when an update targets a missing or disabled network interface."""
+
+
+@error_key("host_network_interface_update_error")
+class HostNetworkInterfaceUpdateError(HostNetworkError):
+    """Raised when a requested network interface update is not possible."""
+
+
+@error_key("host_network_create_config_error")
+class HostNetworkCreateConfigError(HostNetworkError):
+    """Raised when creating and activating a connection profile fails."""
+
+
+@error_key("host_network_update_config_error")
+class HostNetworkUpdateConfigError(HostNetworkError):
+    """Raised when updating an existing connection profile fails."""
+
+
+@error_key("host_network_delete_config_error")
+class HostNetworkDeleteConfigError(HostNetworkError):
+    """Raised when deleting a connection profile fails."""
+
+
+@error_key("host_network_deactivate_config_error")
+class HostNetworkDeactivateConfigError(HostNetworkError):
+    """Raised when deactivating a connection fails."""
+
+
 class ServiceError(SupervisorError, ABC):
     """Error related to a discovery service."""
 
@@ -533,6 +627,18 @@ class BackupRestoreUnknownError(BackupError):
     """Raised when an unknown error occurs during backup or restore."""
 
 
+@error_key("backup_supervisor_version_error")
+class BackupSupervisorVersionError(BackupError, SupervisorBadRequestError):
+    """Raised if backup requires a newer Supervisor and auto update is disabled."""
+
+
+@error_key("backup_supervisor_update_in_progress_error")
+class BackupSupervisorUpdateInProgressError(
+    BackupError, SupervisorServiceUnavailableError
+):
+    """Raised if backup requires a newer Supervisor and an update is in progress."""
+
+
 class MountError(SupervisorError, ABC):
     """Error related to mounting/unmounting."""
 
@@ -569,6 +675,51 @@ class MountTargetNotDirectoryError(MountInvalidError, SupervisorBadRequestError)
 @error_key("mount_target_not_empty_error")
 class MountTargetNotEmptyError(MountInvalidError, SupervisorBadRequestError):
     """Raised when a mount target directory contains existing data."""
+
+
+@error_key("mount_disks_not_supported_error")
+class MountDisksNotSupportedError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when the host cannot mount local disks."""
+
+
+@error_key("mount_device_not_found_error")
+class MountDeviceNotFoundError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when no block device matches the requested device or UUID."""
+
+
+@error_key("mount_device_mismatch_error")
+class MountDeviceMismatchError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when a device does not carry the requested filesystem UUID."""
+
+
+@error_key("mount_device_missing_uuid_error")
+class MountDeviceMissingUUIDError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when a device holds a filesystem without a UUID."""
+
+
+@error_key("mount_device_in_use_error")
+class MountDeviceInUseError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when a device is already mounted or used by another mount."""
+
+
+@error_key("mount_device_protected_error")
+class MountDeviceProtectedError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when a device belongs to the system and cannot be mounted."""
+
+
+@error_key("mount_device_read_only_error")
+class MountDeviceReadOnlyError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when a write-protected device is requested as writable."""
+
+
+@error_key("mount_filesystem_not_supported_error")
+class MountFilesystemNotSupportedError(MountInvalidError, SupervisorBadRequestError):
+    """Raised when a device does not hold a filesystem that can be mounted."""
+
+
+@error_key("mount_device_link_error")
+class MountDeviceLinkError(MountError, SupervisorBadRequestError):
+    """Raised when the device link of a disk mount cannot be created."""
 
 
 @error_key("mount_not_found_error")
