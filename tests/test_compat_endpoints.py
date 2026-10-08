@@ -3,6 +3,7 @@
 from collections.abc import Callable
 import inspect
 import re
+import sys
 from typing import Any
 
 from aiointercept import aiointercept
@@ -14,6 +15,9 @@ from aiohasupervisor.exceptions import SupervisorError
 
 from .compat.check_responses import is_omitted, normalize
 from .compat.endpoints import ENDPOINTS, Endpoint
+
+if sys.version_info >= (3, 14):
+    from annotationlib import Format, get_annotations
 
 # Client methods returning a value without parsing a JSON response
 NOT_JSON = {
@@ -41,6 +45,18 @@ def client_classes() -> list[type]:
         SupervisorClient,
         *(cls for cls in components if issubclass(cls, _SupervisorComponentClient)),
     ]
+
+
+def returns_none(func: Callable[..., Any]) -> bool:
+    """Return true if func is annotated to return None.
+
+    Reads the annotation as a string where annotations are evaluated lazily
+    (Python 3.14+). Evaluating them in the class scope fails where a method name
+    shadows a builtin used in an annotation, like AddonsClient.list.
+    """
+    if sys.version_info >= (3, 14):
+        return get_annotations(func, format=Format.STRING).get("return") == "None"
+    return inspect.signature(func).return_annotation is None
 
 
 def public_methods() -> dict[str, tuple[type, Callable[..., Any]]]:
@@ -121,10 +137,6 @@ async def test_endpoints_cover_client(
         with pytest.raises(SupervisorError):
             await endpoint.call(supervisor_client, params)
 
-    returning = {
-        name
-        for name, (_, func) in methods.items()
-        if inspect.signature(func).return_annotation is not None
-    }
+    returning = {name for name, (_, func) in methods.items() if not returns_none(func)}
     assert returning >= NOT_JSON, "stale NOT_JSON entry"
     assert returning - NOT_JSON - called == set()
