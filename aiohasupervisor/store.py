@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from aiohttp import ClientTimeout
+
 from .client import _SupervisorComponentClient
 from .const import ResponseType
 from .models.addons import (
@@ -105,8 +107,11 @@ class StoreClient(_SupervisorComponentClient):
         )
 
     async def reload(self) -> None:
-        """Reload the store."""
-        await self._client.post("store/reload")
+        """Reload the store.
+
+        Supervisor pulls all repositories before responding.
+        """
+        await self._client.post("store/reload", timeout=ClientTimeout(total=300))
 
     async def repositories_list(self) -> list[Repository]:
         """Get list of repositories."""
