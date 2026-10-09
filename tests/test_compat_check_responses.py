@@ -310,7 +310,34 @@ def test_main_invalid_coverage(
     assert "argument --coverage" in capsys.readouterr().err
 
 
-@pytest.mark.parametrize("records", ["not json\n", '{"method": "GET"}\n'])
+def record_line(**overrides: Any) -> str:
+    """Return a JSONL line for a record with fields overridden."""
+    return json.dumps(make_record() | overrides) + "\n"
+
+
+@pytest.mark.parametrize(
+    "records",
+    [
+        "not json\n",
+        "[]\n",
+        '{"method": "GET"}\n',
+        record_line(method=1),
+        record_line(template=1),
+        record_line(params="media_test"),
+        record_line(status="ok"),
+        record_line(test=1),
+    ],
+    ids=[
+        "not_json",
+        "not_object",
+        "missing_fields",
+        "method_type",
+        "template_type",
+        "params_type",
+        "status_type",
+        "test_type",
+    ],
+)
 def test_main_invalid_records(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], records: str
 ) -> None:
@@ -318,4 +345,6 @@ def test_main_invalid_records(
     (tmp_path / "gw0.jsonl").write_text(records, encoding="utf-8")
 
     assert main([str(tmp_path)]) == 2
-    assert capsys.readouterr().err
+    assert capsys.readouterr().err.startswith(
+        f"{tmp_path / 'gw0.jsonl'}:1: invalid record: "
+    )

@@ -160,23 +160,25 @@ def load_records(records_dir: Path) -> list[Record]:
                     continue
                 try:
                     raw = json.loads(line)
+                    params = raw.get("params", [])
+                    if not isinstance(params, list):
+                        raise TypeError("params must be a list")  # noqa: TRY301
                     record = Record(
                         method=raw["method"],
                         template=raw["template"],
-                        params=[str(param) for param in raw.get("params", [])],
+                        params=[str(param) for param in params],
                         status=int(raw["status"]),
                         body=raw["body"],
                         test=_TEST_PHASE_RE.sub("", raw.get("test", "")),
                     )
-                except (ValueError, KeyError, TypeError) as err:
+                    key = (
+                        *record.key,
+                        record.status,
+                        json.dumps(record.body, sort_keys=True),
+                    )
+                except (AttributeError, KeyError, TypeError, ValueError) as err:
                     msg = f"{path}:{line_no}: invalid record: {err}"
                     raise ValueError(msg) from err
-                key = (
-                    record.method.upper(),
-                    record.template,
-                    record.status,
-                    json.dumps(record.body, sort_keys=True),
-                )
                 records.setdefault(key, record)
     return list(records.values())
 
