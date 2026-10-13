@@ -4,6 +4,7 @@ from typing import Any
 
 from .client import _SupervisorComponentClient
 from .const import TIMEOUT_60_SECONDS, ResponseType
+from .exceptions import SupervisorNotFoundError
 from .models.addons import (
     AddonsConfigValidate,
     AddonsList,
@@ -26,8 +27,15 @@ class AddonsClient(_SupervisorComponentClient):
         return AddonsList.from_dict(result.data).addons
 
     async def addon_info(self, addon: str) -> InstalledAddonComplete:
-        """Get all info for addon."""
+        """Get all info for addon.
+
+        Raises SupervisorNotFoundError if the addon is not installed.
+        """
         result = await self._client.get(f"addons/{addon}/info")
+        # Supervisor answers with store info for addons that are not installed
+        if result.data and result.data.get("installed") is False:
+            msg = f"Addon {addon} is not installed"
+            raise SupervisorNotFoundError(msg)
         return InstalledAddonComplete.from_dict(result.data)
 
     async def uninstall_addon(

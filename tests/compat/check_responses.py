@@ -55,7 +55,7 @@ from aiohttp import ClientSession, web
 from aiohttp.test_utils import TestServer
 
 from aiohasupervisor import SupervisorClient
-from aiohasupervisor.exceptions import ERROR_KEYS
+from aiohasupervisor.exceptions import ERROR_KEYS, SupervisorNotFoundError
 from aiohasupervisor.models.base import Response, ResultType
 
 if __package__:
@@ -290,6 +290,9 @@ async def _check_model(
     try:
         async with asyncio.timeout(CALL_TIMEOUT):
             await endpoint.call(client, record.params)
+    except SupervisorNotFoundError:
+        # Client recognized the response and reports it as a missing resource
+        return None
     except Exception as err:  # noqa: BLE001
         return Issue(
             f"{record.describe()}: client cannot parse response: "

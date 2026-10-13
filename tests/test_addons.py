@@ -3,9 +3,11 @@
 from ipaddress import IPv4Address
 
 from aiointercept import aiointercept
+import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient
+from aiohasupervisor.exceptions import SupervisorNotFoundError
 from aiohasupervisor.models import (
     AddonBoot,
     AddonsOptions,
@@ -67,6 +69,19 @@ async def test_addons_info(
     assert addon.system_managed is False
     assert addon.system_managed_config_entry is None
     assert addon.startup == AddonStartup.SERVICES
+
+
+async def test_addons_info_not_installed(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test addons info API raises not found for an addon that is not installed."""
+    responses.get(
+        f"{SUPERVISOR_URL}/addons/local_ssh/info",
+        status=200,
+        body=load_fixture("addons_info_not_installed.json"),
+    )
+    with pytest.raises(SupervisorNotFoundError, match="local_ssh is not installed"):
+        await supervisor_client.addons.addon_info("local_ssh")
 
 
 async def test_addons_uninstall(

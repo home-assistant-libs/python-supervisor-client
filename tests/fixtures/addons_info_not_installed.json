@@ -1,0 +1,49 @@
+{
+  "result": "ok",
+  "data": {
+    "advanced": false,
+    "arch": [
+      "aarch64",
+      "amd64"
+    ],
+    "available": true,
+    "build": true,
+    "description": "Allow logging in remotely to Home Assistant using SSH",
+    "documentation": false,
+    "homeassistant": null,
+    "icon": false,
+    "installed": false,
+    "logo": false,
+    "name": "Terminal & SSH",
+    "repository": "local",
+    "slug": "local_ssh",
+    "stage": "stable",
+    "update_available": false,
+    "url": "https://github.com/home-assistant/hassio-addons/tree/master/ssh",
+    "version_latest": "9.2.1",
+    "version": null,
+    "apparmor": "default",
+    "auth_api": true,
+    "detached": false,
+    "docker_api": false,
+    "full_access": false,
+    "hassio_api": true,
+    "hassio_role": "manager",
+    "homeassistant_api": true,
+    "host_network": false,
+    "host_pid": false,
+    "ingress": true,
+    "long_description": null,
+    "rating": 6,
+    "signed": false,
+    "state": "unknown",
+    "options": {
+      "authorized_keys": [],
+      "apks": [],
+      "password": "",
+      "server": {
+        "tcp_forwarding": false
+      }
+    }
+  }
+}
