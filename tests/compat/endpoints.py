@@ -30,6 +30,9 @@ class Endpoint:
     template: str
     # Calls the client method, params given in template order
     call: Callable[[SupervisorClient, list[str]], Awaitable[Any]]
+    # Query keys the call sends, values are ignored. A template can appear more
+    # than once with different query keys when they change the response
+    query: frozenset[str] = frozenset()
 
 
 async def _empty_stream() -> AsyncIterator[bytes]:
@@ -94,7 +97,12 @@ ENDPOINTS = [
     # Host
     Endpoint("GET", "host/info", lambda c, _: c.host.info()),
     Endpoint("GET", "host/services", lambda c, _: c.host.services()),
-    Endpoint("GET", "host/disks/default/usage", lambda c, _: c.host.get_disk_usage()),
+    Endpoint(
+        "GET",
+        "host/disks/default/usage",
+        lambda c, _: c.host.get_disk_usage(),
+        query=frozenset({"max_depth"}),
+    ),
     # Ingress
     Endpoint("GET", "ingress/panels", lambda c, _: c.ingress.panels()),
     Endpoint("POST", "ingress/session", lambda c, _: c.ingress.create_session()),
