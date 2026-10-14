@@ -306,6 +306,30 @@ async def test_record_without_query_replayed(tmp_path: Path) -> None:
     assert report.failures == []
 
 
+async def test_load_records_keeps_path_params(tmp_path: Path) -> None:
+    """Test identical responses for different params are kept, as params match."""
+    body = json.loads(load_fixture("host_disk_usage.json"))
+    write_records(
+        tmp_path,
+        *(
+            make_record(
+                "/host/disks/{disk}/usage",
+                body,
+                params=[disk],
+                query=[["max_depth", "1"]],
+            )
+            for disk in ("media_test", "default")
+        ),
+    )
+
+    records = load_records(tmp_path)
+    assert [r.params for r in records] == [["media_test"], ["default"]]
+
+    report = await check(records)
+    assert report.replayed == 1
+    assert report.failures == []
+
+
 def test_load_records_dedupes_query_keys(tmp_path: Path) -> None:
     """Test responses are deduped by query keys, not values."""
     write_records(

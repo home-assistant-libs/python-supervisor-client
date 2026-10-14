@@ -9,9 +9,9 @@ test, with that version installed:
 Records are read from every ``*.jsonl`` file in ``<records-dir>``, one JSON object
 per line, as written by Supervisor's API test recorder:
 
-    {"method": "GET", "template": "/mounts/{mount}/reload", "params": ["test"],
-     "query": [["force", "1"]], "status": 200, "body": {...},
-     "test": "tests/api/test_mounts.py::test_x"}
+    {"method": "GET", "template": "/host/disks/{disk}/usage", "params": ["default"],
+     "query": [["max_depth", "2"]], "status": 200, "body": {...},
+     "test": "tests/api/test_host.py::test_x"}
 
 ``template`` is the request path with each route parameter replaced by ``{name}``,
 ``params`` holds the actual values in template order, ``query`` holds the query
@@ -192,6 +192,7 @@ class Report:
 
 def load_records(records_dir: Path) -> list[Record]:
     """Load records from all JSONL files in directory, without duplicates."""
+    # Keyed by path, since params can decide which endpoint a record matches.
     # Query values are left out, they don't change the shape of the response
     records: dict[tuple[str, str, frozenset[str], int, str], Record] = {}
     for path in sorted(records_dir.glob("*.jsonl")):
@@ -221,7 +222,7 @@ def load_records(records_dir: Path) -> list[Record]:
                         test=_TEST_PHASE_RE.sub("", raw.get("test", "")),
                     )
                     key = (
-                        *record.key,
+                        *record.path_key,
                         record.status,
                         json.dumps(record.body, sort_keys=True),
                     )
