@@ -291,7 +291,8 @@ async def _check_model(
         async with asyncio.timeout(CALL_TIMEOUT):
             await endpoint.call(client, record.params)
     except SupervisorNotFoundError:
-        # Client recognized the response and reports it as a missing resource
+        # addons.addon_info raises it for the store info Supervisor returns for
+        # addons that are not installed
         return None
     except Exception as err:  # noqa: BLE001
         return Issue(
