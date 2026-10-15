@@ -9,19 +9,25 @@ test, with that version installed:
 Records are read from every ``*.jsonl`` file in ``<records-dir>``, one JSON object
 per line, as written by Supervisor's API test recorder:
 
-    {"method": "GET", "template": "/mounts/{mount}/reload", "params": ["test"],
-     "status": 200, "body": {...}, "test": "tests/api/test_mounts.py::test_x"}
+    {"method": "GET", "template": "/host/disks/{disk}/usage", "params": ["default"],
+     "query": [["max_depth", "2"]], "status": 200, "body": {...},
+     "test": "tests/api/test_host.py::test_x"}
 
 ``template`` is the request path with each route parameter replaced by ``{name}``,
-``params`` holds the actual values in template order and ``test`` is the id of the
-Supervisor test that produced the response.
+``params`` holds the actual values in template order, ``query`` holds the query
+string as ``[key, value]`` pairs in request order (missing from records of older
+Supervisor versions, read as none) and ``test`` is the id of the Supervisor test
+that produced the response.
 
 Each unique response is checked as follows:
 
 - Envelope: every body must parse as a ``Response``. Error responses with an
   ``error_key`` unknown to this client are reported as warnings.
 - Model: successful v1 responses to an endpoint in ``endpoints.ENDPOINTS`` are
-  served to the client method that calls it, which must not raise.
+  served to the client method that calls it, which must not raise. A record
+  matches an endpoint by template, or by path with its params filled in for
+  endpoints the client calls with a fixed param. It must also have the same query
+  keys, since those can change the response, values are ignored.
 - Coverage, off by default: with ``--coverage client`` recorded GET endpoints the
   client lacks, other than ``endpoints.OMITTED``, are reported as warnings, with
   ``--coverage supervisor`` client endpoints no recording covers are,
@@ -58,7 +64,7 @@ else:  # Run as a script, its directory is on sys.path
     from endpoints import ENDPOINTS, OMITTED, Endpoint
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
 
 CALL_TIMEOUT = 10
 
@@ -79,6 +85,17 @@ def is_v2(template: str) -> bool:
 def is_omitted(template: str) -> bool:
     """Return true if the client intentionally omits the endpoint."""
     return any(fnmatchcase(normalize(template), pattern) for pattern in OMITTED)
+
+
+def endpoint_key(endpoint: Endpoint) -> tuple[str, str, frozenset[str]]:
+    """Key to match an endpoint against records."""
+    return (endpoint.method, normalize(endpoint.template), endpoint.query)
+
+
+def describe(method: str, template: str, query_keys: Iterable[str]) -> str:
+    """Describe a request for messages."""
+    query = "&".join(sorted(query_keys))
+    return f"{method.upper()} /{template.lstrip('/')}" + (f"?{query}" if query else "")
 
 
 class Coverage(StrEnum):
@@ -108,14 +125,37 @@ class Record:
     method: str
     template: str
     params: list[str]
+    query: list[tuple[str, str]]
     status: int
     body: Any
     test: str
 
     @property
-    def key(self) -> tuple[str, str]:
+    def query_keys(self) -> frozenset[str]:
+        """Keys in the query string."""
+        return frozenset(key for key, _ in self.query)
+
+    @property
+    def key(self) -> tuple[str, str, frozenset[str]]:
         """Key to match against endpoints."""
-        return (self.method.upper(), normalize(self.template))
+        return (self.method.upper(), normalize(self.template), self.query_keys)
+
+    @property
+    def path_key(self) -> tuple[str, str, frozenset[str]]:
+        """Key to match against endpoints with params in the path, like a default.
+
+        Matches ``host/disks/default/usage`` for template
+        ``/host/disks/{disk}/usage`` with param ``default``.
+        """
+        params = iter(self.params)
+        path = _PARAM_RE.sub(lambda m: next(params, m.group()), self.template)
+        return (self.method.upper(), normalize(path), self.query_keys)
+
+    def match(
+        self, endpoints: Mapping[tuple[str, str, frozenset[str]], Endpoint]
+    ) -> Endpoint | None:
+        """Return the endpoint for the request, by template or path."""
+        return endpoints.get(self.key) or endpoints.get(self.path_key)
 
     @property
     def test_file(self) -> str:
@@ -129,7 +169,7 @@ class Record:
 
     def describe(self) -> str:
         """Describe the request for messages."""
-        return f"{self.method.upper()} /{self.template.lstrip('/')}"
+        return describe(self.method, self.template, self.query_keys)
 
 
 @dataclass(frozen=True)
@@ -152,7 +192,9 @@ class Report:
 
 def load_records(records_dir: Path) -> list[Record]:
     """Load records from all JSONL files in directory, without duplicates."""
-    records: dict[tuple[str, str, int, str], Record] = {}
+    # Keyed by path, since params can decide which endpoint a record matches.
+    # Query values are left out, they don't change the shape of the response
+    records: dict[tuple[str, str, frozenset[str], int, str], Record] = {}
     for path in sorted(records_dir.glob("*.jsonl")):
         with path.open(encoding="utf-8") as file:
             for line_no, line in enumerate(file, start=1):
@@ -163,16 +205,24 @@ def load_records(records_dir: Path) -> list[Record]:
                     params = raw.get("params", [])
                     if not isinstance(params, list):
                         raise TypeError("params must be a list")  # noqa: TRY301
+                    query = raw.get("query", [])
+                    if not isinstance(query, list) or not all(
+                        isinstance(pair, list) and len(pair) == 2 for pair in query
+                    ):
+                        raise TypeError(  # noqa: TRY301
+                            "query must be a list of [key, value] pairs"
+                        )
                     record = Record(
                         method=raw["method"],
                         template=raw["template"],
                         params=[str(param) for param in params],
+                        query=[(str(key), str(value)) for key, value in query],
                         status=int(raw["status"]),
                         body=raw["body"],
                         test=_TEST_PHASE_RE.sub("", raw.get("test", "")),
                     )
                     key = (
-                        *record.key,
+                        *record.path_key,
                         record.status,
                         json.dumps(record.body, sort_keys=True),
                     )
@@ -253,39 +303,49 @@ def _check_coverage(
     records: Iterable[Record], report: Report, coverage: Coverage
 ) -> None:
     """Warn about endpoints only one side knows about."""
-    recorded: dict[tuple[str, str], Record] = {}
+    endpoints = {endpoint_key(ep): ep for ep in ENDPOINTS}
+    # Endpoints with a recorded response and requests with an endpoint
+    covered: set[tuple[str, str, frozenset[str]]] = set()
+    matched: set[tuple[str, str, frozenset[str]]] = set()
+    unmatched: dict[tuple[str, str, frozenset[str]], Record] = {}
     for record in records:
-        if record.is_success and not is_v2(record.template):
-            recorded.setdefault(record.key, record)
+        if not record.is_success or is_v2(record.template):
+            continue
+        if endpoint := record.match(endpoints):
+            covered.add(endpoint_key(endpoint))
+            matched.add(record.key)
+        else:
+            unmatched.setdefault(record.key, record)
 
     if coverage in (Coverage.CLIENT, Coverage.ALL):
-        endpoints = {(ep.method, normalize(ep.template)) for ep in ENDPOINTS}
         report.warnings.extend(
             Issue(
                 f"{record.describe()}: Supervisor endpoint has no client method "
                 f"(from {record.test})",
                 record.test_file,
             )
-            for key, record in sorted(recorded.items())
+            for key, record in sorted(
+                unmatched.items(), key=lambda item: (*item[0][:2], sorted(item[0][2]))
+            )
             if key[0] == "GET"
-            and key not in endpoints
+            and key not in matched
             and not is_omitted(record.template)
         )
 
     if coverage in (Coverage.SUPERVISOR, Coverage.ALL):
         report.warnings.extend(
             Issue(
-                f"{ep.method} /{ep.template}: client endpoint has no successful "
-                "response recorded by Supervisor's tests"
+                f"{describe(ep.method, ep.template, ep.query)}: client endpoint has "
+                "no successful response recorded by Supervisor's tests"
             )
-            for ep in ENDPOINTS
-            if (ep.method, normalize(ep.template)) not in recorded
+            for key, ep in endpoints.items()
+            if key not in covered
         )
 
 
 async def check(records: list[Record], *, coverage: Coverage = Coverage.NONE) -> Report:
     """Check recorded responses against the client."""
-    endpoints = {(ep.method, normalize(ep.template)): ep for ep in ENDPOINTS}
+    endpoints = {endpoint_key(ep): ep for ep in ENDPOINTS}
     report = Report(checked=len(records))
     unknown_keys: set[str] = set()
 
@@ -303,7 +363,7 @@ async def check(records: list[Record], *, coverage: Coverage = Coverage.NONE) ->
                 continue
             if not record.is_success or is_v2(record.template):
                 continue
-            if not (endpoint := endpoints.get(record.key)):
+            if not (endpoint := record.match(endpoints)):
                 continue
 
             server.record = record

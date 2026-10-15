@@ -28,6 +28,7 @@ def make_record(
     *,
     method: str = "GET",
     params: list[str] | None = None,
+    query: list[list[str]] | None = None,
     status: int = 200,
     test: str = TEST_ID,
 ) -> dict[str, Any]:
@@ -36,6 +37,7 @@ def make_record(
         "method": method,
         "template": template,
         "params": params or [],
+        "query": query or [],
         "status": status,
         "body": json.loads(load_fixture("mounts_info.json")) if body is None else body,
         "test": test,
@@ -44,7 +46,14 @@ def make_record(
 
 def to_record(raw: dict[str, Any]) -> Record:
     """Convert a raw record to a Record."""
-    return Record(**raw)
+    return Record(**raw | {"query": [tuple(pair) for pair in raw["query"]]})
+
+
+def one_shot_stats(**kwargs: Any) -> dict[str, Any]:
+    """Make a record of a one shot stats response, without cpu_percent."""
+    body = json.loads(load_fixture("homeassistant_stats.json"))
+    body["data"]["cpu_percent"] = None
+    return make_record("/core/stats", body, **kwargs)
 
 
 def write_records(path: Path, *records: dict[str, Any]) -> Path:
@@ -80,6 +89,64 @@ async def test_valid_response_with_params() -> None:
 
     assert report.replayed == 1
     assert report.failures == []
+
+
+async def test_query_variant_not_replayed() -> None:
+    """Test a response to query keys no endpoint sends is not replayed."""
+    report = await check([to_record(one_shot_stats(query=[["one_shot", ""]]))])
+
+    assert report.replayed == 0
+    assert report.failures == []
+
+    # Same response without the query key would be a failure
+    report = await check([to_record(one_shot_stats())])
+    assert report.replayed == 1
+    assert messages(report.failures)[0].startswith(
+        "GET /core/stats: client cannot parse response"
+    )
+
+
+async def test_query_values_ignored() -> None:
+    """Test a response matches an endpoint by query keys, whatever the values."""
+    record = make_record(
+        "/host/disks/{disk}/usage",
+        json.loads(load_fixture("host_disk_usage.json")),
+        params=["default"],
+        query=[["max_depth", "2"]],
+    )
+    report = await check([to_record(record)])
+
+    assert report.replayed == 1
+    assert report.failures == []
+
+
+async def test_path_params_must_match() -> None:
+    """Test an endpoint with a fixed path param only matches that param."""
+    record = make_record(
+        "/host/disks/{disk}/usage",
+        {"result": "ok", "data": {}},
+        params=["sda"],
+        query=[["max_depth", "1"]],
+    )
+    report = await check([to_record(record)])
+
+    assert report.replayed == 0
+    assert report.failures == []
+
+
+async def test_query_failure_message() -> None:
+    """Test failures name the query keys of the request."""
+    record = make_record(
+        "/host/disks/{disk}/usage",
+        {"result": "ok", "data": {}},
+        params=["default"],
+        query=[["max_depth", "2"]],
+    )
+    report = await check([to_record(record)])
+
+    assert messages(report.failures)[0].startswith(
+        "GET /host/disks/{disk}/usage?max_depth: client cannot parse response"
+    )
 
 
 async def test_model_failure() -> None:
@@ -216,6 +283,119 @@ def test_load_records_dedupes(tmp_path: Path) -> None:
     ]
 
 
+def test_load_records_without_query(tmp_path: Path) -> None:
+    """Test records from Supervisor versions without query load with none."""
+    raw = make_record()
+    del raw["query"]
+    write_records(tmp_path, raw)
+
+    records = load_records(tmp_path)
+
+    assert [r.query for r in records] == [[]]
+
+
+async def test_record_without_query_replayed(tmp_path: Path) -> None:
+    """Test records without query match endpoints that send none."""
+    raw = make_record()
+    del raw["query"]
+    write_records(tmp_path, raw)
+
+    report = await check(load_records(tmp_path))
+
+    assert report.replayed == 1
+    assert report.failures == []
+
+
+async def test_load_records_keeps_path_params(tmp_path: Path) -> None:
+    """Test identical responses for different params are kept, as params match."""
+    body = json.loads(load_fixture("host_disk_usage.json"))
+    write_records(
+        tmp_path,
+        *(
+            make_record(
+                "/host/disks/{disk}/usage",
+                body,
+                params=[disk],
+                query=[["max_depth", "1"]],
+            )
+            for disk in ("media_test", "default")
+        ),
+    )
+
+    records = load_records(tmp_path)
+    assert [r.params for r in records] == [["media_test"], ["default"]]
+
+    report = await check(records)
+    assert report.replayed == 1
+    assert report.failures == []
+
+
+def test_load_records_dedupes_query_keys(tmp_path: Path) -> None:
+    """Test responses are deduped by query keys, not values."""
+    write_records(
+        tmp_path,
+        make_record(query=[["a", "1"]]),
+        make_record(query=[["a", "2"], ["a", "3"]]),
+        make_record(query=[["b", "1"], ["a", "1"]]),
+        make_record(query=[["a", "1"], ["b", "2"]]),
+        make_record(),
+    )
+
+    records = load_records(tmp_path)
+
+    assert [r.query for r in records] == [
+        [("a", "1")],
+        [("b", "1"), ("a", "1")],
+        [],
+    ]
+
+
+async def test_coverage_query_keys() -> None:
+    """Test coverage compares query keys, naming them in warnings."""
+    disk_usage = json.loads(load_fixture("host_disk_usage.json"))
+    records = [
+        to_record(one_shot_stats(query=[["one_shot", ""]])),
+        to_record(
+            make_record("/host/disks/{disk}/usage", disk_usage, params=["default"])
+        ),
+    ]
+    report = await check(records, coverage=Coverage.ALL)
+
+    warnings = messages(report.warnings)
+    assert [w for w in warnings if CLIENT_GAP in w] == [
+        f"GET /core/stats?one_shot: {CLIENT_GAP} (from {TEST_ID})",
+        f"GET /host/disks/{{disk}}/usage: {CLIENT_GAP} (from {TEST_ID})",
+    ]
+    unrecorded = [w for w in warnings if SUPERVISOR_GAP in w]
+    assert f"GET /core/stats: {SUPERVISOR_GAP} by Supervisor's tests" in unrecorded
+    assert (
+        f"GET /host/disks/default/usage?max_depth: {SUPERVISOR_GAP} by "
+        "Supervisor's tests"
+    ) in unrecorded
+
+
+async def test_coverage_path_params() -> None:
+    """Test a fixed path param endpoint is covered by a record for that param."""
+    disk_usage = json.loads(load_fixture("host_disk_usage.json"))
+    records = [
+        to_record(
+            make_record(
+                "/host/disks/{disk}/usage",
+                disk_usage,
+                params=disk,
+                query=[["max_depth", "1"]],
+            )
+        )
+        for disk in (["sda"], ["default"])
+    ]
+    report = await check(records, coverage=Coverage.ALL)
+
+    assert report.replayed == 1
+    warnings = messages(report.warnings)
+    assert not [w for w in warnings if CLIENT_GAP in w]
+    assert not [w for w in warnings if "/host/disks/" in w]
+
+
 def test_main_pass(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """Test main exits zero when all responses parse."""
     write_records(tmp_path, make_record())
@@ -324,6 +504,9 @@ def record_line(**overrides: Any) -> str:
         record_line(method=1),
         record_line(template=1),
         record_line(params="media_test"),
+        record_line(query="one_shot"),
+        record_line(query=[["one_shot"]]),
+        record_line(query=[{"one_shot": ""}]),
         record_line(status="ok"),
         record_line(test=1),
     ],
@@ -334,6 +517,9 @@ def record_line(**overrides: Any) -> str:
         "method_type",
         "template_type",
         "params_type",
+        "query_type",
+        "query_pair_length",
+        "query_pair_type",
         "status_type",
         "test_type",
     ],

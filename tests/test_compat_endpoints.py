@@ -13,7 +13,7 @@ from aiohasupervisor import SupervisorClient
 from aiohasupervisor.client import _SupervisorComponentClient
 from aiohasupervisor.exceptions import SupervisorError
 
-from .compat.check_responses import is_omitted, normalize
+from .compat.check_responses import describe, endpoint_key, is_omitted
 from .compat.endpoints import ENDPOINTS, Endpoint
 
 if sys.version_info >= (3, 14):
@@ -84,28 +84,31 @@ def failing_responses_fixture(responses: aiointercept) -> aiointercept:
 
 
 @pytest.mark.parametrize(
-    "endpoint", ENDPOINTS, ids=[f"{ep.method} {ep.template}" for ep in ENDPOINTS]
+    "endpoint",
+    ENDPOINTS,
+    ids=[describe(ep.method, ep.template, ep.query) for ep in ENDPOINTS],
 )
 async def test_endpoint_request(
     failing_responses: aiointercept,
     supervisor_client: SupervisorClient,
     endpoint: Endpoint,
 ) -> None:
-    """Test each endpoint calls the method and path in its template."""
+    """Test each endpoint calls the method, path and query keys it declares."""
     params = placeholder_params(endpoint.template)
 
     with pytest.raises(SupervisorError):
         await endpoint.call(supervisor_client, params)
 
     expected = PARAM_RE.sub(lambda _: params.pop(0), endpoint.template)
-    assert [(method, url.path) for method, url in failing_responses.requests] == [
-        (endpoint.method, f"/{expected}")
-    ]
+    assert [
+        (method, url.path, frozenset(url.query))
+        for method, url in failing_responses.requests
+    ] == [(endpoint.method, f"/{expected}", endpoint.query)]
 
 
 def test_endpoints_unique() -> None:
     """Test no two endpoints match the same recorded request."""
-    keys = [(ep.method, normalize(ep.template)) for ep in ENDPOINTS]
+    keys = [endpoint_key(ep) for ep in ENDPOINTS]
     assert len(keys) == len(set(keys))
 
 
