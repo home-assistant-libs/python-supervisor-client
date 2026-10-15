@@ -120,6 +120,19 @@ async def test_query_values_ignored() -> None:
     assert report.failures == []
 
 
+async def test_not_found_from_client() -> None:
+    """Test a response the client deliberately reports as not found passes."""
+    record = make_record(
+        "/addons/{addon}/info",
+        json.loads(load_fixture("addons_info_not_installed.json")),
+        params=["local_ssh"],
+    )
+    report = await check([to_record(record)])
+
+    assert report.replayed == 1
+    assert report.failures == []
+
+
 async def test_path_params_must_match() -> None:
     """Test an endpoint with a fixed path param only matches that param."""
     record = make_record(
