@@ -30,9 +30,15 @@ class SupervisorClient:
         api_host: str,
         token: str,
         session: ClientSession | None = None,
+        *,
+        source: str | None = None,
     ) -> None:
-        """Initialize client."""
-        self._client = _SupervisorClient(api_host, token, session)
+        """Initialize client.
+
+        Optional source is sent as the X-Hass-Source header on all requests. It is
+        intended for Home Assistant Core to identify itself.
+        """
+        self._client = _SupervisorClient(api_host, token, session, source)
         self._addons = AddonsClient(self._client)
         self._os = OSClient(self._client)
         self._backups = BackupsClient(self._client)

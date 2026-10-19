@@ -15,7 +15,7 @@ from aiohttp import (
 from multidict import MultiDict
 from yarl import URL
 
-from .const import DEFAULT_TIMEOUT, ResponseType
+from .const import DEFAULT_TIMEOUT, HEADER_HASS_SOURCE, ResponseType
 from .exceptions import (
     ERROR_KEYS,
     SupervisorAuthenticationError,
@@ -54,6 +54,7 @@ class _SupervisorClient:
     api_host: str
     token: str
     session: ClientSession | None = None
+    source: str | None = None
     _close_session: bool = field(default=False, init=False)
 
     async def _raise_on_status(self, response: ClientResponse) -> None:
@@ -118,6 +119,8 @@ class _SupervisorClient:
             "Accept": accept,
             "Authorization": f"Bearer {self.token}",
         }
+        if self.source:
+            headers[HEADER_HASS_SOURCE] = self.source
 
         if self.session is None:
             self.session = ClientSession()
