@@ -7,6 +7,8 @@ from aiohttp import ClientTimeout
 DEFAULT_TIMEOUT = ClientTimeout(total=10)
 TIMEOUT_60_SECONDS = ClientTimeout(total=60)
 
+HEADER_HASS_SOURCE = "X-Hass-Source"
+
 
 class ResponseType(StrEnum):
     """Expected response type."""
