@@ -3,6 +3,7 @@
 from aiohasupervisor.models.addons import (
     AddonBoot,
     AddonBootConfig,
+    AddonLogFormat,
     AddonsConfigValidate,
     AddonsOptions,
     AddonsRebuild,
@@ -169,6 +170,7 @@ __all__ = [
     "AccessPoint",
     "AddonBoot",
     "AddonBootConfig",
+    "AddonLogFormat",
     "AddonSet",
     "AddonStage",
     "AddonStartup",
