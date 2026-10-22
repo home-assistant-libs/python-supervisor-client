@@ -580,6 +580,7 @@ async def test_download_backup_partial_read_releases_connection(
             await result.aclose()
         case "unstarted_close":
             result.close()
+            assert await anext(result, None) is None
         case "aclose":
             await anext(result)
             await result.aclose()
@@ -594,6 +595,10 @@ async def test_download_backup_partial_read_releases_connection(
         case "full_read":
             assert b"".join([chunk async for chunk in result]) == body
             assert _acquired_connections(supervisor_client) == 0
+            # Exhaustion is repeatable
+            assert await anext(result, None) is None
+            assert await anext(result, None) is None
+            assert [chunk async for chunk in result] == []
             await result.aclose()
             await result.aclose()
 
