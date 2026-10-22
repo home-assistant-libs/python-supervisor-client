@@ -29,7 +29,7 @@ from .exceptions import (
     SupervisorTimeoutError,
 )
 from .models.base import Response, ResultType
-from .utils.aiohttp import ChunkAsyncStreamIterator
+from .utils.aiohttp import iter_response_chunks
 
 VERSION = metadata.version(__package__)
 
@@ -144,9 +144,7 @@ class _SupervisorClient:
                 case ResponseType.TEXT:
                     return Response(ResultType.OK, await response.text())
                 case ResponseType.STREAM:
-                    return Response(
-                        ResultType.OK, ChunkAsyncStreamIterator(response.content)
-                    )
+                    return Response(ResultType.OK, iter_response_chunks(response))
                 case _:
                     return Response(ResultType.OK)
 

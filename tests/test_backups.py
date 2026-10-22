@@ -545,6 +545,40 @@ async def test_download_backup(
         assert chunk == b"backup test"
 
 
+@pytest.mark.parametrize("abandon", ["aclose", "exception", "drop"])
+async def test_download_backup_partial_read_releases_connection(
+    responses: aiointercept, supervisor_client: SupervisorClient, abandon: str
+) -> None:
+    """Test a partially read download stream does not leak its connection."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/7fed74c8/download",
+        status=200,
+        body=b"x" * (2 * 1024 * 1024),
+    )
+    result = await supervisor_client.backups.download_backup("7fed74c8")
+    connector = supervisor_client._client.session.connector
+    assert len(connector._acquired) == 1
+
+    match abandon:
+        case "aclose":
+            await anext(result)
+            await result.aclose()
+        case "exception":
+            with pytest.raises(ValueError, match="stop"):  # noqa: PT012
+                async for _ in result:
+                    raise ValueError("stop")
+            del result
+        case "drop":
+            await anext(result)
+            del result
+
+    # Let the async generator finalizer of a dropped stream run aclose()
+    await asyncio.sleep(0)
+    await asyncio.sleep(0)
+
+    assert len(connector._acquired) == 0
+
+
 @pytest.mark.parametrize(
     ("options", "as_dict"),
     [

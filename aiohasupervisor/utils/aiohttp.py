@@ -1,8 +1,9 @@
 """Utilities for interacting with aiohttp."""
 
+from collections.abc import AsyncGenerator
 from typing import Self
 
-from aiohttp import StreamReader
+from aiohttp import ClientResponse, StreamReader
 
 
 class ChunkAsyncStreamIterator:
@@ -29,3 +30,19 @@ class ChunkAsyncStreamIterator:
         if rv == (b"", False):
             raise StopAsyncIteration
         return rv[0]
+
+
+async def iter_response_chunks(response: ClientResponse) -> AsyncGenerator[bytes]:
+    """Yield chunks of the response body and close the response when done.
+
+    A partially read response holds its connection until it is closed, and is
+    kept alive by the connector, so it is never garbage collected. Closing in
+    finally returns the connection when the caller stops iterating early, calls
+    aclose() or drops the generator. A fully read response has already released
+    its connection, so close() is a no-op then.
+    """
+    try:
+        async for chunk in ChunkAsyncStreamIterator(response.content):
+            yield chunk
+    finally:
+        response.close()
