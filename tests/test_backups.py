@@ -664,9 +664,9 @@ async def test_download_backup_disconnect_releases_connection(
         body=truncated_body(),
     )
     result = await supervisor_client.backups.download_backup("7fed74c8")
+    assert await anext(result) == b"backup"
     with pytest.raises(ClientPayloadError):
-        async for _ in result:
-            pass
+        await anext(result)
     assert _acquired_connections(supervisor_client) == 0
 
     # The body was cut short, so it must not look complete
