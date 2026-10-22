@@ -6,11 +6,12 @@ from datetime import UTC, datetime
 from pathlib import PurePath
 from typing import Any
 
+from aiohttp import ClientConnectionError
 from aiointercept import CallbackResult, aiointercept
 import pytest
 from yarl import URL
 
-from aiohasupervisor import SupervisorClient
+from aiohasupervisor import SupervisorClient, SupervisorError
 from aiohasupervisor.models import (
     AddonSet,
     BackupLocationAttributes,
@@ -545,21 +546,40 @@ async def test_download_backup(
         assert chunk == b"backup test"
 
 
-@pytest.mark.parametrize("abandon", ["aclose", "exception", "drop"])
+def _acquired_connections(supervisor_client: SupervisorClient) -> int:
+    """Return number of connections currently checked out of the pool."""
+    # TCPConnector._acquired is an aiohttp internal holding in-use connections
+    return len(supervisor_client._client.session.connector._acquired)
+
+
+@pytest.mark.parametrize(
+    "abandon",
+    [
+        "unstarted_drop",
+        "unstarted_aclose",
+        "unstarted_close",
+        "aclose",
+        "exception",
+        "drop",
+        "full_read",
+    ],
+)
 async def test_download_backup_partial_read_releases_connection(
     responses: aiointercept, supervisor_client: SupervisorClient, abandon: str
 ) -> None:
     """Test a partially read download stream does not leak its connection."""
-    responses.get(
-        f"{SUPERVISOR_URL}/backups/7fed74c8/download",
-        status=200,
-        body=b"x" * (2 * 1024 * 1024),
-    )
+    body = b"x" * (2 * 1024 * 1024)
+    responses.get(f"{SUPERVISOR_URL}/backups/7fed74c8/download", status=200, body=body)
     result = await supervisor_client.backups.download_backup("7fed74c8")
-    connector = supervisor_client._client.session.connector
-    assert len(connector._acquired) == 1
+    assert _acquired_connections(supervisor_client) == 1
 
     match abandon:
+        case "unstarted_drop":
+            del result
+        case "unstarted_aclose":
+            await result.aclose()
+        case "unstarted_close":
+            result.close()
         case "aclose":
             await anext(result)
             await result.aclose()
@@ -571,12 +591,65 @@ async def test_download_backup_partial_read_releases_connection(
         case "drop":
             await anext(result)
             del result
+        case "full_read":
+            assert b"".join([chunk async for chunk in result]) == body
+            assert _acquired_connections(supervisor_client) == 0
+            await result.aclose()
+            await result.aclose()
 
-    # Let the async generator finalizer of a dropped stream run aclose()
-    await asyncio.sleep(0)
-    await asyncio.sleep(0)
+    assert _acquired_connections(supervisor_client) == 0
 
-    assert len(connector._acquired) == 0
+
+@pytest.mark.parametrize("abandon", ["close", "cancel"])
+async def test_download_backup_in_flight_read_releases_connection(
+    responses: aiointercept, supervisor_client: SupervisorClient, abandon: str
+) -> None:
+    """Test closing or cancelling a download with a pending read."""
+    stalled = asyncio.Event()
+
+    async def stalling_body() -> AsyncIterator[bytes]:
+        yield b"backup"
+        await stalled.wait()
+
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/7fed74c8/download",
+        status=200,
+        body=stalling_body(),
+    )
+    result = await supervisor_client.backups.download_backup("7fed74c8")
+    assert await anext(result) == b"backup"
+    read = asyncio.create_task(anext(result))
+    await asyncio.sleep(0)
+    assert not read.done()
+
+    match abandon:
+        case "close":
+            # Closing from another task while a read is pending
+            result.close()
+            with pytest.raises(ClientConnectionError):
+                await read
+        case "cancel":
+            read.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await read
+
+    assert _acquired_connections(supervisor_client) == 0
+    stalled.set()
+
+
+async def test_download_backup_error_releases_connection(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test an unread non-JSON error body does not leak its connection."""
+    responses.get(
+        f"{SUPERVISOR_URL}/backups/7fed74c8/download",
+        status=500,
+        body=b"x" * (2 * 1024 * 1024),
+        content_type="text/plain",
+    )
+    with pytest.raises(SupervisorError):
+        await supervisor_client.backups.download_backup("7fed74c8")
+    assert _acquired_connections(supervisor_client) == 0
 
 
 @pytest.mark.parametrize(

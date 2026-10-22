@@ -26,6 +26,7 @@ from .models.backups import (
     UploadBackupOptions,
     UploadedBackup,
 )
+from .utils.aiohttp import ResponseChunkIterator
 
 
 class BackupsClient(_SupervisorComponentClient):
@@ -162,8 +163,12 @@ class BackupsClient(_SupervisorComponentClient):
 
     async def download_backup(
         self, backup: str, options: DownloadBackupOptions | None = None
-    ) -> AsyncIterator[bytes]:
-        """Download backup and return stream."""
+    ) -> ResponseChunkIterator:
+        """Download backup and return stream.
+
+        The stream holds a connection to Supervisor until it is fully read. Call
+        close() or aclose() on it when stopping early to release the connection.
+        """
         params = MultiDict()
         if options and options.location:
             params.add("location", options.location)

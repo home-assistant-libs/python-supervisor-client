@@ -1,24 +1,31 @@
 """Utilities for interacting with aiohttp."""
 
-from collections.abc import AsyncGenerator
 from typing import Self
 
-from aiohttp import ClientResponse, StreamReader
+from aiohttp import ClientResponse
 
 
-class ChunkAsyncStreamIterator:
-    """Async iterator for chunked streams.
+class ResponseChunkIterator:
+    """Async iterator over the chunks of a response body.
 
-    Based on aiohttp.streams.ChunkTupleAsyncStreamIterator, but yields
-    bytes instead of tuple[bytes, bool].
-    Borrowed from home-assistant/core.
+    Yields bytes like aiohttp.streams.ChunkTupleAsyncStreamIterator, but owns the
+    response and closes it when done.
+
+    A partially read response holds its connection until it is closed, and is
+    kept alive by the connector, so it is never garbage collected. The response
+    is closed when the body is fully read, when reading raises, when close() or
+    aclose() is called, or when the iterator is garbage collected, whether or
+    not iteration has started. close() may be called while a read is in flight
+    in another task, the pending read then raises ClientConnectionError.
+    A fully read response has already released its connection, so closing it is
+    a no-op.
     """
 
-    __slots__ = ("_stream",)
+    __slots__ = ("_response",)
 
-    def __init__(self, stream: StreamReader) -> None:
+    def __init__(self, response: ClientResponse) -> None:
         """Initialize."""
-        self._stream = stream
+        self._response = response
 
     def __aiter__(self) -> Self:
         """Iterate."""
@@ -26,23 +33,24 @@ class ChunkAsyncStreamIterator:
 
     async def __anext__(self) -> bytes:
         """Yield next chunk."""
-        rv = await self._stream.readchunk()
+        try:
+            rv = await self._response.content.readchunk()
+        except BaseException:
+            self.close()
+            raise
         if rv == (b"", False):
+            self.close()
             raise StopAsyncIteration
         return rv[0]
 
+    def close(self) -> None:
+        """Close the response and release its connection."""
+        self._response.close()
 
-async def iter_response_chunks(response: ClientResponse) -> AsyncGenerator[bytes]:
-    """Yield chunks of the response body and close the response when done.
+    async def aclose(self) -> None:
+        """Close the response and release its connection."""
+        self.close()
 
-    A partially read response holds its connection until it is closed, and is
-    kept alive by the connector, so it is never garbage collected. Closing in
-    finally returns the connection when the caller stops iterating early, calls
-    aclose() or drops the generator. A fully read response has already released
-    its connection, so close() is a no-op then.
-    """
-    try:
-        async for chunk in ChunkAsyncStreamIterator(response.content):
-            yield chunk
-    finally:
-        response.close()
+    def __del__(self) -> None:
+        """Close the response when the iterator is garbage collected."""
+        self.close()
