@@ -45,3 +45,17 @@ async def test_source_header(
 
     request = responses.requests[(method.upper(), URL(f"{SUPERVISOR_URL}/test"))][0]
     assert request.kwargs["headers"].get("X-Hass-Source") == expected
+
+
+async def test_unread_body_releases_connection(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test a large body which is not read does not leak its connection."""
+    responses.post(
+        f"{SUPERVISOR_URL}/supervisor/reload",
+        status=200,
+        body=b"x" * (2 * 1024 * 1024),
+    )
+    await supervisor_client.supervisor.reload()
+    # TCPConnector._acquired is an aiohttp internal holding in-use connections
+    assert not supervisor_client._client.session.connector._acquired

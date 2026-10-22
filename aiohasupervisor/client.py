@@ -147,6 +147,8 @@ class _SupervisorClient:
                     case ResponseType.STREAM:
                         return Response(ResultType.OK, ResponseChunkIterator(response))
                     case _:
+                        # Release the connection, the body is not needed
+                        response.release()
                         return Response(ResultType.OK)
             except BaseException:
                 # An unread body holds the connection until the response is closed
