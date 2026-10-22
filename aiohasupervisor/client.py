@@ -29,7 +29,7 @@ from .exceptions import (
     SupervisorTimeoutError,
 )
 from .models.base import Response, ResultType
-from .utils.aiohttp import ChunkAsyncStreamIterator
+from .utils.aiohttp import ResponseChunkIterator
 
 VERSION = metadata.version(__package__)
 
@@ -136,19 +136,24 @@ class _SupervisorClient:
                 json=json,
                 data=data,
             )
-            await self._raise_on_status(response)
-            match response_type:
-                case ResponseType.JSON:
-                    is_json(response, raise_on_fail=True)
-                    return Response.from_json(await response.text())
-                case ResponseType.TEXT:
-                    return Response(ResultType.OK, await response.text())
-                case ResponseType.STREAM:
-                    return Response(
-                        ResultType.OK, ChunkAsyncStreamIterator(response.content)
-                    )
-                case _:
-                    return Response(ResultType.OK)
+            try:
+                await self._raise_on_status(response)
+                match response_type:
+                    case ResponseType.JSON:
+                        is_json(response, raise_on_fail=True)
+                        return Response.from_json(await response.text())
+                    case ResponseType.TEXT:
+                        return Response(ResultType.OK, await response.text())
+                    case ResponseType.STREAM:
+                        return Response(ResultType.OK, ResponseChunkIterator(response))
+                    case _:
+                        # Release the connection, the body is not needed
+                        response.release()
+                        return Response(ResultType.OK)
+            except BaseException:
+                # An unread body holds the connection until the response is closed
+                response.close()
+                raise
 
         except (UnicodeDecodeError, ClientResponseError) as err:
             raise SupervisorResponseError(

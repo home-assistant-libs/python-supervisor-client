@@ -146,6 +146,7 @@ from aiohasupervisor.exceptions import (
     SystemNotReadyError,
 )
 from aiohasupervisor.root import SupervisorClient
+from aiohasupervisor.utils.aiohttp import ResponseChunkIterator
 
 __all__ = [
     "AddonNotSupportedArchitectureError",
@@ -271,6 +272,7 @@ __all__ = [
     "ResolutionError",
     "ResolutionIssueNotFoundError",
     "ResolutionSuggestionNotFoundError",
+    "ResponseChunkIterator",
     "ServiceAlreadyProvidedError",
     "ServiceError",
     "ServiceNotProvidedError",
