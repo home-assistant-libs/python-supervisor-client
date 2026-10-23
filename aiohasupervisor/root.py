@@ -7,6 +7,7 @@ from aiohttp import ClientSession, ClientTimeout
 from .addons import AddonsClient
 from .backups import BackupsClient
 from .client import _SupervisorClient
+from .const import DEFAULT_UNIX_SOCKET_API_HOST
 from .discovery import DiscoveryClient
 from .homeassistant import HomeAssistantClient
 from .host import HostClient
@@ -27,18 +28,33 @@ class SupervisorClient:
 
     def __init__(
         self,
-        api_host: str,
-        token: str,
+        api_host: str | None = None,
+        token: str | None = None,
         session: ClientSession | None = None,
         *,
         source: str | None = None,
+        unix_socket: str | None = None,
     ) -> None:
         """Initialize client.
 
         Optional source is sent as the X-Hass-Source header on all requests. It is
         intended for Home Assistant Core to identify itself.
+
+        Optional unix_socket is the path of a Unix socket to reach Supervisor on.
+        Supervisor identifies the caller by the socket, so a token cannot be passed.
+        If a session is passed it must already use a connector for that socket.
+        api_host defaults to http://localhost in this case.
         """
-        self._client = _SupervisorClient(api_host, token, session, source)
+        if unix_socket is None:
+            if api_host is None or token is None:
+                raise ValueError("api_host and token are required without unix_socket")
+        elif not unix_socket:
+            raise ValueError("unix_socket cannot be empty")
+        elif token is not None:
+            raise ValueError("token cannot be used with unix_socket")
+        elif api_host is None:
+            api_host = DEFAULT_UNIX_SOCKET_API_HOST
+        self._client = _SupervisorClient(api_host, token, session, source, unix_socket)
         self._addons = AddonsClient(self._client)
         self._os = OSClient(self._client)
         self._backups = BackupsClient(self._client)
