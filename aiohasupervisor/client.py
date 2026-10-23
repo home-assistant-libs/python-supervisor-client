@@ -11,6 +11,7 @@ from aiohttp import (
     ClientResponseError,
     ClientSession,
     ClientTimeout,
+    UnixConnector,
 )
 from multidict import MultiDict
 from yarl import URL
@@ -52,9 +53,10 @@ class _SupervisorClient:
     """Main class for handling connections with Supervisor."""
 
     api_host: str
-    token: str
+    token: str | None
     session: ClientSession | None = None
     source: str | None = None
+    unix_socket: str | None = None
     _close_session: bool = field(default=False, init=False)
 
     async def _raise_on_status(self, response: ClientResponse) -> None:
@@ -117,13 +119,18 @@ class _SupervisorClient:
         headers = {
             "User-Agent": f"AioHASupervisor/{VERSION}",
             "Accept": accept,
-            "Authorization": f"Bearer {self.token}",
         }
+        # On a Unix socket Supervisor identifies the caller by the socket
+        if self.unix_socket is None:
+            headers["Authorization"] = f"Bearer {self.token}"
         if self.source:
             headers[HEADER_HASS_SOURCE] = self.source
 
         if self.session is None:
-            self.session = ClientSession()
+            connector = (
+                UnixConnector(path=self.unix_socket) if self.unix_socket else None
+            )
+            self.session = ClientSession(connector=connector)
             self._close_session = True
 
         try:
