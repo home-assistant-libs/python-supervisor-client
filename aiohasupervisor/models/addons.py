@@ -110,6 +110,14 @@ class AddonStartup(StrEnum):
     SYSTEM = "system"
 
 
+class AddonLogFormat(StrEnum):
+    """AddonLogFormat type."""
+
+    PLAIN = "plain"
+    TIMESTAMP = "timestamp"
+    VERBOSE = "verbose"
+
+
 # --- OBJECTS ----
 
 
@@ -258,6 +266,7 @@ class InstalledAddonComplete(
     devices: list[str]
     system_managed: bool
     system_managed_config_entry: str | None
+    log_format: AddonLogFormat
 
 
 @dataclass(frozen=True, slots=True)

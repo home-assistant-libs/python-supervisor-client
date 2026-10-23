@@ -123,6 +123,7 @@
     "watchdog": false,
     "devices": [],
     "system_managed": false,
-    "system_managed_config_entry": null
+    "system_managed_config_entry": null,
+    "log_format": "plain"
   }
 }
