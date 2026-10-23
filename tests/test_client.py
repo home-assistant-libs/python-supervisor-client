@@ -149,3 +149,9 @@ def test_unix_socket_rejects_token() -> None:
     """Test a token cannot be passed with a Unix socket."""
     with pytest.raises(ValueError, match="token cannot be used with unix_socket"):
         SupervisorClient(None, "abc123", unix_socket="/run/supervisor.sock")
+
+
+def test_unix_socket_rejects_empty_path() -> None:
+    """Test an empty Unix socket path is rejected rather than falling back to TCP."""
+    with pytest.raises(ValueError, match="unix_socket cannot be empty"):
+        SupervisorClient(unix_socket="")

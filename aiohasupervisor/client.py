@@ -128,7 +128,9 @@ class _SupervisorClient:
 
         if self.session is None:
             connector = (
-                UnixConnector(path=self.unix_socket) if self.unix_socket else None
+                UnixConnector(path=self.unix_socket)
+                if self.unix_socket is not None
+                else None
             )
             self.session = ClientSession(connector=connector)
             self._close_session = True
