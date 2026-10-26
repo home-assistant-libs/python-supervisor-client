@@ -9,7 +9,7 @@
   "remoteEnv": {
     "PATH": "${containerEnv:VIRTUAL_ENV}/bin:${containerEnv:PATH}"
   },
-  "postCreateCommand": "script/devcontainer_setup",
+  "postCreateCommand": "sudo chown vscode:vscode /home/vscode/.claude && script/devcontainer_setup",
   "postStartCommand": "bash devcontainer_bootstrap",
   "runArgs": ["-e", "GIT_EDITOR=code --wait"],
   "customizations": {
