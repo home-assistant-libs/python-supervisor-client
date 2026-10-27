@@ -112,7 +112,6 @@ class AddonStartup(StrEnum):
 
 class AddonLogFormat(StrEnum):
     """AddonLogFormat type.
-    
     This is an incomplete list. Supervisor may add new log formats. Therefore when
     returning the log format of apps, some may have a log format that is not in this
     list parsed as strings on older versions of the client.
