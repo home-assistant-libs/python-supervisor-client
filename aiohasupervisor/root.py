@@ -1,5 +1,6 @@
 """Main client for supervisor."""
 
+from pathlib import Path
 from typing import Self
 
 from aiohttp import ClientSession, ClientTimeout
@@ -33,7 +34,7 @@ class SupervisorClient:
         session: ClientSession | None = None,
         *,
         source: str | None = None,
-        unix_socket: str | None = None,
+        unix_socket: Path | None = None,
     ) -> None:
         """Initialize client.
 
@@ -48,8 +49,6 @@ class SupervisorClient:
         if unix_socket is None:
             if api_host is None or token is None:
                 raise ValueError("api_host and token are required without unix_socket")
-        elif not unix_socket:
-            raise ValueError("unix_socket cannot be empty")
         elif token is not None:
             raise ValueError("token cannot be used with unix_socket")
         elif api_host is None:

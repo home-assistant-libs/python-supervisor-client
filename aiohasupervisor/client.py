@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from http import HTTPMethod, HTTPStatus
 from importlib import metadata
+from pathlib import Path
 from typing import Any
 
 from aiohttp import (
@@ -56,7 +57,7 @@ class _SupervisorClient:
     token: str | None
     session: ClientSession | None = None
     source: str | None = None
-    unix_socket: str | None = None
+    unix_socket: Path | None = None
     _close_session: bool = field(default=False, init=False)
 
     async def _raise_on_status(self, response: ClientResponse) -> None:
@@ -128,7 +129,7 @@ class _SupervisorClient:
 
         if self.session is None:
             connector = (
-                UnixConnector(path=self.unix_socket)
+                UnixConnector(path=str(self.unix_socket))
                 if self.unix_socket is not None
                 else None
             )

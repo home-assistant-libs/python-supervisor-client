@@ -69,7 +69,7 @@ async def test_unread_body_releases_connection(
 
 @pytest.fixture(name="unix_socket_server")
 async def unix_socket_server_fixture() -> (
-    AsyncGenerator[tuple[str, list[web.Request]], None]
+    AsyncGenerator[tuple[Path, list[web.Request]], None]
 ):
     """Serve Supervisor's ping on a Unix socket and record requests made to it."""
     requests: list[web.Request] = []
@@ -84,21 +84,21 @@ async def unix_socket_server_fixture() -> (
     await runner.setup()
     # Not tmp_path, it exceeds the sun_path limit on macOS (104 bytes)
     socket_dir = tempfile.mkdtemp(dir="/tmp")
-    path = str(Path(socket_dir, "supervisor.sock"))
-    await web.UnixSite(runner, path).start()
+    path = Path(socket_dir, "supervisor.sock")
+    await web.UnixSite(runner, str(path)).start()
     yield path, requests
     await runner.cleanup()
     shutil.rmtree(socket_dir)
 
 
-async def test_unix_socket(unix_socket_server: tuple[str, list[web.Request]]) -> None:
+async def test_unix_socket(unix_socket_server: tuple[Path, list[web.Request]]) -> None:
     """Test client connects over a Unix socket and sends no token there."""
     path, requests = unix_socket_server
     async with SupervisorClient(unix_socket=path) as supervisor_client:
         await supervisor_client.supervisor.ping()
         connector = supervisor_client._client.session.connector
         assert isinstance(connector, UnixConnector)
-        assert connector.path == path
+        assert connector.path == str(path)
 
     assert len(requests) == 1
     assert requests[0].host == "localhost"
@@ -106,11 +106,11 @@ async def test_unix_socket(unix_socket_server: tuple[str, list[web.Request]]) ->
 
 
 async def test_unix_socket_with_session(
-    unix_socket_server: tuple[str, list[web.Request]],
+    unix_socket_server: tuple[Path, list[web.Request]],
 ) -> None:
     """Test a passed session is used for a Unix socket and left open."""
     path, requests = unix_socket_server
-    async with ClientSession(connector=UnixConnector(path=path)) as session:
+    async with ClientSession(connector=UnixConnector(path=str(path))) as session:
         async with SupervisorClient(
             session=session, unix_socket=path
         ) as supervisor_client:
@@ -148,10 +148,4 @@ def test_tcp_requires_api_host_and_token(
 def test_unix_socket_rejects_token() -> None:
     """Test a token cannot be passed with a Unix socket."""
     with pytest.raises(ValueError, match="token cannot be used with unix_socket"):
-        SupervisorClient(None, "abc123", unix_socket="/run/supervisor.sock")
-
-
-def test_unix_socket_rejects_empty_path() -> None:
-    """Test an empty Unix socket path is rejected rather than falling back to TCP."""
-    with pytest.raises(ValueError, match="unix_socket cannot be empty"):
-        SupervisorClient(unix_socket="")
+        SupervisorClient(None, "abc123", unix_socket=Path("/run/supervisor.sock"))

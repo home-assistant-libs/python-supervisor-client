@@ -17,7 +17,7 @@ Where Supervisor provides a Unix socket, pass its path as `unix_socket` instead.
 Supervisor identifies the caller by the socket, so no token is needed or sent:
 
 ```py
-client = SupervisorClient(unix_socket=os.environ["SUPERVISOR_SOCKET"])
+client = SupervisorClient(unix_socket=Path(os.environ["SUPERVISOR_SOCKET"]))
 ```
 
 ## Installation
