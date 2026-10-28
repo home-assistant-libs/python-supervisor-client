@@ -69,7 +69,7 @@ async def test_addons_info(
     assert addon.supervisor_role == SupervisorRole.MANAGER
     assert addon.system_managed is False
     assert addon.system_managed_config_entry is None
-    assert addon.log_format == AddonLogFormat.PLAIN
+    assert addon.log_format is AddonLogFormat.PLAIN
     assert addon.startup == AddonStartup.SERVICES
 
 
