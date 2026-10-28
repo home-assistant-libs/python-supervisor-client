@@ -110,6 +110,19 @@ class AddonStartup(StrEnum):
     SYSTEM = "system"
 
 
+class AddonLogFormat(StrEnum):
+    """AddonLogFormat type.
+
+    This is an incomplete list. Supervisor may add new log formats. Therefore when
+    returning the log format of apps, some may have a log format that is not in this
+    list parsed as strings on older versions of the client.
+    """
+
+    PLAIN = "plain"
+    TIMESTAMP = "timestamp"
+    VERBOSE = "verbose"
+
+
 # --- OBJECTS ----
 
 
@@ -258,6 +271,7 @@ class InstalledAddonComplete(
     devices: list[str]
     system_managed: bool
     system_managed_config_entry: str | None
+    log_format: AddonLogFormat | str
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,6 +1,7 @@
 """Test addons supervisor client."""
 
 from ipaddress import IPv4Address
+import json
 
 from aiointercept import aiointercept
 import pytest
@@ -10,6 +11,7 @@ from aiohasupervisor import SupervisorClient
 from aiohasupervisor.exceptions import SupervisorNotFoundError
 from aiohasupervisor.models import (
     AddonBoot,
+    AddonLogFormat,
     AddonsOptions,
     AddonsRebuild,
     AddonsSecurityOptions,
@@ -68,7 +70,23 @@ async def test_addons_info(
     assert addon.supervisor_role == SupervisorRole.MANAGER
     assert addon.system_managed is False
     assert addon.system_managed_config_entry is None
+    assert addon.log_format is AddonLogFormat.PLAIN
     assert addon.startup == AddonStartup.SERVICES
+
+
+async def test_addons_info_unknown_log_format(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test addons info API returns an unknown log format as a string."""
+    fixture = json.loads(load_fixture("addons_info.json"))
+    fixture["data"]["log_format"] = "future_format"
+    responses.get(
+        f"{SUPERVISOR_URL}/addons/core_ssh/info",
+        status=200,
+        payload=fixture,
+    )
+    addon = await supervisor_client.addons.addon_info("core_ssh")
+    assert addon.log_format == "future_format"
 
 
 async def test_addons_info_not_installed(
