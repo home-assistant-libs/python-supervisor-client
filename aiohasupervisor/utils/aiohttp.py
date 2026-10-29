@@ -1,5 +1,6 @@
 """Utilities for interacting with aiohttp."""
 
+from abc import ABC, abstractmethod
 import asyncio
 import contextlib
 from typing import Self
@@ -7,7 +8,7 @@ from typing import Self
 from aiohttp import ClientResponse
 
 
-class _ResponseIterator[T]:
+class _ResponseIterator[T](ABC):
     """Async iterator over a response body, which owns the response.
 
     A partially read response holds its connection until it is closed, and is
@@ -54,9 +55,9 @@ class _ResponseIterator[T]:
             raise StopAsyncIteration
         return item
 
+    @abstractmethod
     async def _read(self) -> T | None:
         """Read the next item, None at the end of the body."""
-        raise NotImplementedError
 
     def _close_response(self) -> None:
         """Close the response, which makes further reads raise."""
