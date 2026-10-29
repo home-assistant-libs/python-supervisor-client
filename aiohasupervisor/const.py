@@ -6,6 +6,8 @@ from aiohttp import ClientTimeout
 
 DEFAULT_TIMEOUT = ClientTimeout(total=10)
 TIMEOUT_60_SECONDS = ClientTimeout(total=60)
+# Logs are streamed and following has no end, so only limit connecting
+LOGS_TIMEOUT = ClientTimeout(total=None, sock_connect=10)
 
 HEADER_HASS_SOURCE = "X-Hass-Source"
 
@@ -18,4 +20,5 @@ class ResponseType(StrEnum):
     NONE = "none"
     JSON = "json"
     STREAM = "stream"
+    LINES = "lines"
     TEXT = "text"

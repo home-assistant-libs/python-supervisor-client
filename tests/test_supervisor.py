@@ -2,13 +2,18 @@
 
 from ipaddress import IPv4Address
 import json
+from typing import Any
 
 from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
-from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models import SupervisorOptions, SupervisorUpdateOptions
+from aiohasupervisor import ResponseLineIterator, SupervisorClient
+from aiohasupervisor.models import (
+    LogsOptions,
+    SupervisorOptions,
+    SupervisorUpdateOptions,
+)
 from aiohasupervisor.models.supervisor import DetectBlockingIO, FeatureFlag
 
 from . import load_fixture
@@ -202,3 +207,41 @@ async def test_supervisor_repair(
     assert responses.requests.keys() == {
         ("POST", URL(f"{SUPERVISOR_URL}/supervisor/repair"))
     }
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "path"),
+    [
+        pytest.param({}, "supervisor/logs", id="default"),
+        pytest.param({"latest": True}, "supervisor/logs/latest", id="latest"),
+        pytest.param({"follow": True}, "supervisor/logs/follow", id="follow"),
+        pytest.param({"boot": 0}, "supervisor/logs/boots/0", id="boot"),
+        pytest.param(
+            {"boot": -1, "follow": True},
+            "supervisor/logs/boots/-1/follow",
+            id="boot_follow",
+        ),
+    ],
+)
+async def test_supervisor_logs(
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    kwargs: dict[str, Any],
+    path: str,
+) -> None:
+    """Test supervisor logs API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/{path}?lines=10", status=200, body=b"line 1\nline 2\n"
+    )
+    result = await supervisor_client.supervisor.logs(LogsOptions(lines=10), **kwargs)
+    assert isinstance(result, ResponseLineIterator)
+    assert [line async for line in result] == ["line 1", "line 2"]
+
+
+@pytest.mark.parametrize("kwargs", [{"boot": 0}, {"follow": True}])
+async def test_supervisor_logs_latest_exclusive(
+    supervisor_client: SupervisorClient, kwargs: dict[str, Any]
+) -> None:
+    """Test latest supervisor logs can't be combined with a boot or follow."""
+    with pytest.raises(ValueError, match="latest can't be combined"):
+        await supervisor_client.supervisor.logs(latest=True, **kwargs)

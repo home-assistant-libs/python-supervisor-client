@@ -258,7 +258,7 @@ async def test_coverage_warnings(
         to_record(make_record("/new/{thing}/info", params=["a"])),
         to_record(make_record("/new/thing", method="POST")),
         to_record(make_record("/missing/route", status=404)),
-        to_record(make_record("/host/logs/identifiers")),
+        to_record(make_record("/host/logs")),
         to_record(make_record("/store/addons/{app}/icon", params=["a"])),
         to_record(make_record("/ingress/{token}/{path}", params=["a", "b"])),
     ]

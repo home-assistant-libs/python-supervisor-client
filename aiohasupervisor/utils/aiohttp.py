@@ -7,11 +7,8 @@ from typing import Self
 from aiohttp import ClientResponse
 
 
-class ResponseChunkIterator:
-    """Async iterator over the chunks of a response body.
-
-    Yields bytes like aiohttp.streams.ChunkTupleAsyncStreamIterator, but owns the
-    response and closes it when done.
+class _ResponseIterator[T]:
+    """Async iterator over a response body, which owns the response.
 
     A partially read response holds its connection until it is closed, and is
     kept alive by the connector, so it is never garbage collected. The response
@@ -42,20 +39,24 @@ class ResponseChunkIterator:
         """Iterate."""
         return self
 
-    async def __anext__(self) -> bytes:
-        """Yield next chunk."""
+    async def __anext__(self) -> T:
+        """Yield next item."""
         # A closed response's reader raises, so don't read from it again
         if self._exhausted:
             raise StopAsyncIteration
         try:
-            rv = await self._response.content.readchunk()
+            item = await self._read()
         except BaseException:
             self._close_response()
             raise
-        if rv == (b"", False):
+        if item is None:
             self.close()
             raise StopAsyncIteration
-        return rv[0]
+        return item
+
+    async def _read(self) -> T | None:
+        """Read the next item, None at the end of the body."""
+        raise NotImplementedError
 
     def _close_response(self) -> None:
         """Close the response, which makes further reads raise."""
@@ -90,3 +91,35 @@ class ResponseChunkIterator:
         # was closed concurrently, skip closing like aiohttp does.
         with contextlib.suppress(RuntimeError):
             loop.call_soon_threadsafe(self._response.close)
+
+
+class ResponseChunkIterator(_ResponseIterator[bytes]):
+    """Async iterator over the chunks of a response body.
+
+    Yields bytes like aiohttp.streams.ChunkTupleAsyncStreamIterator.
+    """
+
+    __slots__ = ()
+
+    async def _read(self) -> bytes | None:
+        """Read the next chunk."""
+        rv = await self._response.content.readchunk()
+        if rv == (b"", False):
+            return None
+        return rv[0]
+
+
+class ResponseLineIterator(_ResponseIterator[str]):
+    """Async iterator over the lines of a text response body.
+
+    Yields each line without its trailing newline, as soon as it is received.
+    """
+
+    __slots__ = ()
+
+    async def _read(self) -> str | None:
+        """Read the next line."""
+        line = await self._response.content.readline()
+        if not line:
+            return None
+        return line.decode("utf-8", errors="replace").removesuffix("\n")

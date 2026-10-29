@@ -30,6 +30,22 @@ class ServiceState(StrEnum):
     MAINTENANCE = "maintenance"
 
 
+class LogFormat(StrEnum):
+    """LogFormat type.
+
+    Format of each line of a log read from the journal. Plain is the message only,
+    timestamp adds the time and verbose also adds the host and process.
+
+    This is an incomplete list. Supervisor may add new log formats. Therefore when
+    returning the log format of apps, some may have a log format that is not in this
+    list parsed as strings on older versions of the client.
+    """
+
+    PLAIN = "plain"
+    TIMESTAMP = "timestamp"
+    VERBOSE = "verbose"
+
+
 # --- OBJECTS ----
 
 
@@ -122,3 +138,35 @@ class DiskUsage(ResponseData):
     label: str | None = None
     total_bytes: int | None = None
     children: list["DiskUsage"] | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class LogsOptions:
+    """LogsOptions model.
+
+    lines is the number of lines from the end of the log to return, range is a
+    journal Range header such as "entries=:-99:100" or "realtime=<from>:<to>:<n>".
+    lines takes precedence over range. With no_colors ANSI color codes are removed.
+    """
+
+    lines: int | None = None
+    format: LogFormat | None = None
+    no_colors: bool = False
+    range: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class LogBoots(ResponseData):
+    """LogBoots model.
+
+    Boot IDs of the host by offset, 0 is the current boot, -1 the one before.
+    """
+
+    boots: dict[int, str]
+
+
+@dataclass(frozen=True, slots=True)
+class LogIdentifiers(ResponseData):
+    """LogIdentifiers model."""
+
+    identifiers: list[str]

@@ -97,6 +97,8 @@ ENDPOINTS = [
     # Host
     Endpoint("GET", "host/info", lambda c, _: c.host.info()),
     Endpoint("GET", "host/services", lambda c, _: c.host.services()),
+    Endpoint("GET", "host/logs/boots", lambda c, _: c.host.log_boots()),
+    Endpoint("GET", "host/logs/identifiers", lambda c, _: c.host.log_identifiers()),
     Endpoint(
         "GET",
         "host/disks/default/usage",
@@ -168,9 +170,18 @@ ENDPOINTS = [
 # against templates without a leading slash and with each param replaced by "*".
 # Not reported as client gaps when checking coverage.
 OMITTED = [
-    # Log endpoints, omitted for now (AddonsClient, HostClient)
+    # Log endpoints stream text, which Supervisor does not record
     "*/logs",
-    "*/logs/*",
+    "*/logs/follow",
+    "*/logs/latest",
+    "*/logs/boots/*",
+    "host/logs/identifiers/*",
+    # Log endpoints of the plugins, omitted for now (no plugin clients)
+    "audio/logs*",
+    "cli/logs*",
+    "dns/logs*",
+    "multicast/logs*",
+    "observer/logs*",
     # Icon/logo endpoints, omitted for now (StoreClient)
     "*/icon",
     "*/logo",

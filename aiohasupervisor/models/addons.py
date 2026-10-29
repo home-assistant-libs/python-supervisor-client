@@ -10,6 +10,7 @@ from mashumaro import field_options
 from mashumaro.config import TO_DICT_ADD_BY_ALIAS_FLAG, BaseConfig
 
 from .base import DEFAULT, ContainerStats, Options, Request, RequestConfig, ResponseData
+from .host import LogFormat
 
 # --- ENUMS ----
 
@@ -110,17 +111,7 @@ class AddonStartup(StrEnum):
     SYSTEM = "system"
 
 
-class AddonLogFormat(StrEnum):
-    """AddonLogFormat type.
-
-    This is an incomplete list. Supervisor may add new log formats. Therefore when
-    returning the log format of apps, some may have a log format that is not in this
-    list parsed as strings on older versions of the client.
-    """
-
-    PLAIN = "plain"
-    TIMESTAMP = "timestamp"
-    VERBOSE = "verbose"
+AddonLogFormat = LogFormat
 
 
 # --- OBJECTS ----
