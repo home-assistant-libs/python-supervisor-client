@@ -6,11 +6,15 @@ from .models.host import (
     DiskUsage,
     HostInfo,
     HostOptions,
+    LogBoots,
+    LogIdentifiers,
+    LogsOptions,
     RebootOptions,
     Service,
     ServiceList,
     ShutdownOptions,
 )
+from .utils.aiohttp import ResponseLineIterator
 
 
 class HostClient(_SupervisorComponentClient):
@@ -56,4 +60,31 @@ class HostClient(_SupervisorComponentClient):
         )
         return DiskUsage.from_dict(result.data)
 
-    # Omitted for now - Log endpoints
+    async def logs(
+        self,
+        options: LogsOptions | None = None,
+        *,
+        identifier: str | None = None,
+        boot: int | str | None = None,
+        follow: bool = False,
+    ) -> ResponseLineIterator:
+        """Stream the host log, limited to a syslog identifier and a boot if given.
+
+        boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
+        """
+        uri = "host/logs"
+        if boot is not None:
+            uri = f"{uri}/boots/{boot}"
+        if identifier is not None:
+            uri = f"{uri}/identifiers/{identifier}"
+        return await self._logs(uri, options, follow=follow)
+
+    async def log_boots(self) -> dict[int, str]:
+        """Get boot IDs by offset, 0 is the current boot and -1 the one before."""
+        result = await self._client.get("host/logs/boots")
+        return LogBoots.from_dict(result.data).boots
+
+    async def log_identifiers(self) -> list[str]:
+        """Get syslog identifiers in the host log."""
+        result = await self._client.get("host/logs/identifiers")
+        return LogIdentifiers.from_dict(result.data).identifiers
