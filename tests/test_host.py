@@ -350,7 +350,8 @@ async def test_host_logs(
     timeout = request_timeouts[("GET", URL(f"{SUPERVISOR_URL}/{path}"))][0]
     assert timeout.total is None
     assert timeout.sock_read is None
-    assert timeout.sock_connect == 10
+    assert timeout.connect == 10
+    assert timeout.sock_connect is None
 
 
 async def test_host_logs_lines(
