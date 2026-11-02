@@ -372,6 +372,23 @@ async def test_host_logs_lines(
     assert not supervisor_client._client.session.connector._acquired
 
 
+async def test_host_logs_long_line(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test a line longer than aiohttp's read buffer limit is not an error."""
+    long_line = "x" * (512 * 1024)
+    responses.get(
+        f"{SUPERVISOR_URL}/host/logs",
+        status=200,
+        body=f"first\n{long_line}\nlast\n".encode(),
+    )
+    result = await supervisor_client.host.logs()
+    assert await anext(result) == "first"
+    assert await anext(result) == long_line
+    assert await anext(result) == "last"
+    assert await anext(result, None) is None
+
+
 async def test_host_logs_error(
     responses: aiointercept, supervisor_client: SupervisorClient
 ) -> None:

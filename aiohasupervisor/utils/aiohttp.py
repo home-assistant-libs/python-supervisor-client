@@ -116,11 +116,31 @@ class ResponseLineIterator(_ResponseIterator[str]):
     Yields each line without its trailing newline, as soon as it is received.
     """
 
-    __slots__ = ()
+    __slots__ = ("_buffer", "_scanned")
+
+    def __init__(self, response: ClientResponse) -> None:
+        """Initialize."""
+        super().__init__(response)
+        self._buffer = bytearray()
+        self._scanned = 0
 
     async def _read(self) -> str | None:
         """Read the next line."""
-        line = await self._response.content.readline()
-        if not line:
+        # The reader's readline() raises on lines over its buffer limit, so
+        # assemble lines from chunks, which have no limit
+        content = self._response.content
+        while (end := self._buffer.find(b"\n", self._scanned)) == -1:
+            self._scanned = len(self._buffer)
+            if not (chunk := await content.readany()):
+                break
+            self._buffer += chunk
+        if end != -1:
+            line = bytes(self._buffer[:end])
+            del self._buffer[: end + 1]
+        elif self._buffer:
+            line = bytes(self._buffer)
+            self._buffer.clear()
+        else:
             return None
-        return line.decode("utf-8", errors="replace").removesuffix("\n")
+        self._scanned = 0
+        return line.decode("utf-8", errors="replace")
