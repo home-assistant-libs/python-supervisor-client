@@ -45,7 +45,8 @@ jobs:
             ${{ runner.os }}-venv-${{
             steps.python.outputs.python-version }}-${{
             hashFiles('pyproject.toml') }}
-      - name: Create Python virtual environment
+      - &create-venv
+        name: Create Python virtual environment
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
           python -m venv venv
@@ -91,22 +92,13 @@ jobs:
         with:
           path: venv
           key: *venv-key
-      - name: Fail job if Python cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
+      - *create-venv
       - name: Restore pre-commit environment from cache
         id: cache-precommit
         uses: actions/cache@v6.1.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: *pre-commit-key
-      - name: Fail job if cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
       - name: Run ruff-format
         run: |
           . venv/bin/activate
@@ -136,22 +128,13 @@ jobs:
         with:
           path: venv
           key: *venv-key
-      - name: Fail job if Python cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
+      - *create-venv
       - name: Restore pre-commit environment from cache
         id: cache-precommit
         uses: actions/cache@v6.1.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: *pre-commit-key
-      - name: Fail job if cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
       - name: Run ruff
         run: |
           . venv/bin/activate
@@ -181,22 +164,13 @@ jobs:
         with:
           path: venv
           key: *venv-key
-      - name: Fail job if Python cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
+      - *create-venv
       - name: Restore pre-commit environment from cache
         id: cache-precommit
         uses: actions/cache@v6.1.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: *pre-commit-key
-      - name: Fail job if cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
 
       - name: Register yamllint problem matcher
         run: |
@@ -269,11 +243,7 @@ jobs:
         with:
           path: venv
           key: *venv-key
-      - name: Fail job if Python cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
+      - *create-venv
       - name: Register Python problem matcher
         run: |
           echo "::add-matcher::.github/workflows/matchers/python.json"
@@ -319,11 +289,7 @@ jobs:
         with:
           path: venv
           key: *venv-key
-      - name: Fail job if Python cache restore failed
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          echo "Failed to restore Python virtual environment from cache"
-          exit 1
+      - *create-venv
       - name: Download all coverage artifacts
         uses: actions/download-artifact@v8.0.2
       - name: Combine coverage results
