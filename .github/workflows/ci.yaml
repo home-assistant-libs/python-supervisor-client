@@ -88,14 +88,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: venv
           key: *venv-key
       - *create-venv
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: *pre-commit-key
@@ -124,14 +124,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: venv
           key: *venv-key
       - *create-venv
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: *pre-commit-key
@@ -160,14 +160,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: venv
           key: *venv-key
       - *create-venv
       - name: Restore pre-commit environment from cache
         id: cache-precommit
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: *pre-commit-key
@@ -239,7 +239,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: venv
           key: *venv-key
@@ -285,7 +285,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PYTHON }}
       - name: Restore Python virtual environment
         id: cache-venv
-        uses: actions/cache@v6.1.0
+        uses: actions/cache/restore@v6.1.0
         with:
           path: venv
           key: *venv-key
