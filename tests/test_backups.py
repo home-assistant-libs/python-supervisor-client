@@ -7,12 +7,12 @@ from pathlib import PurePath
 import sys
 from typing import Any
 
-from aiohttp import ClientConnectionError, ClientPayloadError
 from aiointercept import CallbackResult, aiointercept
 import pytest
 from yarl import URL
 
 from aiohasupervisor import SupervisorClient, SupervisorError
+from aiohasupervisor.exceptions import SupervisorConnectionError
 from aiohasupervisor.models import (
     AddonSet,
     BackupLocationAttributes,
@@ -633,7 +633,7 @@ async def test_download_backup_in_flight_read_releases_connection(
             case "close":
                 # Closing from another task while a read is pending
                 result.close()
-                with pytest.raises(ClientConnectionError):
+                with pytest.raises(SupervisorConnectionError):
                     await read
                 assert await anext(result, None) is None
             case "cancel":
@@ -641,7 +641,7 @@ async def test_download_backup_in_flight_read_releases_connection(
                 with pytest.raises(asyncio.CancelledError):
                     await read
                 # The body was cut short, so it must not look complete
-                with pytest.raises(ClientConnectionError):
+                with pytest.raises(SupervisorConnectionError):
                     await anext(result, None)
 
         assert _acquired_connections(supervisor_client) == 0
@@ -665,12 +665,12 @@ async def test_download_backup_disconnect_releases_connection(
     )
     result = await supervisor_client.backups.download_backup("7fed74c8")
     assert await anext(result) == b"backup"
-    with pytest.raises(ClientPayloadError):
+    with pytest.raises(SupervisorConnectionError):
         await anext(result)
     assert _acquired_connections(supervisor_client) == 0
 
     # The body was cut short, so it must not look complete
-    with pytest.raises(ClientPayloadError):
+    with pytest.raises(SupervisorConnectionError):
         await anext(result, None)
 
 

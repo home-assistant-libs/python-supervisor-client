@@ -1,5 +1,6 @@
 """Test host supervisor client."""
 
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
@@ -8,7 +9,10 @@ import pytest
 from yarl import URL
 
 from aiohasupervisor import ResponseLineIterator, SupervisorClient
-from aiohasupervisor.exceptions import SupervisorBadRequestError
+from aiohasupervisor.exceptions import (
+    SupervisorBadRequestError,
+    SupervisorConnectionError,
+)
 from aiohasupervisor.models import (
     HostInfo,
     HostOptions,
@@ -388,6 +392,26 @@ async def test_host_logs_long_line(
     assert await anext(result) == long_line
     assert await anext(result) == "last"
     assert await anext(result, None) is None
+
+
+async def test_host_logs_disconnect(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test a log stream cut short raises a library error, not an aiohttp one."""
+
+    async def truncated_body() -> AsyncIterator[bytes]:
+        yield b"first\n"
+        raise ConnectionResetError
+
+    responses.get(f"{SUPERVISOR_URL}/host/logs", status=200, body=truncated_body())
+    result = await supervisor_client.host.logs()
+    assert await anext(result) == "first"
+    with pytest.raises(SupervisorConnectionError):
+        await anext(result)
+    # The body was cut short, so it must not look complete
+    with pytest.raises(SupervisorConnectionError):
+        await anext(result, None)
+    assert not supervisor_client._client.session.connector._acquired
 
 
 async def test_host_logs_error(

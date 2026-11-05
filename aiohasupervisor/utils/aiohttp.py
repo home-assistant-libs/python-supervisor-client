@@ -5,7 +5,9 @@ import asyncio
 import contextlib
 from typing import Self
 
-from aiohttp import ClientResponse
+from aiohttp import ClientError, ClientResponse
+
+from aiohasupervisor.exceptions import SupervisorConnectionError
 
 
 class _ResponseIterator[T](ABC):
@@ -18,13 +20,15 @@ class _ResponseIterator[T](ABC):
     not iteration has started. Garbage collection may happen in any thread, the
     response is then closed on the event loop. close() and aclose() must be
     called from the event loop thread, and may be called while a read is in
-    flight in another task, the pending read then raises ClientConnectionError.
+    flight in another task, the pending read then raises
+    SupervisorConnectionError.
 
     Once the body is fully read or close() is called, the iterator is exhausted
     and further iteration stops immediately. If reading raised, further reads
     raise as well, so a truncated body is not mistaken for a complete one. A
     fully read response has already released its connection, so closing it is
-    a no-op.
+    a no-op. Connection errors while reading, like Supervisor restarting in
+    the middle of a followed log, raise SupervisorConnectionError.
     """
 
     __slots__ = ("_closed", "_exhausted", "_loop", "_response")
@@ -47,6 +51,11 @@ class _ResponseIterator[T](ABC):
             raise StopAsyncIteration
         try:
             item = await self._read()
+        except ClientError as err:
+            self._close_response()
+            raise SupervisorConnectionError(
+                "Connection to Supervisor lost while reading the response"
+            ) from err
         except BaseException:
             self._close_response()
             raise
