@@ -329,6 +329,22 @@ async def test_host_disk_usage_with_custom_depth(
             None,
             id="identifier_encoded",
         ),
+        pytest.param(
+            None,
+            {"identifier": "(sd-pam)"},
+            "host/logs/identifiers/(sd-pam)",
+            "",
+            None,
+            id="identifier_sub_delims",
+        ),
+        pytest.param(
+            None,
+            {"identifier": "user@host:1"},
+            "host/logs/identifiers/user@host:1",
+            "",
+            None,
+            id="identifier_colon_at",
+        ),
     ],
 )
 async def test_host_logs(

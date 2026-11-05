@@ -3,7 +3,7 @@
 from urllib.parse import quote
 
 from .client import _SupervisorComponentClient
-from .const import TIMEOUT_60_SECONDS
+from .const import PATH_SEGMENT_SAFE, TIMEOUT_60_SECONDS
 from .models.host import (
     DiskUsage,
     HostInfo,
@@ -80,7 +80,7 @@ class HostClient(_SupervisorComponentClient):
         if boot is not None:
             uri = f"{uri}/boots/{boot}"
         if identifier is not None:
-            uri = f"{uri}/identifiers/{quote(identifier, safe='')}"
+            uri = f"{uri}/identifiers/{quote(identifier, safe=PATH_SEGMENT_SAFE)}"
         return await self._logs(uri, options, follow=follow)
 
     async def log_boots(self) -> dict[int, str]:

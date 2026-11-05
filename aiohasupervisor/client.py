@@ -108,7 +108,7 @@ class _SupervisorClient:
         """Handle a request to Supervisor."""
         # Parsing a URL string keeps percent-encoded segments as they are, where
         # joinpath() would encode them again. A free-form value in a path must
-        # be quoted with nothing left safe by the caller building the uri, like
+        # be quoted with PATH_SEGMENT_SAFE by the caller building the uri, like
         # the syslog identifier of the host logs. Most path parameters are slugs
         # with a closed character set and need no quoting.
         url = URL(f"{self.api_host.rstrip('/')}/{uri}")

@@ -13,6 +13,11 @@ HEADER_HASS_SOURCE = "X-Hass-Source"
 
 DEFAULT_UNIX_SOCKET_API_HOST = "http://localhost"
 
+# Characters yarl leaves unencoded in a path segment (RFC 3986 sub-delims, ":"
+# and "@"). Quoting them would be undone when the URL is built, so a free-form
+# value put in a path must leave exactly these safe.
+PATH_SEGMENT_SAFE = "!$&'()*,:;=@"
+
 
 class ResponseType(StrEnum):
     """Expected response type."""
