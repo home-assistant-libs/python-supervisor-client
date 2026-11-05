@@ -17,7 +17,7 @@ from aiohttp import (
 from multidict import MultiDict
 from yarl import URL
 
-from .const import DEFAULT_TIMEOUT, HEADER_HASS_SOURCE, ResponseType
+from .const import DEFAULT_SOURCE, DEFAULT_TIMEOUT, HEADER_HASS_SOURCE, ResponseType
 from .exceptions import (
     ERROR_KEYS,
     SupervisorAuthenticationError,
@@ -56,7 +56,7 @@ class _SupervisorClient:
     api_host: str
     token: str | None
     session: ClientSession | None = None
-    source: str | None = None
+    source: str = DEFAULT_SOURCE
     unix_socket: Path | None = None
     _close_session: bool = field(default=False, init=False)
 
@@ -120,12 +120,11 @@ class _SupervisorClient:
         headers = {
             "User-Agent": f"AioHASupervisor/{VERSION}",
             "Accept": accept,
+            HEADER_HASS_SOURCE: self.source,
         }
         # On a Unix socket Supervisor identifies the caller by the socket
         if self.unix_socket is None:
             headers["Authorization"] = f"Bearer {self.token}"
-        if self.source:
-            headers[HEADER_HASS_SOURCE] = self.source
 
         if self.session is None:
             connector = (

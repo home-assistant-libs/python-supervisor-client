@@ -8,7 +8,7 @@ from aiohttp import ClientSession, ClientTimeout
 from .addons import AddonsClient
 from .backups import BackupsClient
 from .client import _SupervisorClient
-from .const import DEFAULT_UNIX_SOCKET_API_HOST
+from .const import DEFAULT_SOURCE, DEFAULT_UNIX_SOCKET_API_HOST
 from .discovery import DiscoveryClient
 from .homeassistant import HomeAssistantClient
 from .host import HostClient
@@ -33,13 +33,13 @@ class SupervisorClient:
         token: str | None = None,
         session: ClientSession | None = None,
         *,
-        source: str | None = None,
+        source: str = DEFAULT_SOURCE,
         unix_socket: Path | None = None,
     ) -> None:
         """Initialize client.
 
-        Optional source is sent as the X-Hass-Source header on all requests. It is
-        intended for Home Assistant Core to identify itself.
+        Source is sent as the X-Hass-Source header on all requests. It defaults to
+        AioHASupervisor and is intended for Home Assistant Core to identify itself.
 
         Optional unix_socket is the path of a Unix socket to reach Supervisor on.
         Supervisor identifies the caller by the socket, so a token cannot be passed.
