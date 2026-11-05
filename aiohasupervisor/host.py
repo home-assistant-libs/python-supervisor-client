@@ -1,5 +1,7 @@
 """Host client for supervisor."""
 
+from urllib.parse import quote
+
 from .client import _SupervisorComponentClient
 from .const import TIMEOUT_60_SECONDS
 from .models.host import (
@@ -71,12 +73,14 @@ class HostClient(_SupervisorComponentClient):
         """Stream the host log, limited to a syslog identifier and a boot if given.
 
         boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
+        identifier is a syslog identifier as returned by log_identifiers(), the
+        client encodes it for the URL.
         """
         uri = "host/logs"
         if boot is not None:
             uri = f"{uri}/boots/{boot}"
         if identifier is not None:
-            uri = f"{uri}/identifiers/{identifier}"
+            uri = f"{uri}/identifiers/{quote(identifier, safe='')}"
         return await self._logs(uri, options, follow=follow)
 
     async def log_boots(self) -> dict[int, str]:

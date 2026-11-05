@@ -321,6 +321,14 @@ async def test_host_disk_usage_with_custom_depth(
             None,
             id="identifier_follow",
         ),
+        pytest.param(
+            None,
+            {"identifier": "foo bar"},
+            "host/logs/identifiers/foo%20bar",
+            "",
+            None,
+            id="identifier_encoded",
+        ),
     ],
 )
 async def test_host_logs(

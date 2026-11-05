@@ -34,6 +34,30 @@ async def test_path_manipulation_blocked(method: str) -> None:
         await action("test/%2E%2E/bad")
 
 
+async def test_encoded_path_segment_kept(
+    unix_socket_server: tuple[Path, list[web.Request]],
+) -> None:
+    """Test a percent-encoded path segment is sent as is, not encoded again."""
+    path, requests = unix_socket_server
+    async with SupervisorClient(unix_socket=path) as supervisor_client:
+        await supervisor_client._client.get("test/a%2Fb%20c")
+
+    assert requests[0].raw_path == "/test/a%2Fb%20c"
+    assert requests[0].match_info["segment"] == "a/b c"
+
+
+async def test_api_host_trailing_slash(responses: aiointercept) -> None:
+    """Test a trailing slash on the API host does not double the path separator."""
+    responses.get(f"{SUPERVISOR_URL}/supervisor/ping", status=200, body="{}")
+    async with SupervisorClient(f"{SUPERVISOR_URL}/", "abc123") as supervisor_client:
+        await supervisor_client._client.get(
+            "supervisor/ping", response_type=ResponseType.NONE
+        )
+    assert list(responses.requests) == [
+        ("GET", URL(f"{SUPERVISOR_URL}/supervisor/ping"))
+    ]
+
+
 @pytest.mark.parametrize("method", ["get", "post", "put", "delete"])
 @pytest.mark.parametrize(
     ("source", "expected"), [("core.handler", "core.handler"), (None, None)]
@@ -80,6 +104,7 @@ async def unix_socket_server_fixture() -> (
 
     app = web.Application()
     app.router.add_get("/supervisor/ping", ping)
+    app.router.add_get("/test/{segment}", ping)
     runner = web.AppRunner(app)
     await runner.setup()
     # Not tmp_path, it exceeds the sun_path limit on macOS (104 bytes)

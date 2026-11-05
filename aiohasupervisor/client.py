@@ -106,10 +106,12 @@ class _SupervisorClient:
         headers: dict[str, str] | None = None,
     ) -> Response:
         """Handle a request to Supervisor."""
-        try:
-            url = URL(self.api_host).joinpath(uri)
-        except ValueError as err:
-            raise SupervisorError from err
+        # Parsing a URL string keeps percent-encoded segments as they are, where
+        # joinpath() would encode them again. A free-form value in a path must
+        # be quoted with nothing left safe by the caller building the uri, like
+        # the syslog identifier of the host logs. Most path parameters are slugs
+        # with a closed character set and need no quoting.
+        url = URL(f"{self.api_host.rstrip('/')}/{uri}")
 
         # This check is to make sure the normalized URL string is the same as the URL
         # string that was passed in. If they are different, then the passed in uri
