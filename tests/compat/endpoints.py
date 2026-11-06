@@ -176,12 +176,6 @@ OMITTED = [
     "*/logs/latest",
     "*/logs/boots/*",
     "host/logs/identifiers/*",
-    # Log endpoints of the plugins, omitted for now (no plugin clients)
-    "audio/logs*",
-    "cli/logs*",
-    "dns/logs*",
-    "multicast/logs*",
-    "observer/logs*",
     # Icon/logo endpoints, omitted for now (StoreClient)
     "*/icon",
     "*/logo",
