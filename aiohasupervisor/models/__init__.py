@@ -136,6 +136,7 @@ from aiohasupervisor.models.os import (
     YellowInfo,
     YellowOptions,
 )
+from aiohasupervisor.models.plugins import Plugin
 from aiohasupervisor.models.resolution import (
     Check,
     CheckOptions,
@@ -273,6 +274,7 @@ __all__ = [
     "OSInfo",
     "OSUpdate",
     "PartialBackupOptions",
+    "Plugin",
     "PartialRestoreOptions",
     "RaspberryPiFirmwareInfo",
     "RaucState",

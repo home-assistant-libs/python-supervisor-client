@@ -25,6 +25,7 @@ NOT_JSON = {
     "BackupsClient.download_backup",
     "HomeAssistantClient.logs",
     "HostClient.logs",
+    "PluginsClient.logs",
     "StoreClient.addon_changelog",
     "StoreClient.addon_documentation",
     "SupervisorManagementClient.logs",
