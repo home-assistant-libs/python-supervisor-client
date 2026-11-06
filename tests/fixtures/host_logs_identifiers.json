@@ -1,0 +1,11 @@
+{
+  "result": "ok",
+  "data": {
+    "identifiers": [
+      "NetworkManager",
+      "hassio_supervisor",
+      "homeassistant",
+      "kernel"
+    ]
+  }
+}

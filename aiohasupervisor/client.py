@@ -17,7 +17,12 @@ from aiohttp import (
 from multidict import MultiDict
 from yarl import URL
 
-from .const import DEFAULT_TIMEOUT, HEADER_HASS_SOURCE, ResponseType
+from .const import (
+    DEFAULT_TIMEOUT,
+    HEADER_HASS_SOURCE,
+    LOGS_TIMEOUT,
+    ResponseType,
+)
 from .exceptions import (
     ERROR_KEYS,
     SupervisorAuthenticationError,
@@ -31,7 +36,8 @@ from .exceptions import (
     SupervisorTimeoutError,
 )
 from .models.base import Response, ResultType
-from .utils.aiohttp import ResponseChunkIterator
+from .models.host import LogsOptions
+from .utils.aiohttp import ResponseChunkIterator, ResponseLineIterator
 
 VERSION = metadata.version(__package__)
 
@@ -97,12 +103,15 @@ class _SupervisorClient:
         json: dict[str, Any] | None = None,
         data: Any = None,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        headers: dict[str, str] | None = None,
     ) -> Response:
         """Handle a request to Supervisor."""
-        try:
-            url = URL(self.api_host).joinpath(uri)
-        except ValueError as err:
-            raise SupervisorError from err
+        # Parsing a URL string keeps percent-encoded segments as they are, where
+        # joinpath() would encode them again. A free-form value in a path must
+        # be quoted with PATH_SEGMENT_SAFE by the caller building the uri, like
+        # the syslog identifier of the host logs. Most path parameters are slugs
+        # with a closed character set and need no quoting.
+        url = URL(f"{self.api_host.rstrip('/')}/{uri}")
 
         # This check is to make sure the normalized URL string is the same as the URL
         # string that was passed in. If they are different, then the passed in uri
@@ -114,10 +123,14 @@ class _SupervisorClient:
         match response_type:
             case ResponseType.TEXT:
                 accept = "text/plain, */*"
+            case ResponseType.LINES:
+                # The log endpoints only accept an exact media type
+                accept = "text/plain"
             case _:
                 accept = "application/json, text/plain, */*"
 
         headers = {
+            **(headers or {}),
             "User-Agent": f"AioHASupervisor/{VERSION}",
             "Accept": accept,
         }
@@ -156,6 +169,8 @@ class _SupervisorClient:
                         return Response(ResultType.OK, await response.text())
                     case ResponseType.STREAM:
                         return Response(ResultType.OK, ResponseChunkIterator(response))
+                    case ResponseType.LINES:
+                        return Response(ResultType.OK, ResponseLineIterator(response))
                     case _:
                         # Release the connection, the body is not needed
                         response.release()
@@ -183,6 +198,7 @@ class _SupervisorClient:
         params: dict[str, str] | MultiDict[str] | None = None,
         response_type: ResponseType = ResponseType.JSON,
         timeout: ClientTimeout | None = DEFAULT_TIMEOUT,
+        headers: dict[str, str] | None = None,
     ) -> Response:
         """Handle a GET request to Supervisor."""
         return await self._request(
@@ -191,6 +207,7 @@ class _SupervisorClient:
             params=params,
             response_type=response_type,
             timeout=timeout,
+            headers=headers,
         )
 
     async def post(
@@ -262,3 +279,48 @@ class _SupervisorComponentClient:
     def __init__(self, client: _SupervisorClient) -> None:
         """Initialize sub module with client for API calls."""
         self._client = client
+
+    async def _logs(
+        self,
+        uri: str,
+        options: LogsOptions | None = None,
+        *,
+        boot: int | str | None = None,
+        follow: bool = False,
+        latest: bool = False,
+    ) -> ResponseLineIterator:
+        """Stream the lines of a journal log endpoint.
+
+        boot selects a boot by ID or offset. follow keeps streaming new lines
+        until the iterator is closed. latest returns the log since the container
+        last started, it can't be combined with boot or follow.
+        """
+        if latest and (boot is not None or follow):
+            raise ValueError("latest can't be combined with boot or follow")
+        if boot is not None:
+            uri = f"{uri}/boots/{boot}"
+        if latest:
+            uri = f"{uri}/latest"
+        elif follow:
+            uri = f"{uri}/follow"
+
+        params: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        if options:
+            if options.lines is not None:
+                params["lines"] = str(options.lines)
+            if options.format is not None:
+                params["format"] = options.format
+            if options.no_colors:
+                params["no_colors"] = ""
+            if options.range is not None:
+                headers["Range"] = options.range
+
+        result = await self._client.get(
+            uri,
+            params=params,
+            headers=headers,
+            response_type=ResponseType.LINES,
+            timeout=LOGS_TIMEOUT,
+        )
+        return result.data

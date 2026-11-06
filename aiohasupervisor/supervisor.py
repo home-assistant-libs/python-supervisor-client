@@ -4,12 +4,14 @@ from aiohttp import ClientTimeout
 
 from .client import _SupervisorComponentClient
 from .const import ResponseType
+from .models.host import LogsOptions
 from .models.supervisor import (
     SupervisorInfo,
     SupervisorOptions,
     SupervisorStats,
     SupervisorUpdateOptions,
 )
+from .utils.aiohttp import ResponseLineIterator
 
 
 class SupervisorManagementClient(_SupervisorComponentClient):
@@ -61,3 +63,20 @@ class SupervisorManagementClient(_SupervisorComponentClient):
     async def repair(self) -> None:
         """Repair local supervisor and docker setup."""
         await self._client.post("supervisor/repair")
+
+    async def logs(
+        self,
+        options: LogsOptions | None = None,
+        *,
+        boot: int | str | None = None,
+        follow: bool = False,
+        latest: bool = False,
+    ) -> ResponseLineIterator:
+        """Stream the supervisor log.
+
+        boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
+        latest returns the log since the container last started, without colors.
+        """
+        return await self._logs(
+            "supervisor/logs", options, boot=boot, follow=follow, latest=latest
+        )

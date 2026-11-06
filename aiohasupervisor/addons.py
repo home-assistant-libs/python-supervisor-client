@@ -16,6 +16,8 @@ from .models.addons import (
     InstalledAddon,
     InstalledAddonComplete,
 )
+from .models.host import LogsOptions
+from .utils.aiohttp import ResponseLineIterator
 
 
 class AddonsClient(_SupervisorComponentClient):
@@ -110,4 +112,20 @@ class AddonsClient(_SupervisorComponentClient):
         result = await self._client.get(f"addons/{addon}/stats")
         return AddonsStats.from_dict(result.data)
 
-    # Omitted for now - Log endpoints
+    async def addon_logs(
+        self,
+        addon: str,
+        options: LogsOptions | None = None,
+        *,
+        boot: int | str | None = None,
+        follow: bool = False,
+        latest: bool = False,
+    ) -> ResponseLineIterator:
+        """Stream the log of an addon.
+
+        boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
+        latest returns the log since the container last started, without colors.
+        """
+        return await self._logs(
+            f"addons/{addon}/logs", options, boot=boot, follow=follow, latest=latest
+        )

@@ -21,9 +21,13 @@ if sys.version_info >= (3, 14):
 
 # Client methods returning a value without parsing a JSON response
 NOT_JSON = {
+    "AddonsClient.addon_logs",
     "BackupsClient.download_backup",
+    "HomeAssistantClient.logs",
+    "HostClient.logs",
     "StoreClient.addon_changelog",
     "StoreClient.addon_documentation",
+    "SupervisorManagementClient.logs",
 }
 
 PARAM_RE = re.compile(r"\{[^}]*\}")

@@ -1,17 +1,17 @@
 """Utilities for interacting with aiohttp."""
 
+from abc import ABC, abstractmethod
 import asyncio
 import contextlib
 from typing import Self
 
-from aiohttp import ClientResponse
+from aiohttp import ClientError, ClientResponse
+
+from aiohasupervisor.exceptions import SupervisorConnectionError
 
 
-class ResponseChunkIterator:
-    """Async iterator over the chunks of a response body.
-
-    Yields bytes like aiohttp.streams.ChunkTupleAsyncStreamIterator, but owns the
-    response and closes it when done.
+class _ResponseIterator[T](ABC):
+    """Async iterator over a response body, which owns the response.
 
     A partially read response holds its connection until it is closed, and is
     kept alive by the connector, so it is never garbage collected. The response
@@ -20,13 +20,15 @@ class ResponseChunkIterator:
     not iteration has started. Garbage collection may happen in any thread, the
     response is then closed on the event loop. close() and aclose() must be
     called from the event loop thread, and may be called while a read is in
-    flight in another task, the pending read then raises ClientConnectionError.
+    flight in another task, the pending read then raises
+    SupervisorConnectionError.
 
     Once the body is fully read or close() is called, the iterator is exhausted
     and further iteration stops immediately. If reading raised, further reads
     raise as well, so a truncated body is not mistaken for a complete one. A
     fully read response has already released its connection, so closing it is
-    a no-op.
+    a no-op. Connection errors while reading, like Supervisor restarting in
+    the middle of a followed log, raise SupervisorConnectionError.
     """
 
     __slots__ = ("_closed", "_exhausted", "_loop", "_response")
@@ -42,20 +44,29 @@ class ResponseChunkIterator:
         """Iterate."""
         return self
 
-    async def __anext__(self) -> bytes:
-        """Yield next chunk."""
+    async def __anext__(self) -> T:
+        """Yield next item."""
         # A closed response's reader raises, so don't read from it again
         if self._exhausted:
             raise StopAsyncIteration
         try:
-            rv = await self._response.content.readchunk()
+            item = await self._read()
+        except ClientError as err:
+            self._close_response()
+            raise SupervisorConnectionError(
+                "Connection to Supervisor lost while reading the response"
+            ) from err
         except BaseException:
             self._close_response()
             raise
-        if rv == (b"", False):
+        if item is None:
             self.close()
             raise StopAsyncIteration
-        return rv[0]
+        return item
+
+    @abstractmethod
+    async def _read(self) -> T | None:
+        """Read the next item, None at the end of the body."""
 
     def _close_response(self) -> None:
         """Close the response, which makes further reads raise."""
@@ -90,3 +101,55 @@ class ResponseChunkIterator:
         # was closed concurrently, skip closing like aiohttp does.
         with contextlib.suppress(RuntimeError):
             loop.call_soon_threadsafe(self._response.close)
+
+
+class ResponseChunkIterator(_ResponseIterator[bytes]):
+    """Async iterator over the chunks of a response body.
+
+    Yields bytes like aiohttp.streams.ChunkTupleAsyncStreamIterator.
+    """
+
+    __slots__ = ()
+
+    async def _read(self) -> bytes | None:
+        """Read the next chunk."""
+        rv = await self._response.content.readchunk()
+        if rv == (b"", False):
+            return None
+        return rv[0]
+
+
+class ResponseLineIterator(_ResponseIterator[str]):
+    """Async iterator over the lines of a text response body.
+
+    Yields each line without its trailing newline, as soon as it is received.
+    """
+
+    __slots__ = ("_buffer", "_scanned")
+
+    def __init__(self, response: ClientResponse) -> None:
+        """Initialize."""
+        super().__init__(response)
+        self._buffer = bytearray()
+        self._scanned = 0
+
+    async def _read(self) -> str | None:
+        """Read the next line."""
+        # The reader's readline() raises on lines over its buffer limit, so
+        # assemble lines from chunks, which have no limit
+        content = self._response.content
+        while (end := self._buffer.find(b"\n", self._scanned)) == -1:
+            self._scanned = len(self._buffer)
+            if not (chunk := await content.readany()):
+                break
+            self._buffer += chunk
+        if end != -1:
+            line = bytes(self._buffer[:end])
+            del self._buffer[: end + 1]
+        elif self._buffer:
+            line = bytes(self._buffer)
+            self._buffer.clear()
+        else:
+            return None
+        self._scanned = 0
+        return line.decode("utf-8", errors="replace")

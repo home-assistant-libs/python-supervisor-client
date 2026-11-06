@@ -1,16 +1,29 @@
 """Test host supervisor client."""
 
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from typing import Any
 
 from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
-from aiohasupervisor import SupervisorClient
-from aiohasupervisor.models import HostInfo, HostOptions, RebootOptions, ShutdownOptions
+from aiohasupervisor import ResponseLineIterator, SupervisorClient
+from aiohasupervisor.exceptions import (
+    SupervisorBadRequestError,
+    SupervisorConnectionError,
+)
+from aiohasupervisor.models import (
+    HostInfo,
+    HostOptions,
+    LogFormat,
+    LogsOptions,
+    RebootOptions,
+    ShutdownOptions,
+)
 from aiohasupervisor.models.root import HostFeature
 
-from . import load_fixture
+from . import RequestTimeouts, load_fixture
 from .const import SUPERVISOR_URL
 
 
@@ -262,3 +275,210 @@ async def test_host_disk_usage_with_custom_depth(
     # Test that the custom max_depth parameter was used
     assert result.total_bytes == 503312781312
     assert result.used_bytes == 430243422208
+
+
+@pytest.mark.parametrize(
+    ("options", "kwargs", "path", "query", "range_header"),
+    [
+        pytest.param(None, {}, "host/logs", "", None, id="default"),
+        pytest.param(
+            LogsOptions(lines=50, format=LogFormat.VERBOSE, no_colors=True),
+            {},
+            "host/logs",
+            "?format=verbose&lines=50&no_colors=",
+            None,
+            id="options",
+        ),
+        pytest.param(
+            LogsOptions(range="entries=:-99:100"),
+            {},
+            "host/logs",
+            "",
+            "entries=:-99:100",
+            id="range",
+        ),
+        pytest.param(
+            None,
+            {"identifier": "kernel", "boot": -1},
+            "host/logs/boots/-1/identifiers/kernel",
+            "",
+            None,
+            id="boot_identifier",
+        ),
+        pytest.param(
+            None,
+            {"boot": "b2aca10d5ca54fb1b6fb35c85a0efca9", "follow": True},
+            "host/logs/boots/b2aca10d5ca54fb1b6fb35c85a0efca9/follow",
+            "",
+            None,
+            id="boot_follow",
+        ),
+        pytest.param(
+            None,
+            {"identifier": "kernel", "follow": True},
+            "host/logs/identifiers/kernel/follow",
+            "",
+            None,
+            id="identifier_follow",
+        ),
+        pytest.param(
+            None,
+            {"identifier": "foo bar"},
+            "host/logs/identifiers/foo%20bar",
+            "",
+            None,
+            id="identifier_encoded",
+        ),
+        pytest.param(
+            None,
+            {"identifier": "(sd-pam)"},
+            "host/logs/identifiers/(sd-pam)",
+            "",
+            None,
+            id="identifier_sub_delims",
+        ),
+        pytest.param(
+            None,
+            {"identifier": "user@host:1"},
+            "host/logs/identifiers/user@host:1",
+            "",
+            None,
+            id="identifier_colon_at",
+        ),
+    ],
+)
+async def test_host_logs(
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    request_timeouts: RequestTimeouts,
+    options: LogsOptions | None,
+    kwargs: dict[str, Any],
+    path: str,
+    query: str,
+    range_header: str | None,
+) -> None:
+    """Test host logs API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/{path}{query}",
+        status=200,
+        body=b"2024-07-01 10:00:00 line 1\n\nline 3\n",
+    )
+    result = await supervisor_client.host.logs(options, **kwargs)
+    assert isinstance(result, ResponseLineIterator)
+    assert [line async for line in result] == [
+        "2024-07-01 10:00:00 line 1",
+        "",
+        "line 3",
+    ]
+
+    request = responses.requests[("GET", URL(f"{SUPERVISOR_URL}/{path}{query}"))][0]
+    assert request.kwargs["headers"].get("Range") == range_header
+    assert request.kwargs["headers"]["Accept"] == "text/plain"
+    # The query is passed as params, so it is not part of the captured URL
+    timeout = request_timeouts[("GET", URL(f"{SUPERVISOR_URL}/{path}"))][0]
+    assert timeout.total is None
+    assert timeout.sock_read is None
+    assert timeout.connect == 10
+    assert timeout.sock_connect is None
+
+
+async def test_host_logs_lines(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test lines are yielded as received, without a final newline and decoded."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/logs",
+        status=200,
+        body=b"\xc3\xbcber\ninvalid \xff\nno newline",
+    )
+    result = await supervisor_client.host.logs()
+    assert await anext(result) == "über"
+    assert await anext(result) == "invalid \ufffd"
+    assert await anext(result) == "no newline"
+    assert await anext(result, None) is None
+    # Exhaustion is repeatable and the connection was released
+    assert await anext(result, None) is None
+    assert not supervisor_client._client.session.connector._acquired
+
+
+async def test_host_logs_long_line(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test a line longer than aiohttp's read buffer limit is not an error."""
+    long_line = "x" * (512 * 1024)
+    responses.get(
+        f"{SUPERVISOR_URL}/host/logs",
+        status=200,
+        body=f"first\n{long_line}\nlast\n".encode(),
+    )
+    result = await supervisor_client.host.logs()
+    assert await anext(result) == "first"
+    assert await anext(result) == long_line
+    assert await anext(result) == "last"
+    assert await anext(result, None) is None
+
+
+async def test_host_logs_disconnect(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test a log stream cut short raises a library error, not an aiohttp one."""
+
+    async def truncated_body() -> AsyncIterator[bytes]:
+        yield b"first\n"
+        raise ConnectionResetError
+
+    responses.get(f"{SUPERVISOR_URL}/host/logs", status=200, body=truncated_body())
+    result = await supervisor_client.host.logs()
+    assert await anext(result) == "first"
+    with pytest.raises(SupervisorConnectionError):
+        await anext(result)
+    # The body was cut short, so it must not look complete
+    with pytest.raises(SupervisorConnectionError):
+        await anext(result, None)
+    assert not supervisor_client._client.session.connector._acquired
+
+
+async def test_host_logs_error(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test host logs API error."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/logs",
+        status=400,
+        content_type="application/json",
+        body='{"result": "error", "message": "Invalid content type requested."}',
+    )
+    with pytest.raises(SupervisorBadRequestError, match="Invalid content type"):
+        await supervisor_client.host.logs()
+
+
+async def test_host_log_boots(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test host log boots API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/logs/boots",
+        status=200,
+        body=load_fixture("host_logs_boots.json"),
+    )
+    assert await supervisor_client.host.log_boots() == {
+        0: "b2aca10d5ca54fb1b6fb35c85a0efca9",
+        -1: "b1c386a144fd44db8f855d7e907256f8",
+    }
+
+
+async def test_host_log_identifiers(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test host log identifiers API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/host/logs/identifiers",
+        status=200,
+        body=load_fixture("host_logs_identifiers.json"),
+    )
+    assert await supervisor_client.host.log_identifiers() == [
+        "NetworkManager",
+        "hassio_supervisor",
+        "homeassistant",
+        "kernel",
+    ]

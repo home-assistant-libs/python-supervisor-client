@@ -10,6 +10,8 @@ from .models.homeassistant import (
     HomeAssistantStopOptions,
     HomeAssistantUpdateOptions,
 )
+from .models.host import LogsOptions
+from .utils.aiohttp import ResponseLineIterator
 
 
 class HomeAssistantClient(_SupervisorComponentClient):
@@ -63,4 +65,21 @@ class HomeAssistantClient(_SupervisorComponentClient):
             "core/rebuild",
             json=options.to_dict() if options else None,
             timeout=None,
+        )
+
+    async def logs(
+        self,
+        options: LogsOptions | None = None,
+        *,
+        boot: int | str | None = None,
+        follow: bool = False,
+        latest: bool = False,
+    ) -> ResponseLineIterator:
+        """Stream the Home Assistant log.
+
+        boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
+        latest returns the log since the container last started, without colors.
+        """
+        return await self._logs(
+            "core/logs", options, boot=boot, follow=follow, latest=latest
         )

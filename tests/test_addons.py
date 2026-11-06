@@ -2,12 +2,13 @@
 
 from ipaddress import IPv4Address
 import json
+from typing import Any
 
 from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
-from aiohasupervisor import SupervisorClient
+from aiohasupervisor import ResponseLineIterator, SupervisorClient
 from aiohasupervisor.exceptions import SupervisorNotFoundError
 from aiohasupervisor.models import (
     AddonBoot,
@@ -21,6 +22,7 @@ from aiohasupervisor.models import (
     AddonsUninstall,
     Capability,
     InstalledAddonComplete,
+    LogsOptions,
     StoreAddonComplete,
     SupervisorRole,
 )
@@ -314,3 +316,43 @@ async def test_addons_serialize_by_alias() -> None:
     assert addon_info.supervisor_api is True
     assert (addon_info.to_dict())["supervisor_api"] is True
     assert (addon_info.to_dict(by_alias=True))["hassio_api"] is True
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "path"),
+    [
+        pytest.param({}, "addons/core_ssh/logs", id="default"),
+        pytest.param({"latest": True}, "addons/core_ssh/logs/latest", id="latest"),
+        pytest.param({"follow": True}, "addons/core_ssh/logs/follow", id="follow"),
+        pytest.param({"boot": 0}, "addons/core_ssh/logs/boots/0", id="boot"),
+        pytest.param(
+            {"boot": -1, "follow": True},
+            "addons/core_ssh/logs/boots/-1/follow",
+            id="boot_follow",
+        ),
+    ],
+)
+async def test_addons_logs(
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    kwargs: dict[str, Any],
+    path: str,
+) -> None:
+    """Test addon logs API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/{path}?lines=10", status=200, body=b"line 1\nline 2\n"
+    )
+    result = await supervisor_client.addons.addon_logs(
+        "core_ssh", LogsOptions(lines=10), **kwargs
+    )
+    assert isinstance(result, ResponseLineIterator)
+    assert [line async for line in result] == ["line 1", "line 2"]
+
+
+@pytest.mark.parametrize("kwargs", [{"boot": 0}, {"follow": True}])
+async def test_addons_logs_latest_exclusive(
+    supervisor_client: SupervisorClient, kwargs: dict[str, Any]
+) -> None:
+    """Test latest addon logs can't be combined with a boot or follow."""
+    with pytest.raises(ValueError, match="latest can't be combined"):
+        await supervisor_client.addons.addon_logs("core_ssh", latest=True, **kwargs)

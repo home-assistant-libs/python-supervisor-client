@@ -1,18 +1,20 @@
 """Test Home Assistant supervisor client."""
 
 from ipaddress import IPv4Address
+from typing import Any
 
 from aiointercept import aiointercept
 import pytest
 from yarl import URL
 
-from aiohasupervisor import SupervisorClient
+from aiohasupervisor import ResponseLineIterator, SupervisorClient
 from aiohasupervisor.models import (
     HomeAssistantOptions,
     HomeAssistantRebuildOptions,
     HomeAssistantRestartOptions,
     HomeAssistantStopOptions,
     HomeAssistantUpdateOptions,
+    LogsOptions,
 )
 
 from . import RequestTimeouts, assert_request_timeout, load_fixture
@@ -184,3 +186,39 @@ async def test_homeassistant_rebuild(
         f"{SUPERVISOR_URL}/core/rebuild",
         has_timeout=False,
     )
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "path"),
+    [
+        pytest.param({}, "core/logs", id="default"),
+        pytest.param({"latest": True}, "core/logs/latest", id="latest"),
+        pytest.param({"follow": True}, "core/logs/follow", id="follow"),
+        pytest.param({"boot": 0}, "core/logs/boots/0", id="boot"),
+        pytest.param(
+            {"boot": -1, "follow": True}, "core/logs/boots/-1/follow", id="boot_follow"
+        ),
+    ],
+)
+async def test_homeassistant_logs(
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    kwargs: dict[str, Any],
+    path: str,
+) -> None:
+    """Test Home Assistant logs API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/{path}?lines=10", status=200, body=b"line 1\nline 2\n"
+    )
+    result = await supervisor_client.homeassistant.logs(LogsOptions(lines=10), **kwargs)
+    assert isinstance(result, ResponseLineIterator)
+    assert [line async for line in result] == ["line 1", "line 2"]
+
+
+@pytest.mark.parametrize("kwargs", [{"boot": 0}, {"follow": True}])
+async def test_homeassistant_logs_latest_exclusive(
+    supervisor_client: SupervisorClient, kwargs: dict[str, Any]
+) -> None:
+    """Test latest Home Assistant logs can't be combined with a boot or follow."""
+    with pytest.raises(ValueError, match="latest can't be combined"):
+        await supervisor_client.homeassistant.logs(latest=True, **kwargs)
