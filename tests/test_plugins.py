@@ -17,7 +17,9 @@ from .const import SUPERVISOR_URL
         pytest.param(Plugin.DNS, {}, "dns/logs", id="default"),
         pytest.param(Plugin.AUDIO, {"latest": True}, "audio/logs/latest", id="latest"),
         pytest.param(Plugin.CLI, {"follow": True}, "cli/logs/follow", id="follow"),
-        pytest.param(Plugin.MULTICAST, {"boot": 0}, "multicast/logs/boots/0", id="boot"),
+        pytest.param(
+            Plugin.MULTICAST, {"boot": 0}, "multicast/logs/boots/0", id="boot"
+        ),
         pytest.param(
             Plugin.OBSERVER,
             {"boot": -1, "follow": True},
