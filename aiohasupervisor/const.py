@@ -7,7 +7,8 @@ from aiohttp import ClientTimeout
 DEFAULT_TIMEOUT = ClientTimeout(total=10)
 TIMEOUT_60_SECONDS = ClientTimeout(total=60)
 # Logs are streamed and following has no end, so only limit connecting
-LOGS_TIMEOUT = ClientTimeout(total=None, connect=10)
+LOGS_CONNECT_TIMEOUT = 10
+LOGS_TIMEOUT = ClientTimeout(total=None, connect=LOGS_CONNECT_TIMEOUT)
 
 HEADER_HASS_SOURCE = "X-Hass-Source"
 

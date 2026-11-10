@@ -47,7 +47,7 @@ class SupervisorConnectionError(SupervisorError, ConnectionError):
 
 
 class SupervisorTimeoutError(SupervisorError, TimeoutError):
-    """Timeout connecting to supervisor."""
+    """Timeout connecting to supervisor or waiting for its response."""
 
 
 class SupervisorBadRequestError(SupervisorError):

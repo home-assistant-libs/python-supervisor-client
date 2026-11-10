@@ -120,12 +120,20 @@ class AddonsClient(_SupervisorComponentClient):
         boot: int | str | None = None,
         follow: bool = False,
         latest: bool = False,
+        read_timeout: float | None = None,
     ) -> ResponseLineIterator:
         """Stream the log of an addon.
 
         boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
         latest returns the log since the container last started, without colors.
+        read_timeout is the time in seconds to wait for the next data from
+        Supervisor, None waits forever.
         """
         return await self._logs(
-            f"addons/{addon}/logs", options, boot=boot, follow=follow, latest=latest
+            f"addons/{addon}/logs",
+            options,
+            boot=boot,
+            follow=follow,
+            latest=latest,
+            read_timeout=read_timeout,
         )

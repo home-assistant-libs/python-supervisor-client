@@ -69,19 +69,22 @@ class HostClient(_SupervisorComponentClient):
         identifier: str | None = None,
         boot: int | str | None = None,
         follow: bool = False,
+        read_timeout: float | None = None,
     ) -> ResponseLineIterator:
         """Stream the host log, limited to a syslog identifier and a boot if given.
 
         boot is a boot ID or an offset, 0 is the current boot and -1 the one before.
         identifier is a syslog identifier as returned by log_identifiers(), the
         client encodes it for the URL.
+        read_timeout is the time in seconds to wait for the next data from
+        Supervisor, None waits forever.
         """
         uri = "host/logs"
         if boot is not None:
             uri = f"{uri}/boots/{boot}"
         if identifier is not None:
             uri = f"{uri}/identifiers/{quote(identifier, safe=PATH_SEGMENT_SAFE)}"
-        return await self._logs(uri, options, follow=follow)
+        return await self._logs(uri, options, follow=follow, read_timeout=read_timeout)
 
     async def log_boots(self) -> dict[int, str]:
         """Get boot IDs by offset, 0 is the current boot and -1 the one before."""

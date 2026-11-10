@@ -7,7 +7,10 @@ from typing import Self
 
 from aiohttp import ClientError, ClientResponse
 
-from aiohasupervisor.exceptions import SupervisorConnectionError
+from aiohasupervisor.exceptions import (
+    SupervisorConnectionError,
+    SupervisorTimeoutError,
+)
 
 
 class _ResponseIterator[T](ABC):
@@ -28,7 +31,8 @@ class _ResponseIterator[T](ABC):
     raise as well, so a truncated body is not mistaken for a complete one. A
     fully read response has already released its connection, so closing it is
     a no-op. Connection errors while reading, like Supervisor restarting in
-    the middle of a followed log, raise SupervisorConnectionError.
+    the middle of a followed log, raise SupervisorConnectionError. A read
+    timeout of the response raises SupervisorTimeoutError.
     """
 
     __slots__ = ("_closed", "_exhausted", "_loop", "_response")
@@ -51,6 +55,11 @@ class _ResponseIterator[T](ABC):
             raise StopAsyncIteration
         try:
             item = await self._read()
+        except TimeoutError as err:
+            self._close_response()
+            raise SupervisorTimeoutError(
+                "Timeout waiting for Supervisor to send more of the response"
+            ) from err
         except ClientError as err:
             self._close_response()
             raise SupervisorConnectionError(

@@ -20,6 +20,7 @@ from yarl import URL
 from .const import (
     DEFAULT_TIMEOUT,
     HEADER_HASS_SOURCE,
+    LOGS_CONNECT_TIMEOUT,
     LOGS_TIMEOUT,
     ResponseType,
 )
@@ -288,12 +289,15 @@ class _SupervisorComponentClient:
         boot: int | str | None = None,
         follow: bool = False,
         latest: bool = False,
+        read_timeout: float | None = None,
     ) -> ResponseLineIterator:
         """Stream the lines of a journal log endpoint.
 
         boot selects a boot by ID or offset. follow keeps streaming new lines
         until the iterator is closed. latest returns the log since the container
-        last started, it can't be combined with boot or follow.
+        last started, it can't be combined with boot or follow. read_timeout is
+        the time in seconds to wait for the next data from Supervisor, the
+        iterator then raises SupervisorTimeoutError.
         """
         if latest and (boot is not None or follow):
             raise ValueError("latest can't be combined with boot or follow")
@@ -321,6 +325,10 @@ class _SupervisorComponentClient:
             params=params,
             headers=headers,
             response_type=ResponseType.LINES,
-            timeout=LOGS_TIMEOUT,
+            timeout=LOGS_TIMEOUT
+            if read_timeout is None
+            else ClientTimeout(
+                total=None, connect=LOGS_CONNECT_TIMEOUT, sock_read=read_timeout
+            ),
         )
         return result.data
