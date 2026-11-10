@@ -26,13 +26,12 @@ from .const import SUPERVISOR_URL
             "observer/logs/boots/-1/follow",
             id="boot_follow",
         ),
-        pytest.param("future", {}, "future/logs", id="unknown_plugin"),
     ],
 )
 async def test_plugin_logs(
     responses: aiointercept,
     supervisor_client: SupervisorClient,
-    plugin: Plugin | str,
+    plugin: Plugin,
     kwargs: dict[str, Any],
     path: str,
 ) -> None:

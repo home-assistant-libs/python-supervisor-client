@@ -11,7 +11,7 @@ class PluginsClient(_SupervisorComponentClient):
 
     async def logs(
         self,
-        plugin: Plugin | str,
+        plugin: Plugin,
         options: LogsOptions | None = None,
         *,
         boot: int | str | None = None,
