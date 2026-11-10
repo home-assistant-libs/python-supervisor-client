@@ -1,5 +1,6 @@
 """Test host supervisor client."""
 
+import asyncio
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
@@ -12,6 +13,7 @@ from aiohasupervisor import ResponseLineIterator, SupervisorClient
 from aiohasupervisor.exceptions import (
     SupervisorBadRequestError,
     SupervisorConnectionError,
+    SupervisorTimeoutError,
 )
 from aiohasupervisor.models import (
     HostInfo,
@@ -434,6 +436,42 @@ async def test_host_logs_disconnect(
         await anext(result)
     # The body was cut short, so it must not look complete
     with pytest.raises(SupervisorConnectionError):
+        await anext(result, None)
+    assert not supervisor_client._client.session.connector._acquired
+
+
+async def test_host_logs_read_timeout(
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    request_timeouts: RequestTimeouts,
+) -> None:
+    """Test a read timeout limits each read, not the whole stream."""
+    responses.get(f"{SUPERVISOR_URL}/host/logs", status=200, body=b"first\n")
+    result = await supervisor_client.host.logs(read_timeout=30)
+    assert [line async for line in result] == ["first"]
+    timeout = request_timeouts[("GET", URL(f"{SUPERVISOR_URL}/host/logs"))][0]
+    assert timeout.total is None
+    assert timeout.sock_read == 30
+    assert timeout.connect == 10
+
+
+async def test_host_logs_read_timeout_stall(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test a stalled log stream raises a timeout error, not an aiohttp one."""
+
+    async def stalled_body() -> AsyncIterator[bytes]:
+        yield b"first\n"
+        await asyncio.sleep(1)
+        yield b"never\n"
+
+    responses.get(f"{SUPERVISOR_URL}/host/logs", status=200, body=stalled_body())
+    result = await supervisor_client.host.logs(read_timeout=0.05)
+    assert await anext(result) == "first"
+    with pytest.raises(SupervisorTimeoutError):
+        await anext(result)
+    # The body was cut short, so it must not look complete
+    with pytest.raises(SupervisorTimeoutError):
         await anext(result, None)
     assert not supervisor_client._client.session.connector._acquired
 
