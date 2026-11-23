@@ -16,6 +16,7 @@ from aiohasupervisor.models import (
     AddonsOptions,
     AddonsRebuild,
     AddonsSecurityOptions,
+    AddonsSystemOptions,
     AddonStage,
     AddonStartup,
     AddonState,
@@ -284,6 +285,49 @@ async def test_addons_security(
         ]
     )
     assert request[0].kwargs["json"] == {"protected": True}
+
+
+@pytest.mark.parametrize(
+    ("options", "expected"),
+    [
+        pytest.param(
+            AddonsSystemOptions(
+                system_managed=True, system_managed_config_entry="abc123"
+            ),
+            {"system_managed": True, "system_managed_config_entry": "abc123"},
+            id="managed_with_config_entry",
+        ),
+        pytest.param(
+            AddonsSystemOptions(system_managed=False),
+            {"system_managed": False},
+            id="unmanaged",
+        ),
+        pytest.param(
+            AddonsSystemOptions(system_managed_config_entry=None),
+            {"system_managed_config_entry": None},
+            id="clear_config_entry",
+        ),
+    ],
+)
+async def test_addons_system_options(
+    responses: aiointercept,
+    supervisor_client: SupervisorClient,
+    options: AddonsSystemOptions,
+    expected: dict[str, Any],
+) -> None:
+    """Test addon system options API."""
+    responses.post(f"{SUPERVISOR_URL}/addons/core_ssh/sys_options", status=200)
+    assert (
+        await supervisor_client.addons.set_addon_system_options("core_ssh", options)
+        is None
+    )
+    assert len(responses.requests) == 1
+    assert (
+        request := responses.requests[
+            ("POST", URL(f"{SUPERVISOR_URL}/addons/core_ssh/sys_options"))
+        ]
+    )
+    assert request[0].kwargs["json"] == expected
 
 
 async def test_addons_stats(

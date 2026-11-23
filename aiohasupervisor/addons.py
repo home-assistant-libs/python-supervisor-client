@@ -12,6 +12,7 @@ from .models.addons import (
     AddonsRebuild,
     AddonsSecurityOptions,
     AddonsStats,
+    AddonsSystemOptions,
     AddonsUninstall,
     InstalledAddon,
     InstalledAddonComplete,
@@ -106,6 +107,12 @@ class AddonsClient(_SupervisorComponentClient):
     ) -> None:
         """Set security options for addon."""
         await self._client.post(f"addons/{addon}/security", json=options.to_dict())
+
+    async def set_addon_system_options(
+        self, addon: str, options: AddonsSystemOptions
+    ) -> None:
+        """Set system options for addon (only Home Assistant Core may call this)."""
+        await self._client.post(f"addons/{addon}/sys_options", json=options.to_dict())
 
     async def addon_stats(self, addon: str) -> AddonsStats:
         """Get stats for addon."""

@@ -313,6 +313,14 @@ class AddonsSecurityOptions(Options):
 
 
 @dataclass(frozen=True, slots=True)
+class AddonsSystemOptions(Options):
+    """AddonsSystemOptions model."""
+
+    system_managed: bool | None = None
+    system_managed_config_entry: str | None = DEFAULT  # type: ignore[assignment]
+
+
+@dataclass(frozen=True, slots=True)
 class AddonsStats(ContainerStats):
     """AddonsStats model."""
 
