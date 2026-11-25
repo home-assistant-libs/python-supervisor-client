@@ -2,10 +2,12 @@
 
 from .client import _SupervisorComponentClient
 from .models.homeassistant import (
+    HomeAssistantAppSocket,
     HomeAssistantInfo,
     HomeAssistantOptions,
     HomeAssistantRebuildOptions,
     HomeAssistantRestartOptions,
+    HomeAssistantSockets,
     HomeAssistantStats,
     HomeAssistantStopOptions,
     HomeAssistantUpdateOptions,
@@ -26,6 +28,14 @@ class HomeAssistantClient(_SupervisorComponentClient):
         """Get Home Assistant stats."""
         result = await self._client.get("core/stats")
         return HomeAssistantStats.from_dict(result.data)
+
+    async def sockets(self) -> list[HomeAssistantAppSocket]:
+        """Get the sockets Core listens on for apps with Core API access.
+
+        Only Home Assistant Core may call this.
+        """
+        result = await self._client.get("core/sockets")
+        return HomeAssistantSockets.from_dict(result.data).sockets
 
     async def set_options(self, options: HomeAssistantOptions) -> None:
         """Set Home Assistant options."""

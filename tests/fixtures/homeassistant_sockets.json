@@ -1,0 +1,19 @@
+{
+  "result": "ok",
+  "data": {
+    "sockets": [
+      {
+        "slug": "core_ssh",
+        "name": "Terminal & SSH",
+        "path": "/run/supervisor/core/apps/core_ssh/core.sock",
+        "role": "admin"
+      },
+      {
+        "slug": "local_future",
+        "name": "Future app",
+        "path": "/run/supervisor/core/apps/local_future/core.sock",
+        "role": "future_role"
+      }
+    ]
+  }
+}

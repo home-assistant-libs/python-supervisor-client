@@ -1,9 +1,19 @@
 """Models for Home Assistant."""
 
 from dataclasses import dataclass
+from enum import StrEnum
 from ipaddress import IPv4Address
 
 from .base import DEFAULT, ContainerStats, Options, Request, ResponseData
+
+# --- ENUMS ----
+
+
+class HomeAssistantAPIRole(StrEnum):
+    """Core group of the user an app with Core API access calls Core as."""
+
+    ADMIN = "admin"
+
 
 # --- OBJECTS ----
 
@@ -27,6 +37,27 @@ class HomeAssistantInfo(ResponseData):
     audio_output: str | None
     backups_exclude_database: bool
     duplicate_log_file: bool
+
+
+@dataclass(frozen=True, slots=True)
+class HomeAssistantAppSocket(ResponseData):
+    """Socket Core listens on for an app with Core API access.
+
+    The path is as Core sees it. A role this client does not know is kept as
+    a string.
+    """
+
+    slug: str
+    name: str
+    path: str
+    role: HomeAssistantAPIRole | str
+
+
+@dataclass(frozen=True, slots=True)
+class HomeAssistantSockets(ResponseData):
+    """HomeAssistantSockets model."""
+
+    sockets: list[HomeAssistantAppSocket]
 
 
 @dataclass(frozen=True, slots=True)

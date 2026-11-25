@@ -57,6 +57,8 @@ from aiohasupervisor.models.discovery import (
     DiscoveryConfig,
 )
 from aiohasupervisor.models.homeassistant import (
+    HomeAssistantAPIRole,
+    HomeAssistantAppSocket,
     HomeAssistantInfo,
     HomeAssistantOptions,
     HomeAssistantRebuildOptions,
@@ -224,6 +226,8 @@ __all__ = [
     "FullRestoreOptions",
     "GreenInfo",
     "GreenOptions",
+    "HomeAssistantAPIRole",
+    "HomeAssistantAppSocket",
     "HomeAssistantInfo",
     "HomeAssistantOptions",
     "HomeAssistantRebuildOptions",
