@@ -10,9 +10,16 @@ from .base import DEFAULT, ContainerStats, Options, Request, ResponseData
 
 
 class HomeAssistantAPIRole(StrEnum):
-    """Core group of the user an app with Core API access calls Core as."""
+    """HomeAssistantAPIRole type.
+
+    Core group of the user an app with Core API access calls Core as. This is an
+    incomplete list. Supervisor may add new roles as apps need other levels of
+    access. Therefore an app socket may have a role that is not in this list
+    parsed as a string on older versions of the client.
+    """
 
     ADMIN = "admin"
+    USER = "user"
 
 
 # --- OBJECTS ----
@@ -43,8 +50,7 @@ class HomeAssistantInfo(ResponseData):
 class HomeAssistantAppSocket(ResponseData):
     """Socket Core listens on for an app with Core API access.
 
-    The path is as Core sees it. A role this client does not know is kept as
-    a string.
+    The path is as Core sees it.
     """
 
     slug: str
