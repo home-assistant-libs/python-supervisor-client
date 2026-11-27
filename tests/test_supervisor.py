@@ -138,6 +138,7 @@ async def test_supervisor_options(
                 debug=True,
                 debug_block=True,
                 country="NL",
+                language="nl",
                 detect_blocking_io=DetectBlockingIO.ON_AT_STARTUP,
             )
         )
@@ -155,6 +156,7 @@ async def test_supervisor_options(
         "debug": True,
         "debug_block": True,
         "country": "NL",
+        "language": "nl",
         "detect_blocking_io": "on_at_startup",
     }
 

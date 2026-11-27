@@ -85,5 +85,6 @@ class SupervisorOptions(Options):
     force_security: bool | None = None
     auto_update: bool | None = None
     country: str | None = None
+    language: str | None = None
     detect_blocking_io: DetectBlockingIO | None = None
     feature_flags: dict[FeatureFlag, bool] | None = None
