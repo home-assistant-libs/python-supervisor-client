@@ -9,6 +9,8 @@ from yarl import URL
 
 from aiohasupervisor import ResponseLineIterator, SupervisorClient
 from aiohasupervisor.models import (
+    HomeAssistantAPIRole,
+    HomeAssistantAppSocket,
     HomeAssistantOptions,
     HomeAssistantRebuildOptions,
     HomeAssistantRestartOptions,
@@ -40,6 +42,35 @@ async def test_homeassistant_info(
     assert info.audio_input is None
     assert info.audio_output is None
     assert info.ip_address == IPv4Address("172.30.32.1")
+
+
+async def test_homeassistant_sockets(
+    responses: aiointercept, supervisor_client: SupervisorClient
+) -> None:
+    """Test Home Assistant sockets API."""
+    responses.get(
+        f"{SUPERVISOR_URL}/core/sockets",
+        status=200,
+        body=load_fixture("homeassistant_sockets.json"),
+    )
+    sockets = await supervisor_client.homeassistant.sockets()
+
+    assert sockets == [
+        HomeAssistantAppSocket(
+            slug="core_ssh",
+            name="Terminal & SSH",
+            path="/run/supervisor/core/apps/core_ssh/core.sock",
+            role=HomeAssistantAPIRole.ADMIN,
+        ),
+        # A role this client does not know is kept as a string
+        HomeAssistantAppSocket(
+            slug="local_future",
+            name="Future app",
+            path="/run/supervisor/core/apps/local_future/core.sock",
+            role="future_role",
+        ),
+    ]
+    assert isinstance(sockets[0].role, HomeAssistantAPIRole)
 
 
 async def test_homeassistant_stats(

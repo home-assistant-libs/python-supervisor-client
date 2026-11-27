@@ -93,6 +93,7 @@ ENDPOINTS = [
     Endpoint("GET", "discovery/{uuid}", lambda c, p: c.discovery.get(UUID(p[0]))),
     # Home Assistant
     Endpoint("GET", "core/info", lambda c, _: c.homeassistant.info()),
+    Endpoint("GET", "core/sockets", lambda c, _: c.homeassistant.sockets()),
     Endpoint("GET", "core/stats", lambda c, _: c.homeassistant.stats()),
     # Host
     Endpoint("GET", "host/info", lambda c, _: c.host.info()),
